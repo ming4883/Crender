@@ -1,0 +1,50 @@
+-- Scene.Vertex
+attribute vec4 i_vertex;
+attribute vec3 i_normal;
+attribute vec2 i_texcoord0;
+
+varying vec3 v_normal;
+varying vec3 v_pos;
+varying vec2 v_texcoord;
+
+uniform mat4 u_worldViewMtx;
+uniform mat4 u_worldViewProjMtx;
+
+void main() {
+	gl_Position = u_worldViewProjMtx * i_vertex;
+	v_normal = (u_worldViewMtx * vec4(i_normal, 0)).xyz;
+	v_pos = (u_worldViewMtx * i_vertex).xyz;
+	v_texcoord = i_texcoord0;
+}
+
+-- Scene.Fragment
+precision mediump float;
+
+varying vec3 v_normal;
+varying vec3 v_pos;
+varying vec2 v_texcoord;
+
+uniform vec4 u_matDiffuse;
+uniform vec4 u_matSpecular;
+uniform float u_matShininess;
+
+uniform sampler2D u_tex;
+
+void main() {
+	vec3 n = normalize(v_normal.xyz);
+	vec3 l = normalize(vec3(0,10,10) - v_pos.xyz);
+	vec3 h = normalize(l + vec3(0, 0, 1));
+	
+	if(false == gl_FrontFacing)
+		n *= -1;
+		
+	float ndl = max(0, dot(n, l)) * 0.8 + 0.2;
+	float ndh = max(0, dot(n, h));
+	ndh = pow(ndh, u_matShininess);
+	
+	vec4 color = u_matDiffuse * texture(u_tex, v_texcoord);
+	color.xyz *= ndl;
+	color.xyz += u_matSpecular.xyz * ndh;
+	
+	gl_FragColor = color;
+}

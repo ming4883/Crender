@@ -1,0 +1,25 @@
+-- Scene.Vertex
+attribute vec4 i_vertex;
+attribute vec2 i_texcoord0;
+
+varying vec2 v_texcoord;
+
+uniform mat4 u_worldViewProjMtx;
+
+void main() {
+	gl_Position = u_worldViewProjMtx * i_vertex;
+	v_texcoord = i_texcoord0;
+}
+
+-- Scene.Fragment
+precision mediump float;
+
+varying vec2 v_texcoord;
+
+uniform sampler2D u_tex;
+
+void main() {
+	
+	vec4 color = texture2D(u_tex, v_texcoord);	
+	gl_FragColor = color.bgra;
+}
