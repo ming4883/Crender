@@ -16,7 +16,7 @@ static CrMemory _crMemory =
 	crDefaultFree
 };
 
-CrMemory* crMemory()
+CR_API CrMemory* crMemory()
 {
 	return &_crMemory;
 }

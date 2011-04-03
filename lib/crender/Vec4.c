@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-CrVec4 crVec4(float x, float y, float z, float w)
+CR_API CrVec4 crVec4(float x, float y, float z, float w)
 {
 	CrVec4 _out;
 	_out.x = x;
@@ -13,7 +13,7 @@ CrVec4 crVec4(float x, float y, float z, float w)
 	return _out;
 }
 
-CrVec4 crVec4FromVec3(const CrVec3* xyz, float w)
+CR_API CrVec4 crVec4FromVec3(const CrVec3* xyz, float w)
 {
 	CrVec4 _out;
 	_out.x = xyz->x;
@@ -29,43 +29,32 @@ static const CrVec4 _CrVec4_c0100 = {0, 1, 0, 0};
 static const CrVec4 _CrVec4_c0010 = {0, 0, 1, 0};
 static const CrVec4 _CrVec4_c0001 = {0, 0, 0, 1};
 
-const CrVec4* CrVec4_c0000()
+CR_API const CrVec4* CrVec4_c0000()
 {
 	return &_CrVec4_c0000;
 }
 
-const CrVec4* CrVec4_c1000()
+CR_API const CrVec4* CrVec4_c1000()
 {
 	return &_CrVec4_c1000;
 }
 
-const CrVec4* CrVec4_c0100()
+CR_API const CrVec4* CrVec4_c0100()
 {
 	return &_CrVec4_c0100;
 }
 
-const CrVec4* CrVec4_c0010()
+CR_API const CrVec4* CrVec4_c0010()
 {
 	return &_CrVec4_c0010;
 }
 
-const CrVec4* CrVec4_c0001()
+CR_API const CrVec4* CrVec4_c0001()
 {
 	return &_CrVec4_c0001;
 }
 
-void crVec4Set(CrVec4* _out, float x, float y, float z, float w)
-{
-	if(nullptr == _out)
-		return;
-
-	_out->x = x;
-	_out->y = y;
-	_out->z = z;
-	_out->w = w;
-}
-
-CrBool crVec4IsEqual(const CrVec4* a, const CrVec4* b, float epsilon)
+CR_API CrBool crVec4IsEqual(const CrVec4* a, const CrVec4* b, float epsilon)
 {
 	float ex = a->x - b->x;
 	float ey = a->y - b->y;
@@ -78,7 +67,7 @@ CrBool crVec4IsEqual(const CrVec4* a, const CrVec4* b, float epsilon)
 	return CrFalse;
 }
 
-CrVec4* crVec4Add(CrVec4* _out, const CrVec4* a, const CrVec4* b)
+CR_API CrVec4* crVec4Add(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 {
 	_out->x = a->x + b->x;
 	_out->y = a->y + b->y;
@@ -87,7 +76,7 @@ CrVec4* crVec4Add(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 	return _out;
 }
 
-CrVec4* crVec4Sub(CrVec4* _out, const CrVec4* a, const CrVec4* b)
+CR_API CrVec4* crVec4Sub(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 {
 	_out->x = a->x - b->x;
 	_out->y = a->y - b->y;
@@ -96,7 +85,7 @@ CrVec4* crVec4Sub(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 	return _out;
 }
 
-CrVec4* crVec4Mult(CrVec4* _out, const CrVec4* a, const CrVec4* b)
+CR_API CrVec4* crVec4Mult(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 {
 	_out->x = a->x * b->x;
 	_out->y = a->y * b->y;
@@ -105,7 +94,7 @@ CrVec4* crVec4Mult(CrVec4* _out, const CrVec4* a, const CrVec4* b)
 	return _out;
 }
 
-CrVec4* crVec4MultS(CrVec4* _out, const CrVec4* a, float b)
+CR_API CrVec4* crVec4MultS(CrVec4* _out, const CrVec4* a, float b)
 {
 	_out->x = a->x * b;
 	_out->y = a->y * b;
@@ -114,29 +103,29 @@ CrVec4* crVec4MultS(CrVec4* _out, const CrVec4* a, float b)
 	return _out;
 }
 
-float crVec4Dot(const CrVec4* a, const CrVec4* b)
+CR_API float crVec4Dot(const CrVec4* a, const CrVec4* b)
 {
 	return (a->x * b->x) + (a->y * b->y) + (a->z * b->z) + (a->w * b->w);
 }
 
-float crVec4SqLength(const CrVec4* a)
+CR_API float crVec4SqLength(const CrVec4* a)
 {
 	return crVec4Dot(a, a);
 }
 
-float crVec4Length(const CrVec4* a)
+CR_API float crVec4Length(const CrVec4* a)
 {
 	return sqrtf(crVec4SqLength(a));
 }
 
-float crVec4Distance(const CrVec4* a, const CrVec4* b)
+CR_API float crVec4Distance(const CrVec4* a, const CrVec4* b)
 {
 	CrVec4 diff;
 	crVec4Sub(&diff, a, b);
 	return crVec4Length(&diff);
 }
 
-float crVec4Normalize(CrVec4* a)
+CR_API float crVec4Normalize(CrVec4* a)
 {
 	float len = crVec4Length(a);
 	
@@ -153,7 +142,7 @@ float crVec4Normalize(CrVec4* a)
 	return len;
 }
 
-CrVec4 crVec4NormalizedCopy(const CrVec4* a)
+CR_API CrVec4 crVec4NormalizedCopy(const CrVec4* a)
 {
 	CrVec4 _out = *a;
 	crVec4Normalize(&_out);

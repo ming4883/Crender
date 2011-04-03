@@ -41,17 +41,17 @@ typedef struct CrBuffer
 
 } CrBuffer;
 
-CrBuffer* crBufferAlloc();
+CR_API CrBuffer* crBufferAlloc();
 
-void crBufferFree(CrBuffer* self);
+CR_API void crBufferFree(CrBuffer* self);
 
-CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData);
+CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData);
 
-void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBytes, void* data);
+CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBytes, void* data);
 
-void* crBufferMap(CrBuffer* self, CrBufferMapAccess usage);
+CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess usage);
 
-void crBufferUnmap(CrBuffer* self);
+CR_API void crBufferUnmap(CrBuffer* self);
 
 #ifdef __cplusplus
 }

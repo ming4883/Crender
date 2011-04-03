@@ -4,14 +4,14 @@
 #include "Memory.h"
 #include <stdio.h>
 
-CrGpuShader* crGpuShaderAlloc()
+CR_API CrGpuShader* crGpuShaderAlloc()
 {
 	CrGpuShaderImpl* self = crMemory()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
 	memset(self, 0, sizeof(CrGpuShaderImpl));
 	return &self->i;
 }
 
-CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type)
+CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type)
 {
 	HRESULT hr;
 	ID3DXBuffer* code;
@@ -81,7 +81,7 @@ CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, C
 	return CrTrue;
 }
 
-void crGpuShaderFree(CrGpuShader* self)
+CR_API void crGpuShaderFree(CrGpuShader* self)
 {
 	CrGpuShaderImpl* impl = (CrGpuShaderImpl*)self;
 
@@ -104,14 +104,14 @@ void crGpuShaderFree(CrGpuShader* self)
 	crMemory()->free(self, "crGpuShader");
 }
 
-CrGpuProgram* crGpuProgramAlloc()
+CR_API CrGpuProgram* crGpuProgramAlloc()
 {
 	CrGpuProgramImpl* self = crMemory()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
 	memset(self, 0, sizeof(CrGpuProgramImpl));
 	return &self->i;
 }
 
-void crGpuProgramUniformCollect(CrGpuShader* self, CrGpuProgramUniform** table, CrGpuProgramUniform** uniforms)
+CR_API void crGpuProgramUniformCollect(CrGpuShader* self, CrGpuProgramUniform** table, CrGpuProgramUniform** uniforms)
 {
 	UINT i;
 	ID3DXConstantTable* constTable = ((CrGpuShaderImpl*)self)->constTable;
@@ -148,7 +148,7 @@ void crGpuProgramUniformCollect(CrGpuShader* self, CrGpuProgramUniform** table, 
 	}
 }
 
-CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt)
+CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 	CrGpuShader* vs = nullptr;
@@ -203,7 +203,7 @@ CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shader
 	
 }
 
-void crGpuProgramFree(CrGpuProgram* self)
+CR_API void crGpuProgramFree(CrGpuProgram* self)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
@@ -233,7 +233,7 @@ void crGpuProgramFree(CrGpuProgram* self)
 	crMemory()->free(self, "crGpuProgram");
 }
 
-void crGpuProgramPreRender(CrGpuProgram* self)
+CR_API void crGpuProgramPreRender(CrGpuProgram* self)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
@@ -249,7 +249,7 @@ void crGpuProgramPreRender(CrGpuProgram* self)
 	IDirect3DDevice9_SetPixelShader(crAPI.d3ddev, impl->d3dps);
 }
 
-CrBool crGpuProgramUniformfv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniformfv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -275,28 +275,27 @@ CrBool crGpuProgramUniformfv(CrGpuProgram* self, CrHashCode hash, size_t count, 
 	return CrTrue;
 }
 
-
-CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	return crGpuProgramUniformfv(self, hash, count, value);
 }
 
-CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	return crGpuProgramUniformfv(self, hash, count, value);
 }
 
-CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	return crGpuProgramUniformfv(self, hash, count, value);
 }
 
-CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	return crGpuProgramUniformfv(self, hash, count, value);
 }
 
-CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value)
+CR_API CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value)
 {
 	return crGpuProgramUniformfv(self, hash, count, value);
 }
@@ -333,7 +332,7 @@ static D3DTEXTUREADDRESS crD3D9_SAMPLER_ADDRESS[] = {
 	D3DTADDRESS_CLAMP,
 };
 
-CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler)
+CR_API CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -508,52 +507,52 @@ void crGpuProgramBindVertexDecl(CrGpuProgram* self, size_t gpuInputId, CrGpuProg
 	IDirect3DDevice9_SetVertexDeclaration(crAPI.d3ddev, ia->d3ddecl);
 }
 
-size_t crGenGpuInputId()
+CR_API size_t crGenGpuInputId()
 {
 	return ++crAPI.gpuInputId;
 }
 
-void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
+CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	crGpuProgramBindBuffer(self, inputs, count);
 	crGpuProgramBindVertexDecl(self, gpuInputId, inputs, count);
 }
 
-void crGpuDrawPoint(size_t offset, size_t count)
+CR_API void crGpuDrawPoint(size_t offset, size_t count)
 {
 	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, D3DPT_POINTLIST, offset, count);
 }
 
-void crGpuDrawLine(size_t offset, size_t count, size_t flags)
+CR_API void crGpuDrawLine(size_t offset, size_t count, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_LINESTRIP : D3DPT_LINELIST;
 	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, mode, offset, count / 2);
 }
 
-void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
+CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_LINESTRIP : D3DPT_LINELIST;
 	IDirect3DDevice9_DrawIndexedPrimitive(crAPI.d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 2);
 }
 
-void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
+CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_TRIANGLESTRIP : D3DPT_TRIANGLELIST;
 	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, mode, offset, count / 3);
 }
 
-void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
+CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_TRIANGLESTRIP : D3DPT_TRIANGLELIST;
 	IDirect3DDevice9_DrawIndexedPrimitive(crAPI.d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 3);
 }
 
-void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)
+CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)
 {
 	// not supported
 }
 
-void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags)
+CR_API void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags)
 {
 	// not supported
 }

@@ -27,23 +27,23 @@ typedef struct CrRenderBuffer
 	struct CrTexture* texture;
 } CrRenderBuffer;
 
-CrRenderTarget* crRenderTargetAlloc();
+CR_API CrRenderTarget* crRenderTargetAlloc();
 
-void crRenderTargetFree(CrRenderTarget* self);
+CR_API void crRenderTargetFree(CrRenderTarget* self);
 
-void crRenderTargetInit(CrRenderTarget* self);
+CR_API void crRenderTargetInit(CrRenderTarget* self);
 
-CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format);
+CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format);
 
-void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer);
+CR_API void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer);
 
-void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth);
+CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth);
 
-void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax);
+CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax);
 
-void crRenderTargetClearColor(float r, float g, float b, float a);
+CR_API void crRenderTargetClearColor(float r, float g, float b, float a);
 
-void crRenderTargetClearDepth(float z);
+CR_API void crRenderTargetClearDepth(float z);
 
 #ifdef __cplusplus
 }

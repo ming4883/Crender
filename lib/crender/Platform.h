@@ -19,6 +19,20 @@
 #include "pstdint.h"
 #endif
 
+#if defined(_MSC_VER)
+#	if defined(CR_USE_DLL)
+#		if(CR_DLL_EXPORT)
+#			define CR_API __declspec(dllexport)
+#		else
+#			define CR_API __declspec(dllimport)
+#		endif
+#	else
+#		define CR_API
+#	endif
+#else
+#	define CR_API
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +43,7 @@ typedef uint8_t CrBool;
 #define CrFalse 0
 #define CrTrue 1
 
-void crDbgStr(const char* str, ...);
+CR_API void crDbgStr(const char* str, ...);
 
 #define crCountOf(A) (sizeof(A) / sizeof(A[0]))
 

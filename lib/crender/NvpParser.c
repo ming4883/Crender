@@ -1,20 +1,20 @@
 #include "NvpParser.h"
 #include "Memory.h"
 
-CrNvpParser* crNvpParserAlloc()
+CR_API CrNvpParser* crNvpParserAlloc()
 {
 	CrNvpParser* self = crMemory()->alloc(sizeof(CrNvpParser), "CrNvpParser");
 	memset(self, 0, sizeof(CrNvpParser));
 	return self;
 }
 
-void crNvpParserFree(CrNvpParser* self)
+CR_API void crNvpParserFree(CrNvpParser* self)
 {
 	crMemory()->free(self->mStr, "CrNvpParser");
 	crMemory()->free(self, "CrNvpParser");
 }
 
-void crNvpParserInit(CrNvpParser* self, const char* str)
+CR_API void crNvpParserInit(CrNvpParser* self, const char* str)
 {
 	self->mStr = self->mPos = crMemory()->alloc(strlen(str), "CrNvpParser");
 	memcpy(self->mStr, str, strlen(str));
@@ -58,7 +58,7 @@ void skipNonSeps(char** pos)
 	} while(advancePos(pos));
 }
 
-CrBool crNvpParserNext(CrNvpParser* self, const char** name, const char** value)
+CR_API CrBool crNvpParserNext(CrNvpParser* self, const char** name, const char** value)
 {
 	static const char cQuots[] = "'\"";
 	char* name_;

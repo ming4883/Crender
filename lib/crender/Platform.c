@@ -11,7 +11,7 @@
 
 #include <windows.h>
 
-void crDbgStr(const char* str, ...)
+CR_API void crDbgStr(const char* str, ...)
 {
 	char msg[1024] = {0};
 
@@ -26,7 +26,7 @@ void crDbgStr(const char* str, ...)
 
 #include <android/log.h>
 
-void crDbgStr(const char* str, ...)
+CR_API void crDbgStr(const char* str, ...)
 {
 	va_list args;
 
@@ -39,7 +39,7 @@ void crDbgStr(const char* str, ...)
 
 #include <stdarg.h>
 
-void crDbgStr(const char* str, ...)
+CR_API void crDbgStr(const char* str, ...)
 {
 	char msg[1024] = {0};
 

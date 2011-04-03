@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-CrMat44 crMat44(
+CR_API CrMat44 crMat44(
 	float m00, float m01, float m02, float m03,
 	float m10, float m11, float m12, float m13,
 	float m20, float m21, float m22, float m23,
@@ -19,7 +19,7 @@ CrMat44 crMat44(
 	return self;
 }
 
-void crMat44Mult(CrMat44* _out, const CrMat44* a, const CrMat44* b)
+CR_API void crMat44Mult(CrMat44* _out, const CrMat44* a, const CrMat44* b)
 {
 	CrMat44 ta = *a;
 	CrMat44 tb = *b;
@@ -45,7 +45,7 @@ void crMat44Mult(CrMat44* _out, const CrMat44* a, const CrMat44* b)
 	_out->m33 = ta.m30 * tb.m03 + ta.m31 * tb.m13 + ta.m32 * tb.m23 + ta.m33 * tb.m33;
 }
 
-CrBool crMat44Inverse(CrMat44* _out, const CrMat44* m)
+CR_API CrBool crMat44Inverse(CrMat44* _out, const CrMat44* m)
 {
 	float invDet;
 
@@ -107,7 +107,7 @@ CrBool crMat44Inverse(CrMat44* _out, const CrMat44* m)
 	return CrTrue;
 }
 
-void crMat44Transpose(CrMat44* _out, const CrMat44* m)
+CR_API void crMat44Transpose(CrMat44* _out, const CrMat44* m)
 {
 	CrMat44 t = *m;
 	_out->m00 = t.m00; _out->m01 = t.m10; _out->m02 = t.m20; _out->m03 = t.m30;
@@ -116,7 +116,7 @@ void crMat44Transpose(CrMat44* _out, const CrMat44* m)
 	_out->m30 = t.m03; _out->m31 = t.m13; _out->m32 = t.m23; _out->m33 = t.m33;
 }
 
-void crMat44Transform(CrVec4* _out, const CrMat44* m)
+CR_API void crMat44Transform(CrVec4* _out, const CrMat44* m)
 {
 	CrVec4 v = *_out;
 	_out->x = m->m00 * v.x + m->m01 * v.y + m->m02 * v.z + m->m03 * v.w;
@@ -125,7 +125,7 @@ void crMat44Transform(CrVec4* _out, const CrMat44* m)
 	_out->w = m->m30 * v.x + m->m31 * v.y + m->m32 * v.z + m->m33 * v.w;
 }
 
-void crMat44TransformPlane(CrVec4* _out, const CrMat44* m)
+CR_API void crMat44TransformPlane(CrVec4* _out, const CrMat44* m)
 {
 	/*
 	CrVec4 v = *_out;
@@ -136,7 +136,7 @@ void crMat44TransformPlane(CrVec4* _out, const CrMat44* m)
 	*/
 }
 
-void crMat44TransformAffineDir(CrVec3* _out, const CrMat44* m)
+CR_API void crMat44TransformAffineDir(CrVec3* _out, const CrMat44* m)
 {
 	CrVec3 v = *_out;
 	_out->x = m->m00 * v.x + m->m01 * v.y + m->m02 * v.z;
@@ -144,7 +144,7 @@ void crMat44TransformAffineDir(CrVec3* _out, const CrMat44* m)
 	_out->z = m->m20 * v.x + m->m21 * v.y + m->m22 * v.z;
 }
 
-void crMat44TransformAffinePt(CrVec3* _out, const CrMat44* m)
+CR_API void crMat44TransformAffinePt(CrVec3* _out, const CrMat44* m)
 {
 	CrVec3 v = *_out;
 	_out->x = m->m00 * v.x + m->m01 * v.y + m->m02 * v.z + m->m03;
@@ -152,7 +152,7 @@ void crMat44TransformAffinePt(CrVec3* _out, const CrMat44* m)
 	_out->z = m->m20 * v.x + m->m21 * v.y + m->m22 * v.z + m->m23;
 }
 
-void crMat44TransformAffineDirs(CrVec3* _out, const CrVec3* _in, size_t cnt, const CrMat44* m)
+CR_API void crMat44TransformAffineDirs(CrVec3* _out, const CrVec3* _in, size_t cnt, const CrMat44* m)
 {
 	size_t i = 0;
 	for(i = 0; i < cnt; ++i) {
@@ -162,7 +162,7 @@ void crMat44TransformAffineDirs(CrVec3* _out, const CrVec3* _in, size_t cnt, con
 	}
 }
 
-void crMat44TransformAffinePts(CrVec3* _out, const CrVec3* _in, size_t cnt, const CrMat44* m)
+CR_API void crMat44TransformAffinePts(CrVec3* _out, const CrVec3* _in, size_t cnt, const CrMat44* m)
 {
 	size_t i = 0;
 	for(i = 0; i < cnt; ++i) {
@@ -172,7 +172,7 @@ void crMat44TransformAffinePts(CrVec3* _out, const CrVec3* _in, size_t cnt, cons
 	}
 }
 
-void crMat44SetIdentity(CrMat44* _out)
+CR_API void crMat44SetIdentity(CrMat44* _out)
 {
 	_out->m00 = 1; _out->m01 = 0; _out->m02 = 0; _out->m03 = 0;
 	_out->m10 = 0; _out->m11 = 1; _out->m12 = 0; _out->m13 = 0;
@@ -180,21 +180,21 @@ void crMat44SetIdentity(CrMat44* _out)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44SetTranslation(CrMat44* _out, const CrVec3* v)
+CR_API void crMat44SetTranslation(CrMat44* _out, const CrVec3* v)
 {
 	_out->m03 = v->x;
 	_out->m13 = v->y;
 	_out->m23 = v->z;
 }
 
-void crMat44GetTranslation(CrVec3* v, const CrMat44* m)
+CR_API void crMat44GetTranslation(CrVec3* v, const CrMat44* m)
 {
 	v->x = m->m03;
 	v->y = m->m13;
 	v->z = m->m23;
 }
 
-void crMat44MakeTranslation(CrMat44* _out, const CrVec3* v)
+CR_API void crMat44MakeTranslation(CrMat44* _out, const CrVec3* v)
 {
 	_out->m00 = 1; _out->m01 = 0; _out->m02 = 0; _out->m03 = v->x;
 	_out->m10 = 0; _out->m11 = 1; _out->m12 = 0; _out->m13 = v->y;
@@ -202,7 +202,7 @@ void crMat44MakeTranslation(CrMat44* _out, const CrVec3* v)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44MakeScale(CrMat44* _out, const CrVec3* v)
+CR_API void crMat44MakeScale(CrMat44* _out, const CrVec3* v)
 {
 	_out->m00 = v->x; _out->m01 = 0; _out->m02 = 0; _out->m03 = 0;
 	_out->m10 = 0; _out->m11 = v->y; _out->m12 = 0; _out->m13 = 0;
@@ -210,7 +210,7 @@ void crMat44MakeScale(CrMat44* _out, const CrVec3* v)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44MakeRotationX(CrMat44* _out, float angleInDeg)
+CR_API void crMat44MakeRotationX(CrMat44* _out, float angleInDeg)
 {
 	float a = angleInDeg * 3.1415926f / 180;
 	float sa = sinf(a);
@@ -222,7 +222,7 @@ void crMat44MakeRotationX(CrMat44* _out, float angleInDeg)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44MakeRotationY(CrMat44* _out, float angleInDeg)
+CR_API void crMat44MakeRotationY(CrMat44* _out, float angleInDeg)
 {
 	float a = angleInDeg * 3.1415926f / 180;
 	float sa = sinf(a);
@@ -234,7 +234,7 @@ void crMat44MakeRotationY(CrMat44* _out, float angleInDeg)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44MakeRotationZ(CrMat44* _out, float angleInDeg)
+CR_API void crMat44MakeRotationZ(CrMat44* _out, float angleInDeg)
 {
 	float a = angleInDeg * 3.1415926f / 180;
 	float sa = sinf(a);
@@ -246,7 +246,7 @@ void crMat44MakeRotationZ(CrMat44* _out, float angleInDeg)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44MakeRotation(CrMat44* _out, const CrVec3* axis, float angleInDeg)
+CR_API void crMat44MakeRotation(CrMat44* _out, const CrVec3* axis, float angleInDeg)
 {
 	float a = angleInDeg * 3.1415926f / 180;
 	float sa = sinf(a);
@@ -277,7 +277,7 @@ void crMat44MakeRotation(CrMat44* _out, const CrVec3* axis, float angleInDeg)
 	_out->m30 = 0; _out->m31 = 0; _out->m32 = 0; _out->m33 = 1;
 }
 
-void crMat44GetBasis(CrVec3* xaxis, CrVec3* yaxis, CrVec3* zaxis, const CrMat44* m)
+CR_API void crMat44GetBasis(CrVec3* xaxis, CrVec3* yaxis, CrVec3* zaxis, const CrMat44* m)
 {
 	// reference: http://web.archive.org/web/20041029003853/http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q5
 	xaxis->x = m->m00;
@@ -293,7 +293,7 @@ void crMat44GetBasis(CrVec3* xaxis, CrVec3* yaxis, CrVec3* zaxis, const CrMat44*
 	zaxis->z = m->m22;
 }
 
-void crMat44CameraLookAt(CrMat44* _out, const CrVec3* eyeAt, const CrVec3* lookAt, const CrVec3* eyeUp)
+CR_API void crMat44CameraLookAt(CrMat44* _out, const CrVec3* eyeAt, const CrVec3* lookAt, const CrVec3* eyeUp)
 {
 	CrVec3 fwd, side, up;
 
@@ -319,7 +319,7 @@ void crMat44CameraLookAt(CrMat44* _out, const CrVec3* eyeAt, const CrVec3* lookA
 	_out->m23 = -crVec3Dot(&fwd, eyeAt);
 }
 
-void crMat44Prespective(CrMat44* _out, float fovyDeg, float aspect, float znear, float zfar)
+CR_API void crMat44Prespective(CrMat44* _out, float fovyDeg, float aspect, float znear, float zfar)
 {
 	float f = 1 / tanf((fovyDeg * 3.1415926f / 180) * 0.5f);
 	float nf = 1 / (znear - zfar);
@@ -333,7 +333,7 @@ void crMat44Prespective(CrMat44* _out, float fovyDeg, float aspect, float znear,
 	_out->m33 = 0;
 }
 
-void crMat44PlanarReflect(CrMat44* _out, const CrVec3* normal, const CrVec3* point)
+CR_API void crMat44PlanarReflect(CrMat44* _out, const CrVec3* normal, const CrVec3* point)
 {
 	float vxx = -2 * normal->x * normal->x;
 	float vxy = -2 * normal->x * normal->y;

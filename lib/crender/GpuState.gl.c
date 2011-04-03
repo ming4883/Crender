@@ -1,14 +1,14 @@
 #include "GpuState.gl.h"
 #include "Memory.h"
 
-CrGpuState* crGpuStateAlloc()
+CR_API CrGpuState* crGpuStateAlloc()
 {
 	CrGpuStateImpl* self = crMemory()->alloc(sizeof(CrGpuStateImpl), "CrGpuState");
 	memset(self, 0, sizeof(CrGpuStateImpl));
 	return &self->i;
 }
 
-void crGpuStateFree(CrGpuState* self)
+CR_API void crGpuStateFree(CrGpuState* self)
 {
 	if(nullptr == self)
 		return;
@@ -16,7 +16,7 @@ void crGpuStateFree(CrGpuState* self)
 	crMemory()->free(self, "CrGpuState");
 }
 
-void crGpuStateInit(CrGpuState* self)
+CR_API void crGpuStateInit(CrGpuState* self)
 {
 	self->desc.depthTest = CrTrue;
 	self->desc.depthWrite = CrTrue;
@@ -51,7 +51,7 @@ static GLenum CrGpuState_polygonModeMapping[] = {
 };
 #endif
 
-void crGpuStatePreRender(CrGpuState* self)
+CR_API void crGpuStatePreRender(CrGpuState* self)
 {
 	if(self->desc.depthTest)
 		glEnable(GL_DEPTH_TEST);

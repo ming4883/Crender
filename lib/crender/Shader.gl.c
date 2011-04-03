@@ -14,14 +14,14 @@ static GLenum crGL_SHADER_TYPE[] = {
 #endif
 };
 
-CrGpuShader* crGpuShaderAlloc()
+CR_API CrGpuShader* crGpuShaderAlloc()
 {
 	CrGpuShaderImpl* self = crMemory()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
 	memset(self, 0, sizeof(CrGpuShaderImpl));
 	return &self->i;
 }
 
-CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type)
+CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type)
 {
 	int compileStatus;
 	CrGpuShaderImpl* impl = (CrGpuShaderImpl*)self;
@@ -59,7 +59,7 @@ CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, C
 	return CrTrue;
 }
 
-void crGpuShaderFree(CrGpuShader* self)
+CR_API void crGpuShaderFree(CrGpuShader* self)
 {
 	CrGpuShaderImpl* impl = (CrGpuShaderImpl*)self;
 
@@ -70,14 +70,14 @@ void crGpuShaderFree(CrGpuShader* self)
 	crMemory()->free(self, "CrGpuShader");
 }
 
-CrGpuProgram* crGpuProgramAlloc()
+CR_API CrGpuProgram* crGpuProgramAlloc()
 {
 	CrGpuProgramImpl* self = crMemory()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
 	memset(self, 0, sizeof(CrGpuProgramImpl));
 	return &self->i;
 }
 
-CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt)
+CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt)
 {
 	size_t i;
 	int linkStatus;
@@ -119,7 +119,7 @@ CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shader
 
 	// query all cache
 	{
-		GLuint i;
+		GLint i;
 		GLint uniformCnt;
 		GLsizei uniformLength;
 		GLint uniformSize;
@@ -174,7 +174,7 @@ CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shader
 
 }
 
-void crGpuProgramFree(CrGpuProgram* self)
+CR_API void crGpuProgramFree(CrGpuProgram* self)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 	if(nullptr == self)
@@ -191,7 +191,7 @@ void crGpuProgramFree(CrGpuProgram* self)
 	crMemory()->free(self, "CrGpuProgram");
 }
 
-void crGpuProgramPreRender(CrGpuProgram* self)
+CR_API void crGpuProgramPreRender(CrGpuProgram* self)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
@@ -206,7 +206,7 @@ void crGpuProgramPreRender(CrGpuProgram* self)
 	glUseProgram(impl->glName);
 }
 
-CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -227,7 +227,7 @@ CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count,
 	return CrTrue;
 }
 
-CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -248,7 +248,7 @@ CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count,
 	return CrTrue;
 }
 
-CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -269,7 +269,7 @@ CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count,
 	return CrTrue;
 }
 
-CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
+CR_API CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -290,7 +290,7 @@ CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count,
 	return CrTrue;
 }
 
-CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value)
+CR_API CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -334,7 +334,7 @@ static GLenum crGL_SAMPLER_ADDRESS[] = {
 	GL_CLAMP_TO_EDGE,
 };
 
-CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler)
+CR_API CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler)
 {
 	CrGpuProgramUniform* uniform;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -396,12 +396,12 @@ CrInputGpuFormatMapping* crInputGpuFormatMappingGet(CrGpuFormat crFormat)
 	return nullptr;
 }
 
-size_t crGenGpuInputId()
+CR_API size_t crGenGpuInputId()
 {
 	return ++crAPI.gpuInputId;
 }
 
-void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
+CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
@@ -442,18 +442,18 @@ static GLenum crGL_INDEX_TYPE[] = {
 	GL_UNSIGNED_INT,
 };
 
-void crGpuDrawPoint(size_t offset, size_t count)
+CR_API void crGpuDrawPoint(size_t offset, size_t count)
 {
 	glDrawArrays(GL_POINTS, offset, count);
 }
 
-void crGpuDrawLine(size_t offset, size_t count, size_t flags)
+CR_API void crGpuDrawLine(size_t offset, size_t count, size_t flags)
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_LINE_STRIP : GL_LINES;
 	glDrawArrays(mode, offset, count);
 }
 
-void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
+CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_LINE_STRIP : GL_LINES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
@@ -464,13 +464,13 @@ void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t max
 #endif
 }
 
-void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
+CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	glDrawArrays(mode, offset, count);
 }
 
-void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
+CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
@@ -481,7 +481,7 @@ void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t
 #endif
 }
 
-void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)
+CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)
 {
 #if !defined(CR_GLES_2)
 	GLenum mode = GL_PATCHES;
@@ -492,7 +492,7 @@ void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t f
 #endif
 }
 
-void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags)
+CR_API void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags)
 {
 #if !defined(CR_GLES_2)
 	GLenum mode = GL_PATCHES;

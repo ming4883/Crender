@@ -1,14 +1,14 @@
 #include "RenderTarget.d3d9.h"
 #include "Memory.h"
 
-CrRenderTarget* crRenderTargetAlloc()
+CR_API CrRenderTarget* crRenderTargetAlloc()
 {
 	CrRenderTargetImpl* self = crMemory()->alloc(sizeof(CrRenderTargetImpl), "CrRenderTarget");
 	memset(self, 0, sizeof(CrRenderTargetImpl));
 	return &self->i;
 }
 
-void crRenderTargetFree(CrRenderTarget* self)
+CR_API void crRenderTargetFree(CrRenderTarget* self)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -26,7 +26,7 @@ void crRenderTargetFree(CrRenderTarget* self)
 	crMemory()->free(self, "CrRenderTarget");
 }
 
-void crRenderTargetInit(CrRenderTarget* self)
+CR_API void crRenderTargetInit(CrRenderTarget* self)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -47,7 +47,7 @@ D3DFORMAT crD3D9_DEPTH_FORMAT[] = {
 	D3DFMT_D24S8,
 };
 
-CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format)
+CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -88,7 +88,7 @@ CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, 
 	return &buffer->i;
 }
 
-void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer)
+CR_API void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer)
 {
 	if(nullptr == self)
 		return;
@@ -99,7 +99,7 @@ void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer)
 	((CrRenderBufferImpl*)buffer)->acquired = CrFalse;
 }
 
-void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth)
+CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -134,7 +134,7 @@ void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRe
 	}
 }
 
-void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
+CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
 {
 	D3DVIEWPORT9 vp;
 	vp.X = (DWORD)x;
@@ -147,12 +147,12 @@ void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, f
 	IDirect3DDevice9_SetViewport(crAPI.d3ddev, &vp);
 }
 
-void crRenderTargetClearColor(float r, float g, float b, float a)
+CR_API void crRenderTargetClearColor(float r, float g, float b, float a)
 {
 	IDirect3DDevice9_Clear(crAPI.d3ddev, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_COLORVALUE(r, g, b, a), 1, 0);
 }
 
-void crRenderTargetClearDepth(float z)
+CR_API void crRenderTargetClearDepth(float z)
 {
 	IDirect3DDevice9_Clear(crAPI.d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
 }

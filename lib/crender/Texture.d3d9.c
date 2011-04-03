@@ -23,14 +23,14 @@ CrTextureGpuFormatMapping* crTextureGpuFormatMappingGet(CrGpuFormat crFormat)
 	return nullptr;
 }
 
-CrTexture* crTextureAlloc()
+CR_API CrTexture* crTextureAlloc()
 {
 	CrTextureImpl* self = crMemory()->alloc(sizeof(CrTextureImpl), "CrTexture");
 	memset(self, 0, sizeof(CrTextureImpl));
 	return &self->i;
 }
 
-size_t CrGpuFormat_getMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
+size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
 {
 	size_t i = 0;
 	size_t offset = 0;
@@ -50,7 +50,7 @@ size_t CrGpuFormat_getMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* m
 	return offset;
 }
 
-void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
+CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
@@ -80,7 +80,7 @@ void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount
 	// init cache memory
 	{
 		size_t tmpw, tmph;
-		self->surfSizeInByte = CrGpuFormat_getMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
+		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
 		self->data = (unsigned char*)crMemory()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
 		memset(self->data, 0, self->surfSizeInByte * self->surfCount);
 	}
@@ -98,7 +98,7 @@ void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount
 	crTextureCommit(self);
 }
 
-void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
+CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
@@ -128,7 +128,7 @@ void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCo
 	// set cache memory to null
 	{
 		size_t tmpw, tmph;
-		self->surfSizeInByte = CrGpuFormat_getMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
+		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
 		self->data = nullptr;
 	}
 
@@ -144,7 +144,7 @@ void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCo
 }
 
 
-unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
+CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
 {
 	if(nullptr == self)
 		return nullptr;
@@ -158,10 +158,10 @@ unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mi
 	//if(nullptr == self->data)
 	//	return nullptr;
 
-	return self->data + (surfIndex * self->surfSizeInByte) + CrGpuFormat_getMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
+	return self->data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
 }
 
-void crTextureCommit(CrTexture* self)
+CR_API void crTextureCommit(CrTexture* self)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
@@ -201,7 +201,7 @@ void crTextureCommit(CrTexture* self)
 	}
 }
 
-void crTextureFree(CrTexture* self)
+CR_API void crTextureFree(CrTexture* self)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 

@@ -1,6 +1,6 @@
 #include "Mat44.h"
 
-void crMat44AdjustToAPIDepthRange(CrMat44* _out)
+CR_API void crMat44AdjustToAPIDepthRange(CrMat44* _out)
 {
 	_out->m20 = (_out->m20 + _out->m30) * 0.5f;  
 	_out->m21 = (_out->m21 + _out->m31) * 0.5f;
@@ -8,7 +8,7 @@ void crMat44AdjustToAPIDepthRange(CrMat44* _out)
 	_out->m23 = (_out->m23 + _out->m33) * 0.5f;
 }
 
-void crMat44AdjustToAPIProjectiveTexture(CrMat44* _out)
+CR_API void crMat44AdjustToAPIProjectiveTexture(CrMat44* _out)
 {
 	_out->m00 = (_out->m30 + _out->m00) * 0.5f;
 	_out->m01 = (_out->m31 + _out->m01) * 0.5f;

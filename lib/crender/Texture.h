@@ -26,18 +26,18 @@ typedef struct CrTexture
 	unsigned char* data;	//<! nullptr implies this is a render-target
 } CrTexture;
 
-CrTexture* crTextureAlloc();
+CR_API CrTexture* crTextureAlloc();
 
-void crTextureFree(CrTexture* self);
+CR_API void crTextureFree(CrTexture* self);
 
-void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
+CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
 
-void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
+CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
 
 //! mipIndex zero-base mip level index
-unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight);
+CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight);
 
-void crTextureCommit(CrTexture* self);
+CR_API void crTextureCommit(CrTexture* self);
 
 #ifdef __cplusplus
 }

@@ -1,14 +1,14 @@
 #include "RenderTarget.gl.h"
 #include "Memory.h"
 
-CrRenderTarget* crRenderTargetAlloc()
+CR_API CrRenderTarget* crRenderTargetAlloc()
 {
 	CrRenderTargetImpl* self = crMemory()->alloc(sizeof(CrRenderTargetImpl), "CrRenderTarget");
 	memset(self, 0, sizeof(CrRenderTargetImpl));
 	return &self->i;
 }
 
-void crRenderTargetFree(CrRenderTarget* self)
+CR_API void crRenderTargetFree(CrRenderTarget* self)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 	if(self->flags & CrRenderTarget_Inited) {
@@ -26,7 +26,7 @@ void crRenderTargetFree(CrRenderTarget* self)
 	crMemory()->free(self, "CrRenderTarget");
 }
 
-void crRenderTargetInit(CrRenderTarget* self)
+CR_API void crRenderTargetInit(CrRenderTarget* self)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -43,7 +43,7 @@ void crRenderTargetInit(CrRenderTarget* self)
 	self->flags |= CrRenderTarget_Inited;
 }
 
-CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format)
+CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, size_t height, CrGpuFormat format)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -67,7 +67,7 @@ CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t width, 
 	return &buffer->i;
 }
 
-void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer)
+CR_API void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* buffer)
 {
 	if(nullptr == self)
 		return;
@@ -91,7 +91,7 @@ static GLenum crGL_ATTACHMENT_POINT[] =
 #endif
 };
 
-void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth)
+CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth)
 {
 	CrRenderTargetImpl* impl = (CrRenderTargetImpl*)self;
 
@@ -134,19 +134,19 @@ void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRe
 	}
 }
 
-void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
+CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
 {
 	glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
 	glDepthRange(zmin, zmax);
 }
 
-void crRenderTargetClearColor(float r, float g, float b, float a)
+CR_API void crRenderTargetClearColor(float r, float g, float b, float a)
 {
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void crRenderTargetClearDepth(float z)
+CR_API void crRenderTargetClearDepth(float z)
 {
 	glClearDepth(z);
 	glClear(GL_DEPTH_BUFFER_BIT);

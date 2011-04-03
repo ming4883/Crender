@@ -22,51 +22,51 @@ typedef struct CrVec3
 	};
 } CrVec3;
 
-CrVec3 crVec3(float x, float y, float z);
+CR_API CrVec3 crVec3(float x, float y, float z);
 
-CrVec3 crVec3FromVec2(const struct CrVec2* xy, float z);
+CR_API CrVec3 crVec3FromVec2(const struct CrVec2* xy, float z);
 
-const CrVec3* CrVec3_c000();
-const CrVec3* CrVec3_c100();
-const CrVec3* CrVec3_c010();
-const CrVec3* CrVec3_c001();
+CR_API const CrVec3* CrVec3_c000();
+CR_API const CrVec3* CrVec3_c100();
+CR_API const CrVec3* CrVec3_c010();
+CR_API const CrVec3* CrVec3_c001();
 
-void crVec3Set(CrVec3* _out, float x, float y, float z);
+#define crVec3Set(_out, x, y, z) {_out.x = x; _out.y = y; _out.z = z;}
 
-CrBool crVec3IsEqual(const CrVec3* a, const CrVec3* b, float epsilon);
+CR_API CrBool crVec3IsEqual(const CrVec3* a, const CrVec3* b, float epsilon);
 
 /* return a + b */
-CrVec3* crVec3Add(CrVec3* _out, const CrVec3* a, const CrVec3* b);
+CR_API CrVec3* crVec3Add(CrVec3* _out, const CrVec3* a, const CrVec3* b);
 
 /* return a - b */
-CrVec3* crVec3Sub(CrVec3* _out, const CrVec3* a, const CrVec3* b);
+CR_API CrVec3* crVec3Sub(CrVec3* _out, const CrVec3* a, const CrVec3* b);
 
 /* return term by term a * b */
-CrVec3* crVec3Mult(CrVec3* _out, const CrVec3* a, const CrVec3* b);
+CR_API CrVec3* crVec3Mult(CrVec3* _out, const CrVec3* a, const CrVec3* b);
 
 /* return a * b */
-CrVec3* crVec3MultS(CrVec3* _out, const CrVec3* a, float b);
+CR_API CrVec3* crVec3MultS(CrVec3* _out, const CrVec3* a, float b);
 
 /* return a dot b */
-float crVec3Dot(const CrVec3* a, const CrVec3* b);
+CR_API float crVec3Dot(const CrVec3* a, const CrVec3* b);
 
 /* return |a|^2 */
-float crVec3SqLength(const CrVec3* a);
+CR_API float crVec3SqLength(const CrVec3* a);
 
 /* return |a| */
-float crVec3Length(const CrVec3* a);
+CR_API float crVec3Length(const CrVec3* a);
 
 /* return |a-b| */
-float crVec3Distance(const CrVec3* a, const CrVec3* b);
+CR_API float crVec3Distance(const CrVec3* a, const CrVec3* b);
 
 /* normalize a and return |a| */
-float crVec3Normalize(CrVec3* a);
+CR_API float crVec3Normalize(CrVec3* a);
 
 /* return normalized copy of a */
-CrVec3 crVec3NormalizedCopy(const CrVec3* a);
+CR_API CrVec3 crVec3NormalizedCopy(const CrVec3* a);
 
 /* return a cross b */
-CrVec3* crVec3Cross(CrVec3* _out, const CrVec3* a, const CrVec3* b);
+CR_API CrVec3* crVec3Cross(CrVec3* _out, const CrVec3* a, const CrVec3* b);
 
 #ifdef __cplusplus
 }

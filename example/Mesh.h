@@ -30,8 +30,6 @@ enum MeshFlag
 	MeshFlag_Dirty = 1 << 1,
 };
 
-struct MeshImpl;
-
 typedef struct Mesh
 {
 	size_t flags;
@@ -43,8 +41,6 @@ typedef struct Mesh
 	struct MeshData normal;
 	struct MeshData color;
 	struct MeshData texcoord[MeshTrait_MaxTexcoord];
-
-	struct MeshImpl* impl;
 } Mesh;
 
 Mesh* meshAlloc();

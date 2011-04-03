@@ -20,14 +20,14 @@ static GLenum crGL_BUFFER_MAP_ACCESS[] = {
 };
 #endif
 
-CrBuffer* crBufferAlloc()
+CR_API CrBuffer* crBufferAlloc()
 {
 	CrBufferImpl* self = crMemory()->alloc(sizeof(CrBufferImpl), "CrBuffer");
 	memset(self, 0, sizeof(CrBufferImpl));
 	return &self->i;
 }
 
-void crBufferFree(CrBuffer* self)
+CR_API void crBufferFree(CrBuffer* self)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 	if(nullptr == self)
@@ -38,7 +38,7 @@ void crBufferFree(CrBuffer* self)
 	crMemory()->free(self, "CrBuffer");
 }
 
-CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData)
+CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 
@@ -54,7 +54,7 @@ CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void*
 	return CrTrue;
 }
 
-void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBytes, void* data)
+CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBytes, void* data)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 
@@ -68,7 +68,7 @@ void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBytes, vo
 	glBufferSubData(crGL_BUFFER_TARGET[self->type], offsetInBytes, sizeInBytes, data);
 }
 
-void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
+CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 	void* ret = nullptr;
@@ -89,7 +89,7 @@ void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 	return ret;
 }
 
-void crBufferUnmap(CrBuffer* self)
+CR_API void crBufferUnmap(CrBuffer* self)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 

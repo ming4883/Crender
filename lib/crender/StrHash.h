@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 typedef size_t CrHashCode;
-CrHashCode CrHashStruct(const void* data, size_t len);
+CR_API CrHashCode CrHashStruct(const void* data, size_t len);
 
 #ifdef __cplusplus
 }

@@ -61,11 +61,11 @@ typedef struct CrGpuShader
 } CrGpuShader;
 
 
-CrGpuShader* crGpuShaderAlloc();
+CR_API CrGpuShader* crGpuShaderAlloc();
 
-void crGpuShaderFree(CrGpuShader* self);
+CR_API void crGpuShaderFree(CrGpuShader* self);
 
-CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type);
+CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t srcCnt, CrGpuShaderType type);
 
 // CrGpuProgram
 typedef enum CrGpuProgramFlag
@@ -79,20 +79,20 @@ typedef struct CrGpuProgram
 
 } CrGpuProgram;
 
-CrGpuProgram* crGpuProgramAlloc();
+CR_API CrGpuProgram* crGpuProgramAlloc();
 
-void crGpuProgramFree(CrGpuProgram* self);
+CR_API void crGpuProgramFree(CrGpuProgram* self);
 
-CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt);
+CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t shaderCnt);
 
-void crGpuProgramPreRender(CrGpuProgram* self);
+CR_API void crGpuProgramPreRender(CrGpuProgram* self);
 
-CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
-CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
-CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
-CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
-CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value);
-CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler);
+CR_API CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
+CR_API CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
+CR_API CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
+CR_API CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value);
+CR_API CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, size_t count, CrBool transpose, const float* value);
+CR_API CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, struct CrTexture* texture, const struct CrSampler* sampler);
 
 typedef struct CrGpuProgramInput
 {
@@ -104,7 +104,7 @@ typedef struct CrGpuProgramInput
 
 size_t crGenGpuInputId();
 
-void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count);
+CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count);
 
 typedef enum CrGpuDrawFlag
 {
@@ -116,16 +116,16 @@ typedef enum CrGpuDrawFlag
 	
 } CrGpuDrawFlag;
 
-void crGpuDrawPoint(size_t offset, size_t count);
+CR_API void crGpuDrawPoint(size_t offset, size_t count);
 
-void crGpuDrawLine(size_t offset, size_t count, size_t flags);
-void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags);
+CR_API void crGpuDrawLine(size_t offset, size_t count, size_t flags);
+CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags);
 
-void crGpuDrawTriangle(size_t offset, size_t count, size_t flags);
-void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags);
+CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags);
+CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags);
 
-void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags);
-void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags);
+CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags);
+CR_API void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t vertexPerPatch, size_t flags);
 
 #ifdef __cplusplus
 }

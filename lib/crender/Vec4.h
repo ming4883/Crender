@@ -23,48 +23,48 @@ typedef struct CrVec4
 	};
 } CrVec4;
 
-CrVec4 crVec4(float x, float y, float z, float w);
-CrVec4 crVec4FromVec3(const struct CrVec3* xyz, float w);
+CR_API CrVec4 crVec4(float x, float y, float z, float w);
+CR_API CrVec4 crVec4FromVec3(const struct CrVec3* xyz, float w);
 
-const CrVec4* CrVec4_c0000();
-const CrVec4* CrVec4_c1000();
-const CrVec4* CrVec4_c0100();
-const CrVec4* CrVec4_c0010();
-const CrVec4* CrVec4_c0001();
+CR_API const CrVec4* CrVec4_c0000();
+CR_API const CrVec4* CrVec4_c1000();
+CR_API const CrVec4* CrVec4_c0100();
+CR_API const CrVec4* CrVec4_c0010();
+CR_API const CrVec4* CrVec4_c0001();
 
-void crVec4Set(CrVec4* _out, float x, float y, float z, float w);
+#define crVec4Set(_out, x, y, z, w) {_out.x = x; _out.y = y; _out.z = z; _out.w = w;}
 
-CrBool crVec4IsEqual(const CrVec4* a, const CrVec4* b, float epsilon);
+CR_API CrBool crVec4IsEqual(const CrVec4* a, const CrVec4* b, float epsilon);
 
 /* return a + b */
-CrVec4* crVec4Add(CrVec4* _out, const CrVec4* a, const CrVec4* b);
+CR_API CrVec4* crVec4Add(CrVec4* _out, const CrVec4* a, const CrVec4* b);
 
 /* return a - b */
-CrVec4* crVec4Sub(CrVec4* _out, const CrVec4* a, const CrVec4* b);
+CR_API CrVec4* crVec4Sub(CrVec4* _out, const CrVec4* a, const CrVec4* b);
 
 /* return a * b */
-CrVec4* crVec4Mult(CrVec4* _out, const CrVec4* a, const CrVec4* b);
+CR_API CrVec4* crVec4Mult(CrVec4* _out, const CrVec4* a, const CrVec4* b);
 
 /* return a * b */
-CrVec4* crVec4MultS(CrVec4* _out, const CrVec4* a, float b);
+CR_API CrVec4* crVec4MultS(CrVec4* _out, const CrVec4* a, float b);
 
 /* return a dot b */
-float crVec4Dot(const CrVec4* a, const CrVec4* b);
+CR_API float crVec4Dot(const CrVec4* a, const CrVec4* b);
 
 /* return |a|^2 */
-float crVec4SqLength(const CrVec4* a);
+CR_API float crVec4SqLength(const CrVec4* a);
 
 /* return |a| */
-float crVec4Length(const CrVec4* a);
+CR_API float crVec4Length(const CrVec4* a);
 
 /* return |a-b| */
-float crVec4Distance(const CrVec4* a, const CrVec4* b);
+CR_API float crVec4Distance(const CrVec4* a, const CrVec4* b);
 
 /* normalize a and return |a| */
-float crVec4Normalize(CrVec4* a);
+CR_API float crVec4Normalize(CrVec4* a);
 
 /* return normalized copy of a */
-CrVec4 crVec4NormalizedCopy(const CrVec4* a);
+CR_API CrVec4 crVec4NormalizedCopy(const CrVec4* a);
 
 #ifdef __cplusplus
 }

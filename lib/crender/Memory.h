@@ -16,7 +16,7 @@ typedef struct CrMemory
 	CrFreeFunc free;
 } CrMemory;
 
-CrMemory* crMemory();
+CR_API CrMemory* crMemory();
 
 #ifdef __cplusplus
 }

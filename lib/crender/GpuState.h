@@ -51,13 +51,13 @@ typedef struct CrGpuState
 
 } CrGpuState;
 
-CrGpuState* crGpuStateAlloc();
+CR_API CrGpuState* crGpuStateAlloc();
 
-void crGpuStateFree(CrGpuState* self);
+CR_API void crGpuStateFree(CrGpuState* self);
 
-void crGpuStateInit(CrGpuState* self);
+CR_API void crGpuStateInit(CrGpuState* self);
 
-void crGpuStatePreRender(CrGpuState* self);
+CR_API void crGpuStatePreRender(CrGpuState* self);
 
 
 #ifdef __cplusplus

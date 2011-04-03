@@ -1,5 +1,6 @@
 #include "Mesh.h"
 
+#include "../lib/crender/Memory.h"
 #include "../lib/crender/Buffer.h"
 #include "../lib/crender/Shader.h"
 #include "../lib/crender/Vec2.h"
@@ -10,6 +11,7 @@
 #include <stdio.h>
 
 typedef struct MeshImpl {
+	Mesh i;
 	struct CrBuffer* indexBuffer;
 	struct CrBuffer* vertexBuffer;
 	struct CrBuffer* normalBuffer;
@@ -20,15 +22,16 @@ typedef struct MeshImpl {
 
 Mesh* meshAlloc()
 {
-	Mesh* self;
-	CrAllocWithImpl(self, Mesh, MeshImpl);
+	MeshImpl* self = crMemory()->alloc(sizeof(MeshImpl), "mesh");
+	memset(self, 0, sizeof(MeshImpl));
 
-	return self;
+	return &self->i;
 }
 
 void meshInit(Mesh* self, size_t vertexCount, size_t indexCount)
 {
 	size_t i;
+	MeshImpl* impl = (MeshImpl*)self;
 
 	self->vertexCount = vertexCount;
 	self->indexCount = indexCount;
@@ -56,24 +59,24 @@ void meshInit(Mesh* self, size_t vertexCount, size_t indexCount)
 	}
 
 	// hardware buffer
-	self->impl->indexBuffer = crBufferAlloc();
-	crBufferInit(self->impl->indexBuffer, CrBufferType_Index, self->index.sizeInBytes, nullptr);
+	impl->indexBuffer = crBufferAlloc();
+	crBufferInit(impl->indexBuffer, CrBufferType_Index, self->index.sizeInBytes, nullptr);
 
-	self->impl->vertexBuffer = crBufferAlloc();
-	crBufferInit(self->impl->vertexBuffer, CrBufferType_Vertex, self->vertex.sizeInBytes, nullptr);
+	impl->vertexBuffer = crBufferAlloc();
+	crBufferInit(impl->vertexBuffer, CrBufferType_Vertex, self->vertex.sizeInBytes, nullptr);
 
-	self->impl->normalBuffer = crBufferAlloc();
-	crBufferInit(self->impl->normalBuffer, CrBufferType_Vertex, self->normal.sizeInBytes, nullptr);
+	impl->normalBuffer = crBufferAlloc();
+	crBufferInit(impl->normalBuffer, CrBufferType_Vertex, self->normal.sizeInBytes, nullptr);
 
-	self->impl->colorBuffer = crBufferAlloc();
-	crBufferInit(self->impl->colorBuffer, CrBufferType_Vertex, self->color.sizeInBytes, nullptr);
+	impl->colorBuffer = crBufferAlloc();
+	crBufferInit(impl->colorBuffer, CrBufferType_Vertex, self->color.sizeInBytes, nullptr);
 
 	for(i=0; i<MeshTrait_MaxTexcoord; ++i) {
-		self->impl->tcBuffer[i] = crBufferAlloc();
-		crBufferInit(self->impl->tcBuffer[i], CrBufferType_Vertex, self->texcoord[i].sizeInBytes, nullptr);
+		impl->tcBuffer[i] = crBufferAlloc();
+		crBufferInit(impl->tcBuffer[i], CrBufferType_Vertex, self->texcoord[i].sizeInBytes, nullptr);
 	}
 
-	self->impl->gpuInputId = crGenGpuInputId();
+	impl->gpuInputId = crGenGpuInputId();
 
 	self->flags |= MeshFlag_Inited;
 }
@@ -81,16 +84,17 @@ void meshInit(Mesh* self, size_t vertexCount, size_t indexCount)
 void meshFree(Mesh* self)
 {
 	size_t i;
+	MeshImpl* impl = (MeshImpl*)self;
 
 	if(self->flags & MeshFlag_Inited) {
 
-		crBufferFree(self->impl->indexBuffer);
-		crBufferFree(self->impl->vertexBuffer);
-		crBufferFree(self->impl->normalBuffer);
-		crBufferFree(self->impl->colorBuffer);
+		crBufferFree(impl->indexBuffer);
+		crBufferFree(impl->vertexBuffer);
+		crBufferFree(impl->normalBuffer);
+		crBufferFree(impl->colorBuffer);
 
 		for(i=0; i<MeshTrait_MaxTexcoord; ++i) {
-			crBufferFree(self->impl->tcBuffer[i]);
+			crBufferFree(impl->tcBuffer[i]);
 		}
 
 		free(self->index.buffer);
@@ -109,9 +113,10 @@ void meshFree(Mesh* self)
 void meshCommit(Mesh* self)
 {
 	size_t i;
+	MeshImpl* impl = (MeshImpl*)self;
 
 #define commit(x) {\
-	crBufferUpdate(self->impl->x##Buffer, 0, self->x.sizeInBytes, self->x.buffer);\
+	crBufferUpdate(impl->x##Buffer, 0, self->x.sizeInBytes, self->x.buffer);\
 	}
 	if(nullptr == self)
 		return;
@@ -124,7 +129,7 @@ void meshCommit(Mesh* self)
 	commit(normal);
 	commit(color);
 	for(i=0; i<MeshTrait_MaxTexcoord; ++i) {
-		crBufferUpdate(self->impl->tcBuffer[i], 0, self->texcoord[i].sizeInBytes, self->texcoord[i].buffer);
+		crBufferUpdate(impl->tcBuffer[i], 0, self->texcoord[i].sizeInBytes, self->texcoord[i].buffer);
 	}
 
 #undef commit
@@ -132,16 +137,18 @@ void meshCommit(Mesh* self)
 
 void meshPreRender(Mesh* self, struct CrGpuProgram* program)
 {
+	MeshImpl* impl = (MeshImpl*)self;
+
 	CrGpuProgramInput inputs[] = {
-		{self->impl->indexBuffer},
-		{self->impl->vertexBuffer, self->vertex.shaderName, 0, CrGpuFormat_FloatR32G32B32},
-		{self->impl->normalBuffer, self->normal.shaderName, 0, CrGpuFormat_FloatR32G32B32},
-		{self->impl->colorBuffer, self->color.shaderName, 0, CrGpuFormat_FloatR32G32B32A32},
-		{self->impl->tcBuffer[0], self->texcoord[0].shaderName, 0, CrGpuFormat_FloatR32G32},
-		{self->impl->tcBuffer[1], self->texcoord[1].shaderName, 0, CrGpuFormat_FloatR32G32},
+		{impl->indexBuffer},
+		{impl->vertexBuffer, self->vertex.shaderName, 0, CrGpuFormat_FloatR32G32B32},
+		{impl->normalBuffer, self->normal.shaderName, 0, CrGpuFormat_FloatR32G32B32},
+		{impl->colorBuffer, self->color.shaderName, 0, CrGpuFormat_FloatR32G32B32A32},
+		{impl->tcBuffer[0], self->texcoord[0].shaderName, 0, CrGpuFormat_FloatR32G32},
+		{impl->tcBuffer[1], self->texcoord[1].shaderName, 0, CrGpuFormat_FloatR32G32},
 	};
 
-	crGpuProgramBindInput(program, self->impl->gpuInputId, inputs, crCountOf(inputs));
+	crGpuProgramBindInput(program, impl->gpuInputId, inputs, crCountOf(inputs));
 }
 
 void meshRenderTriangles(Mesh* self)
@@ -166,6 +173,8 @@ void meshInitWithUnitSphere(Mesh* self, size_t segmentCount)
 {
 #define PI 3.14159265358979323846f
 
+	MeshImpl* impl = (MeshImpl*)self;
+
 	CrVec3* pos;
 	CrVec3* nor;
 	CrVec2* uv0;
@@ -181,10 +190,10 @@ void meshInitWithUnitSphere(Mesh* self, size_t segmentCount)
 	meshInit(self, (height-2)* width+2, (height-2)*(width-1)*2 * 3);
 	self->vertexPerPatch = 3;
 
-	idx = crBufferMap(self->impl->indexBuffer, CrBufferMapAccess_Write);
-	pos = crBufferMap(self->impl->vertexBuffer, CrBufferMapAccess_Write);
-	nor = crBufferMap(self->impl->normalBuffer, CrBufferMapAccess_Write);
-	uv0 = crBufferMap(self->impl->tcBuffer[0], CrBufferMapAccess_Write);
+	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
+	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
+	nor = crBufferMap(impl->normalBuffer, CrBufferMapAccess_Write);
+	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
 
 	for(t=0, j=1; j<height-1; ++j)
 	{
@@ -231,16 +240,18 @@ void meshInitWithUnitSphere(Mesh* self, size_t segmentCount)
 
 	}
 
-	crBufferUnmap(self->impl->indexBuffer);
-	crBufferUnmap(self->impl->vertexBuffer);
-	crBufferUnmap(self->impl->normalBuffer);
-	crBufferUnmap(self->impl->tcBuffer[0]);
+	crBufferUnmap(impl->indexBuffer);
+	crBufferUnmap(impl->vertexBuffer);
+	crBufferUnmap(impl->normalBuffer);
+	crBufferUnmap(impl->tcBuffer[0]);
 
 #undef PI
 }
 
 void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offset, size_t segmentCount)
 {
+	MeshImpl* impl = (MeshImpl*)self;
+
 	CrVec3* pos;
 	CrVec3* nor;
 	CrVec2* uv0;
@@ -252,10 +263,10 @@ void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offse
 	meshInit(self, stride * stride, (stride-1) * (stride-1) * 6);
 	self->vertexPerPatch = 3;
 
-	idx = crBufferMap(self->impl->indexBuffer, CrBufferMapAccess_Write);
-	pos = crBufferMap(self->impl->vertexBuffer, CrBufferMapAccess_Write);
-	nor = crBufferMap(self->impl->normalBuffer, CrBufferMapAccess_Write);
-	uv0 = crBufferMap(self->impl->tcBuffer[0], CrBufferMapAccess_Write);
+	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
+	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
+	nor = crBufferMap(impl->normalBuffer, CrBufferMapAccess_Write);
+	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
 
 	for(r=0; r<(stride-1); ++r)
 	{
@@ -293,14 +304,16 @@ void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offse
 		}
 	}
 
-	crBufferUnmap(self->impl->indexBuffer);
-	crBufferUnmap(self->impl->vertexBuffer);
-	crBufferUnmap(self->impl->normalBuffer);
-	crBufferUnmap(self->impl->tcBuffer[0]);
+	crBufferUnmap(impl->indexBuffer);
+	crBufferUnmap(impl->vertexBuffer);
+	crBufferUnmap(impl->normalBuffer);
+	crBufferUnmap(impl->tcBuffer[0]);
 }
 
 void meshInitWithScreenQuad(Mesh* self)
 {
+	MeshImpl* impl = (MeshImpl*)self;
+
 	CrVec3* pos;
 	CrVec2* uv0;
 	unsigned short* idx;
@@ -308,9 +321,9 @@ void meshInitWithScreenQuad(Mesh* self)
 	meshInit(self, 4, 6);
 	self->vertexPerPatch = 3;
 
-	idx = crBufferMap(self->impl->indexBuffer, CrBufferMapAccess_Write);
-	pos = crBufferMap(self->impl->vertexBuffer, CrBufferMapAccess_Write);
-	uv0 = crBufferMap(self->impl->tcBuffer[0], CrBufferMapAccess_Write);
+	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
+	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
+	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
 
 	(*idx++) = 0; (*idx++) = 1; (*idx++) = 2;
 	(*idx++) = 3; (*idx++) = 2; (*idx++) = 1;
@@ -320,7 +333,7 @@ void meshInitWithScreenQuad(Mesh* self)
 	pos[2] = crVec3( 1, 1, 0); uv0[2] = crVec2(1, 1);
 	pos[3] = crVec3( 1,-1, 0); uv0[3] = crVec2(1, 0);
 
-	crBufferUnmap(self->impl->indexBuffer);
-	crBufferUnmap(self->impl->vertexBuffer);
-	crBufferUnmap(self->impl->tcBuffer[0]);
+	crBufferUnmap(impl->indexBuffer);
+	crBufferUnmap(impl->vertexBuffer);
+	crBufferUnmap(impl->tcBuffer[0]);
 }

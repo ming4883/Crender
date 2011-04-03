@@ -13,13 +13,13 @@ typedef struct CrNvpParser
 	char* mPos;
 } CrNvpParser;
 
-CrNvpParser* crNvpParserAlloc();
+CR_API CrNvpParser* crNvpParserAlloc();
 
-void crNvpParserFree(CrNvpParser* self);
+CR_API void crNvpParserFree(CrNvpParser* self);
 
-void crNvpParserInit(CrNvpParser* self, const char* str);
+CR_API void crNvpParserInit(CrNvpParser* self, const char* str);
 
-CrBool crNvpParserNext(CrNvpParser* self, const char** name, const char** value);
+CR_API CrBool crNvpParserNext(CrNvpParser* self, const char** name, const char** value);
 
 #ifdef __cplusplus
 }
