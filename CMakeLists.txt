@@ -41,6 +41,7 @@ IF( WIN32 )
 	#FILE( GLOB CRENDER lib/crender/*.c lib/crender/*.h )
 	SET( CRENDER
 		${CRENDER_COMMON}
+		lib/crender/API.gl.c
 		lib/crender/API.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
@@ -72,6 +73,7 @@ IF( WIN32 )
 
 	SET( CRENDER_D3D9
 		${CRENDER_COMMON}
+		lib/crender/API.d3d9.c
 		lib/crender/API.d3d9.h
 		lib/crender/Buffer.d3d9.c
 		lib/crender/Buffer.d3d9.h

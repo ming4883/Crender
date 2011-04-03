@@ -43,7 +43,7 @@ typedef struct CrInputGpuFormatMapping
 	CrGpuFormat crFormat;
 	int elemCnt;
 	int elemType;
-	int normalized;
+	GLboolean normalized;
 	int stride;
 } CrInputGpuFormatMapping;
 

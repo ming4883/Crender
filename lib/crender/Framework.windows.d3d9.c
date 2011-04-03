@@ -9,8 +9,6 @@
 
 #include "API.d3d9.h"
 
-CrAPI crAPI = {0};
-
 CrAppContext crAppContext = {
 	"crApp",
 	"d3d9",

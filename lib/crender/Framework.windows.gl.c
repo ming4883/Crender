@@ -10,8 +10,6 @@
 #include "Api.gl.h"
 #include <GL\wglew.h>
 
-CrAPI crAPI = {0};
-
 CrAppContext crAppContext = {
 	"crApp",
 	"gl",

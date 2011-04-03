@@ -211,8 +211,6 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
 
 struct android_app* CR_ANDROID_APP = 0;
 
-CrAPI crAPI = {0};
-
 CrAppContext crAppContext = {
 	"crApp",
 	"gles",
