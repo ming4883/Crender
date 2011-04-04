@@ -102,7 +102,7 @@ typedef struct CrGpuProgramInput
 	CrGpuFormat format;
 } CrGpuProgramInput;
 
-size_t crGenGpuInputId();
+CR_API size_t crGenGpuInputId();
 
 CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count);
 

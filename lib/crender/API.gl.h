@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-typedef struct CrAPI
+typedef struct CrApiPrivates
 {
 	unsigned int gpuInputId;
 #if defined(CR_APPLE_IOS)
@@ -33,9 +33,9 @@ typedef struct CrAPI
 	GLuint defColorBufName;
 	GLuint defDepthBufName;
 #endif
-} CrAPI;
+} CrApiPrivates;
 
-extern CrAPI crAPI;
+extern CrApiPrivates crAPI;
 
 #ifdef __cplusplus
 }

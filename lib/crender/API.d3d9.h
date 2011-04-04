@@ -8,16 +8,16 @@
 extern "C" {
 #endif
 
-typedef struct CrAPI
+typedef struct CrApiPrivates
 {
 	IDirect3D9* d3d;
 	IDirect3DDevice9* d3ddev;
 	IDirect3DSurface9* d3dcolorbuf;
 	IDirect3DSurface9* d3ddepthbuf;
 	unsigned int gpuInputId;
-} CrAPI;
+} CrApiPrivates;
 
-extern CrAPI crAPI;
+extern CrApiPrivates crAPI;
 
 #ifdef __cplusplus
 }

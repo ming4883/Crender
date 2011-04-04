@@ -1,3 +1,3 @@
 #include "API.gl.h"
 
-CrAPI crAPI = {0};
+CrApiPrivates crAPI = {0};
