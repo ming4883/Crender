@@ -10,8 +10,8 @@ extern "C" {
 
 typedef enum CrTextureFlag
 {
-	CrTextureFlag_Inited = 1 << 0,
-	CrTextureFlag_Dirty = 1 << 1,
+	CrTexture_Inited = 1 << 0,
+	CrTexture_Dirty = 1 << 1,
 } CrTextureFlag;
 
 typedef struct CrTexture

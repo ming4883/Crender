@@ -62,7 +62,7 @@ size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipW
 CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
-	if(self->flags & CrTextureFlag_Inited) {
+	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
 		return;
 	}
@@ -108,7 +108,7 @@ CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
-	if(self->flags & CrTextureFlag_Inited) {
+	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
 		return;
 	}
