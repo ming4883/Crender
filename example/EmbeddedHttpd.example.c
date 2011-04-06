@@ -123,12 +123,8 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "Embedded Httpd";
-	crAppContext.xres = 480;
-	crAppContext.yres = 320;
-	crAppContext.multiSampling = CrFalse;
-	crAppContext.vsync = CrFalse;
-	crAppContext.apiMajorVer = 2;
-	crAppContext.apiMinorVer = 1;
+	crAppContext.context->xres = 480;
+	crAppContext.context->yres = 320;
 }
 
 void crAppFinalize()
@@ -145,7 +141,7 @@ CrBool crAppInitialize()
 		{nullptr, nullptr, 0, 0}
 	};
 
-	crRenderTargetSetViewport(0, 0, (float)crAppContext.xres, (float)crAppContext.yres, -1, 1);
+	crRenderTargetSetViewport(0, 0, (float)crAppContext.context->xres, (float)crAppContext.context->yres, -1, 1);
 
 	_config = remoteConfigAlloc();
 	remoteConfigInit(_config, 8080, CrTrue);

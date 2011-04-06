@@ -1,7 +1,7 @@
 #ifndef __CRENDER_BUFFER_GL_H__
 #define __CRENDER_BUFFER_GL_H__
 
-#include "API.gl.h"
+#include "Context.gl.h"
 #include "Buffer.h"
 
 #ifdef __cplusplus

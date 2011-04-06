@@ -46,12 +46,6 @@ typedef uint8_t CrBool;
 //! Plaform specific debug string output
 CR_API void crDbgStr(const char* str, ...);
 
-struct CrApiPrivates;
-typedef struct CrApiPrivates CrApiPrivates;
-
-//! Access each API's private data / objects
-CR_API CrApiPrivates* crApiPrivates();
-
 #define crCountOf(A) (sizeof(A) / sizeof(A[0]))
 
 #define crMin(a, b) (a < b ? a : b)

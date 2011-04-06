@@ -88,7 +88,7 @@ CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t m
 	// create texture
 	{
 		HRESULT hr;
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, width, height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
 			return;
@@ -135,7 +135,7 @@ CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_
 	// create d3d texture
 	{
 		HRESULT hr;
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
 			return;
@@ -176,7 +176,7 @@ CR_API void crTextureCommit(CrTexture* self)
 		size_t i;
 		IDirect3DTexture9* stageTex;
 
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, self->width, self->height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_SYSTEMMEM, &stageTex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, self->width, self->height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_SYSTEMMEM, &stageTex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
 			return;
@@ -195,7 +195,7 @@ CR_API void crTextureCommit(CrTexture* self)
 			IDirect3DTexture9_UnlockRect(stageTex, i);
 		}
 
-		IDirect3DDevice9_UpdateTexture(crAPI.d3ddev, (IDirect3DBaseTexture9*)stageTex, (IDirect3DBaseTexture9*)impl->d3dtex);
+		IDirect3DDevice9_UpdateTexture(crContextImpl()->d3ddev, (IDirect3DBaseTexture9*)stageTex, (IDirect3DBaseTexture9*)impl->d3dtex);
 
 		IDirect3DTexture9_Release(stageTex);
 	}

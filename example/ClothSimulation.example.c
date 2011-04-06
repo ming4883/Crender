@@ -217,7 +217,7 @@ void drawShadowMap()
 	}
 
 	crRenderTargetPreRender(nullptr, nullptr, nullptr);
-	crRenderTargetSetViewport(0, 0, (float)crAppContext.xres, (float)crAppContext.yres, -1, 1);
+	crRenderTargetSetViewport(0, 0, (float)crAppContext.context->xres, (float)crAppContext.context->yres, -1, 1);
 }
 
 void drawScene()
@@ -422,18 +422,10 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "Cloth Simulation";
-	crAppContext.xres = 800;
-	crAppContext.yres = 600;
-	crAppContext.multiSampling = CrFalse;
-	crAppContext.vsync = CrFalse;
 
-	if(strcmp(crAppContext.apiName, "gles") == 0) {
-		crAppContext.apiMajorVer = 2;
-		crAppContext.apiMinorVer = 0;
-	}
-	else {
-		crAppContext.apiMajorVer = 3;
-		crAppContext.apiMinorVer = 3;
+	if(strcmp(crAppContext.context->apiName, "gl") == 0) {
+		crAppContext.context->apiMajorVer = 3;
+		crAppContext.context->apiMinorVer = 3;
 	}
 }
 

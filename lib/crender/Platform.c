@@ -53,9 +53,3 @@ CR_API void crDbgStr(const char* str, ...)
 }
 
 #endif	// CR_WIN32
-
-extern CrApiPrivates crAPI;
-CR_API CrApiPrivates* crApiPrivates()
-{
-	return &crAPI;
-}

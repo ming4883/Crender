@@ -1,7 +1,7 @@
 #ifndef __CRENDER_SHADER_GL_H__
 #define __CRENDER_SHADER_GL_H__
 
-#include "API.gl.h"
+#include "Context.gl.h"
 #include "Shader.h"
 #include "uthash/uthash.h"
 

@@ -123,18 +123,10 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "MeshPerformance";
-	crAppContext.xres = 480;
-	crAppContext.yres = 800;
-	crAppContext.multiSampling = CrFalse;
-	crAppContext.vsync = CrFalse;
 
-	if(strcmp(crAppContext.apiName, "gles") == 0) {
-		crAppContext.apiMajorVer = 2;
-		crAppContext.apiMinorVer = 0;
-	}
-	else {
-		crAppContext.apiMajorVer = 3;
-		crAppContext.apiMinorVer = 3;
+	if(strcmp(crAppContext.context->apiName, "gl") == 0) {
+		crAppContext.context->apiMajorVer = 3;
+		crAppContext.context->apiMinorVer = 3;
 	}
 }
 
@@ -170,7 +162,7 @@ CrBool crAppInitialize()
 	// load mesh
 	{
 		mesh = meshAlloc();
-		if(!meshInitWithObjFile(mesh, "monkey.obj", app->inputStream))
+		if(!meshInitWithObjFile(mesh, "monkey.obj", app->istream))
 			return CrFalse;
 
 		crDbgStr("mesh vcnt=%d, icnt=%d\n", mesh->vertexCount, mesh->indexCount);

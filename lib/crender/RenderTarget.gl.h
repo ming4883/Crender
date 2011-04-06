@@ -1,7 +1,7 @@
 #ifndef __CRENDER_RENDERTARGET_GL_H__
 #define __CRENDER_RENDERTARGET_GL_H__
 
-#include "API.gl.h"
+#include "Context.gl.h"
 #include "RenderTarget.h"
 #include "Texture.gl.h"
 #include "uthash/utlist.h"

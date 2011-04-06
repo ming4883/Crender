@@ -51,7 +51,7 @@ static D3DFILLMODE CrGpuState_polygonModeMapping[] = {
 
 CR_API void crGpuStatePreRender(CrGpuState* self)
 {
-	IDirect3DDevice9* d3ddev = crAPI.d3ddev;
+	IDirect3DDevice9* d3ddev = crContextImpl()->d3ddev;
 
 	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ZENABLE, (BOOL)self->desc.depthTest);
 	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ZWRITEENABLE, (BOOL)self->desc.depthWrite);

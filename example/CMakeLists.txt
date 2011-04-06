@@ -1,5 +1,6 @@
 
 SET( EXAMPLE_COMMON 
+	Framework.h
 	Common.c
 	Common.h
 	Stream.c
@@ -19,26 +20,22 @@ SET( EXAMPLE_COMMON
 IF( WIN32 )
 	SET( EXAMPLE_COMMON_D3D9
 		${EXAMPLE_COMMON}
-		../lib/crender/Framework.h
-		../lib/crender/Framework.windows.d3d9.c
-		Common.generic.c
+		Framework.windows.c
 		Remote.impl.windows.c
 		Remote.impl.windows.h
 	)
 	
+	LIST( SORT EXAMPLE_COMMON_D3D9 )
+	
 	LIST( APPEND EXAMPLE_COMMON
-		../lib/crender/Framework.h
-		../lib/crender/Framework.windows.gl.c
-		Common.generic.c
+		Framework.windows.c
 		Remote.impl.windows.c
 		Remote.impl.windows.h
 	)
 	
 ELSEIF( APPLE )
 	LIST( APPEND EXAMPLE_COMMON
-		../lib/crender/Framework.h
-		../lib/crender/Framework.ios.m
-		Common.ios.m
+		Framework.ios.m
 		Remote.impl.ios.m
 		Remote.impl.ios.h
 	)

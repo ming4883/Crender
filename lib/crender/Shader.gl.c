@@ -398,7 +398,7 @@ CrInputGpuFormatMapping* crInputGpuFormatMappingGet(CrGpuFormat crFormat)
 
 CR_API size_t crGenGpuInputId()
 {
-	return ++crAPI.gpuInputId;
+	return ++crContextImpl()->gpuInputId;
 }
 
 CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
