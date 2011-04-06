@@ -22,7 +22,7 @@
     // isn't available.
     id displayLink;
     NSTimer *animationTimer;
-	EAGLContext *context;
+	//EAGLContext *context;
 	CFTimeInterval lastTime;
 }
 
@@ -62,6 +62,16 @@
 			kEAGLColorFormatRGBA8,
 			kEAGLDrawablePropertyColorFormat,
 			nil];
+
+
+		crAppContext.context = crContextAlloc();
+		crAppConfig();
+
+		crContextInit(crAppContext.context, &eaglLayer);
+		crAppInitialize();
+
+		lastTime = CFAbsoluteTimeGetCurrent();
+
 
 		/*
 		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -127,14 +137,6 @@
 - (void)layoutSubviews
 {
 	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)self.layer;
-
-	crAppContext.context = crContextAlloc();
-	crAppConfig();
-
-	crContextInit(crAppContext.context, &eaglLayer);
-	crAppInitialize();
-
-	lastTime = CFAbsoluteTimeGetCurrent();
 
 	/*
 	// color buffer storage

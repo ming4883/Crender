@@ -60,8 +60,11 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 	// color buffer storage
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defColorBufName);
     [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:*eaglLayer];
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &self->xres);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &self->yres);
+	int w, h;
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &w);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &h);
+	self->xres = w;
+	self->yres = h;
 
 	// depth buffer storage
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defDepthBufName);
