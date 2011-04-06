@@ -23,7 +23,7 @@ CR_API CrContext* crContext();
 
 CR_API CrContext* crContextAlloc();
 
-CR_API CrBool crContextInit(CrContext* self, void* window);
+CR_API CrBool crContextInit(CrContext* self, void** window);
 
 CR_API void crContextFree(CrContext* self);
 

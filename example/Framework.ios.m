@@ -1,5 +1,5 @@
 #import "Framework.h"
-#import "Api.gl.h"
+#import "../lib/crender/Memory.h"
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
@@ -63,6 +63,7 @@
 			kEAGLDrawablePropertyColorFormat,
 			nil];
 
+		/*
 		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
         if (!context || ![EAGLContext setCurrentContext:context])
@@ -84,6 +85,7 @@
         glGenRenderbuffers(1, &crAPI.defDepthBufName);
         glBindRenderbuffer(GL_RENDERBUFFER, crAPI.defDepthBufName);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, crAPI.defDepthBufName);
+		*/
 
         animating = FALSE;
         displayLinkSupported = FALSE;
@@ -110,20 +112,34 @@
 	lastTime = currTime;
 
 	crAppUpdate((unsigned int)(deltaTime * 1000));
+
+	crContextPreRender(crAppContext.context);
+
 	crAppRender();
 
-	glBindRenderbuffer(GL_RENDERBUFFER, crAPI.defColorBufName);
-    [context presentRenderbuffer:GL_RENDERBUFFER];
+	crContextPostRender(crAppContext.context);
+
+	//glBindRenderbuffer(GL_RENDERBUFFER, crAPI.defColorBufName);
+    //[context presentRenderbuffer:GL_RENDERBUFFER];
 
 }
 
 - (void)layoutSubviews
 {
-    CAEAGLLayer* glLayer = (CAEAGLLayer*)self.layer;
+	CAEAGLLayer* eaglLayer = (CAEAGLLayer*)self.layer;
 
+	crAppContext.context = crContextAlloc();
+	crAppConfig();
+
+	crContextInit(crAppContext.context, &eaglLayer);
+	crAppInitialize();
+
+	lastTime = CFAbsoluteTimeGetCurrent();
+
+	/*
 	// color buffer storage
 	glBindRenderbuffer(GL_RENDERBUFFER, crAPI.defColorBufName);
-    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:glLayer];
+    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:eaglLayer];
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &crAppContext.xres);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &crAppContext.yres);
 
@@ -135,12 +151,7 @@
     {
         NSLog(@"Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
-
-	crAppInitialize();
-
-	lastTime = CFAbsoluteTimeGetCurrent();
-
-    //[self drawView:nil];
+	*/
 }
 
 - (NSInteger)animationFrameInterval
@@ -278,13 +289,7 @@
 // main()
 
 CrAppContext crAppContext = {
-	"crApp",
-	"gles",
-	2, 0,
-	CrFalse,
-	CrFalse,
-	480,
-	320,
+	"crApp", nullptr
 };
 
 typedef struct iosFILE
@@ -343,8 +348,6 @@ size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
 }
 
 int main(int argc, char *argv[]) {
-
-	crAppConfig();
 
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     int retVal = UIApplicationMain(argc, argv, nil, nil);

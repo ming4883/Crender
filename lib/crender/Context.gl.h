@@ -38,6 +38,7 @@ typedef struct CrContextImpl
 #endif
 
 #if defined(CR_APPLE_IOS)
+	GLuint eaglContext;
 	GLuint defFBOName;
 	GLuint defColorBufName;
 	GLuint defDepthBufName;
