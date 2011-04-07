@@ -12,13 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef CR_APPLE_IOS
-#include <stddef.h>
-#include <stdint.h>
-#else
-#include "pstdint.h"
-#endif
-
 #if defined(_MSC_VER)
 #	if defined(CR_USE_DLL)
 #		if(CR_DLL_EXPORT)
@@ -39,7 +32,7 @@ extern "C" {
 
 #define nullptr 0
 
-typedef uint8_t CrBool;
+typedef unsigned char CrBool;
 #define CrFalse 0
 #define CrTrue 1
 
