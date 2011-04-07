@@ -1,6 +1,10 @@
 #include "StrHash.h"
 
-#include "pstdint.h" /* Replace with <stdint.h> if appropriate */
+#ifdef CR_WIN32
+#	include "pstdint.h"
+#else
+#	include <stdint.h> /* Replace with <stdint.h> if appropriate */
+#endif
 
 //HSIEH algorithm http://www.azillionmonkeys.com/qed/hash.html
 #undef get16bits
