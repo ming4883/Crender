@@ -115,5 +115,10 @@ CR_API void crContextPostRender(CrContext* self)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
 	IDirect3DDevice9_EndScene(impl->d3ddev);
+}
+
+CR_API void crContextSwapBuffers(CrContext* self)
+{
+	CrContextImpl* impl = (CrContextImpl*)self;
 	IDirect3DDevice9_Present(impl->d3ddev, nullptr, nullptr, nullptr, nullptr);
 }

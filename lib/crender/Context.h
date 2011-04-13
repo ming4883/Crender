@@ -31,6 +31,8 @@ CR_API CrBool crContextPreRender(CrContext* self);
 
 CR_API void crContextPostRender(CrContext* self);
 
+CR_API void crContextSwapBuffers(CrContext* self);
+
 #ifdef __cplusplus
 }
 #endif

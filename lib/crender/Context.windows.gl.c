@@ -186,6 +186,10 @@ CR_API CrBool crContextPreRender(CrContext* self)
 
 CR_API void crContextPostRender(CrContext* self)
 {
+}
+
+CR_API void crContextSwapBuffers(CrContext* self)
+{
 	CrContextImpl* impl = (CrContextImpl*)self;
 	SwapBuffers((HDC)impl->hDC);
 }

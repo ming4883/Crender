@@ -116,7 +116,6 @@
 
 - (void)drawView:(id)sender
 {
-
 	CFTimeInterval currTime = CFAbsoluteTimeGetCurrent();
 	CFTimeInterval deltaTime = currTime - lastTime;
 	lastTime = currTime;
@@ -128,10 +127,8 @@
 	crAppRender();
 
 	crContextPostRender(crAppContext.context);
-
-	//glBindRenderbuffer(GL_RENDERBUFFER, crAPI.defColorBufName);
-    //[context presentRenderbuffer:GL_RENDERBUFFER];
-
+	
+	crContextSwapBuffers(crAppContext.context);
 }
 
 - (void)layoutSubviews

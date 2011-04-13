@@ -79,6 +79,8 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE ignoreMe0, LPSTR ignoreMe1, INT ig
 				crAppRender();
 
 				crContextPostRender(crAppContext.context);
+
+				crContextSwapBuffers(crAppContext.context);
 			}
 		}
 
