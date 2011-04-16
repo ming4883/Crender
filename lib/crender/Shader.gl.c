@@ -138,7 +138,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 			glGetActiveUniform(impl->glName, i, crCountOf(uniformName), &uniformLength, &uniformSize, &uniformType, uniformName);
 			uniform = &impl->uniforms[i];
 			uniform->hash = CrHash(uniformName);
-			uniform->loc = i;
+			uniform->loc = glGetUniformLocation(impl->glName, uniformName);
 			uniform->size = uniformSize;
 			uniform->texunit = texunit;
 

@@ -112,7 +112,7 @@ typedef enum CrGpuDrawFlag
 
 	CrGpuDraw_Indexed		= 0x0010,	//!< draw with a 16-bit index buffer
 	CrGpuDraw_Indexed8		= 0x0011,	//!< draw with a 8-bit index buffer
-	CrGpuDraw_Indexed32	= 0x0012,	//!< draw with a 32-bit index buffer
+	CrGpuDraw_Indexed32		= 0x0012,	//!< draw with a 32-bit index buffer
 	
 } CrGpuDrawFlag;
 
