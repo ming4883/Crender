@@ -108,6 +108,8 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 		//glTexParameteri(impl->glTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
+	self->flags = CrTexture_Inited;
+
 	return crTextureCommit(self);
 }
 
@@ -149,9 +151,9 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	if(self->surfCount == 1) {
 		impl->glTarget = GL_TEXTURE_2D;
 		glBindTexture(impl->glTarget, impl->glName);
-		//glTexParameteri(impl->glTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		//glTexParameteri(impl->glTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+
+	self->flags = CrTexture_Inited | CrTexture_RenderTarget;
 
 	return crTextureCommit(self);
 }
@@ -167,9 +169,6 @@ CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, si
 
 	if(mipIndex > self->mipCount)
 		return nullptr;
-
-	//if(nullptr == self->data)
-	//	return nullptr;
 
 	return self->data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
 }

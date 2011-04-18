@@ -10,8 +10,9 @@ extern "C" {
 
 typedef enum CrTextureFlag
 {
-	CrTexture_Inited = 1 << 0,
-	CrTexture_Dirty = 1 << 1,
+	CrTexture_Inited = 0x0001,
+	CrTexture_Dirty = 0x0002,
+	CrTexture_RenderTarget = 0x0004,
 } CrTextureFlag;
 
 typedef struct CrTexture
@@ -19,11 +20,11 @@ typedef struct CrTexture
 	size_t flags;
 	size_t width;
 	size_t height;
-	size_t mipCount;	//<! include the base level
+	size_t mipCount; //<! NOT include the base level
 	size_t surfCount;
 	size_t surfSizeInByte;
 	CrGpuFormat format;
-	unsigned char* data;	//<! nullptr implies this is a render-target
+	unsigned char* data; //<! nullptr implies this is a render-target
 } CrTexture;
 
 CR_API CrTexture* crTextureAlloc();

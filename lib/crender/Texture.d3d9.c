@@ -99,6 +99,8 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 		}
 	}
 
+	self->flags = CrTexture_Inited;
+
 	return crTextureCommit(self);
 }
 
@@ -145,6 +147,8 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 			return CrFalse;
 		}
 	}
+
+	self->flags = CrTexture_Inited | CrTexture_RenderTarget;
 
 	return CrTrue;
 }
