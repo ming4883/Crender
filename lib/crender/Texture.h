@@ -30,14 +30,14 @@ CR_API CrTexture* crTextureAlloc();
 
 CR_API void crTextureFree(CrTexture* self);
 
-CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
+CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format, const void* data);
 
-CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
+CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format);
 
 //! mipIndex zero-base mip level index
 CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight);
 
-CR_API void crTextureCommit(CrTexture* self);
+CR_API CrBool crTextureCommit(CrTexture* self);
 
 #ifdef __cplusplus
 }
