@@ -68,7 +68,7 @@ CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t 
 		IDirect3DDevice9_CreateDepthStencilSurface(
 			crContextImpl()->d3ddev,
 			width, height,
-			crD3D9_DEPTH_FORMAT[CrGpuFormat_Depth & 0xffff],
+			crD3D9_DEPTH_FORMAT[CrGpuFormat_Depth & 0x0000ffff],
 			D3DMULTISAMPLE_NONE, 0,
 			TRUE, 
 			&buffer->d3dsurf,

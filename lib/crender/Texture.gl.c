@@ -6,6 +6,9 @@
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR8G8B8A8, 4, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE},
 	{CrGpuFormat_UnormR8, 1, GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE},
+	{CrGpuFormat_UnormR5G5B5A1, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1},
+	{CrGpuFormat_UnormR5G6B5, 2, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5},
+	{CrGpuFormat_UnormR4G4B4A4, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4},
 };
 #else
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
