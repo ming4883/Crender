@@ -141,11 +141,11 @@ void meshPreRender(Mesh* self, struct CrGpuProgram* program)
 
 	CrGpuProgramInput inputs[] = {
 		{impl->indexBuffer},
-		{impl->vertexBuffer, self->vertex.shaderName, 0, CrGpuFormat_FloatR32G32B32},
-		{impl->normalBuffer, self->normal.shaderName, 0, CrGpuFormat_FloatR32G32B32},
-		{impl->colorBuffer, self->color.shaderName, 0, CrGpuFormat_FloatR32G32B32A32},
-		{impl->tcBuffer[0], self->texcoord[0].shaderName, 0, CrGpuFormat_FloatR32G32},
-		{impl->tcBuffer[1], self->texcoord[1].shaderName, 0, CrGpuFormat_FloatR32G32},
+		{impl->vertexBuffer, self->vertex.shaderName, 0, sizeof(CrVec3), CrGpuFormat_FloatR32G32B32},
+		{impl->normalBuffer, self->normal.shaderName, 0, sizeof(CrVec3), CrGpuFormat_FloatR32G32B32},
+		{impl->colorBuffer, self->color.shaderName, 0, sizeof(CrVec4), CrGpuFormat_FloatR32G32B32A32},
+		{impl->tcBuffer[0], self->texcoord[0].shaderName, 0, sizeof(CrVec2), CrGpuFormat_FloatR32G32},
+		{impl->tcBuffer[1], self->texcoord[1].shaderName, 0, sizeof(CrVec2), CrGpuFormat_FloatR32G32},
 	};
 
 	crGpuProgramBindInput(program, impl->gpuInputId, inputs, crCountOf(inputs));

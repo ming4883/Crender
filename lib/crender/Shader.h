@@ -99,6 +99,7 @@ typedef struct CrGpuProgramInput
 	struct CrBuffer* buffer;
 	const char* name;
 	size_t offset;
+	size_t stride;
 	CrGpuFormat format;
 } CrGpuProgramInput;
 
