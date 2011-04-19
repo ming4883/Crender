@@ -32,21 +32,21 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 	self->type = type;
 
 	if(CrBufferType_Vertex == type) {
-		hr = IDirect3DDevice9_CreateVertexBuffer(crAPI.d3ddev, self->sizeInBytes, 0, 0, D3DPOOL_DEFAULT, &impl->d3dvb, nullptr);
+		hr = IDirect3DDevice9_CreateVertexBuffer(crContextImpl()->d3ddev, self->sizeInBytes, 0, 0, D3DPOOL_DEFAULT, &impl->d3dvb, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create vertex buffer %8x", hr);
 			return CrFalse;
 		}
 	}
 	else if(CrBufferType_Index == type) {
-		hr = IDirect3DDevice9_CreateIndexBuffer(crAPI.d3ddev, self->sizeInBytes, 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &impl->d3dib, nullptr);
+		hr = IDirect3DDevice9_CreateIndexBuffer(crContextImpl()->d3ddev, self->sizeInBytes, 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &impl->d3dib, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create index buffer %8x", hr);
 			return CrFalse;
 		}
 	}
 	else if(CrBufferType_Index32 == type) {
-		hr = IDirect3DDevice9_CreateIndexBuffer(crAPI.d3ddev, self->sizeInBytes, 0, D3DFMT_INDEX32, D3DPOOL_DEFAULT, &impl->d3dib, nullptr);
+		hr = IDirect3DDevice9_CreateIndexBuffer(crContextImpl()->d3ddev, self->sizeInBytes, 0, D3DFMT_INDEX32, D3DPOOL_DEFAULT, &impl->d3dib, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create index 32 buffer %8x", hr);
 			return CrFalse;

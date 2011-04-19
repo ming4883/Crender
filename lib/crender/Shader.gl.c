@@ -117,7 +117,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 	glUseProgram(impl->glName);
 
-	// query all cache
+	// query all uniforms
 	{
 		GLint i;
 		GLint uniformCnt;
@@ -131,14 +131,14 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 		impl->uniforms = crMemory()->alloc(sizeof(CrGpuProgramUniform) * uniformCnt, "CrGpuProgram");
 		memset(impl->uniforms, 0, sizeof(CrGpuProgramUniform) * uniformCnt);
-		crDbgStr("glProgram %d has %d cache\n", impl->glName, uniformCnt);
+		crDbgStr("glProgram %d has %d uniforms\n", impl->glName, uniformCnt);
 
 		for(i=0; i<uniformCnt; ++i) {
 			CrGpuProgramUniform* uniform;
 			glGetActiveUniform(impl->glName, i, crCountOf(uniformName), &uniformLength, &uniformSize, &uniformType, uniformName);
 			uniform = &impl->uniforms[i];
 			uniform->hash = CrHash(uniformName);
-			uniform->loc = i;
+			uniform->loc = glGetUniformLocation(impl->glName, uniformName);
 			uniform->size = uniformSize;
 			uniform->texunit = texunit;
 
@@ -161,7 +161,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 					uniform->texunit = -1;
 					break;
 			}
-			//crDbgStr("%s %d %d %d %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
+			//crDbgStr("%s %d %d 0x%04x %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
 		}
 
 	}
@@ -308,6 +308,7 @@ CR_API CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, siz
 		return CrFalse;
 
 	glUniformMatrix4fv(uniform->loc, count, transpose, value);
+	//crDbgStr("uniform %d %f %f %f %f\n", uniform->loc, value[0], value[1], value[2], value[3]);
 	return CrTrue;
 }
 
@@ -398,7 +399,7 @@ CrInputGpuFormatMapping* crInputGpuFormatMappingGet(CrGpuFormat crFormat)
 
 CR_API size_t crGenGpuInputId()
 {
-	return ++crAPI.gpuInputId;
+	return ++crContextImpl()->gpuInputId;
 }
 
 CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)

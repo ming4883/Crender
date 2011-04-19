@@ -221,6 +221,26 @@ CrAppContext crAppContext = {
 	480,
 };
 
+void* crOpen(const char* filename)
+{
+	AAsset* asset = AAssetManager_open(CR_ANDROID_APP->activity->assetManager, filename, AASSET_MODE_UNKNOWN);
+
+	if(nullptr == asset) {
+		crDbgStr("failed to open asset '%s'!\n", filename);
+	}
+	return asset;
+}
+
+void crClose(void* handle)
+{
+	AAsset_close((AAsset*)handle);
+}
+
+size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
+{
+	return (size_t)AAsset_read((AAsset*)handle, buff, elsize * nelem);
+}
+
 /**
 * This is the main entry point of a native application that is using
 * android_native_app_glue.  It runs in its own thread, with its own

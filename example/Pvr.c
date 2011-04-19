@@ -36,12 +36,9 @@ CrTexture* Pvr_createTexture(const PvrDataType* pvr)
 
 	tex = crTextureAlloc();
 
-	crTextureInit(tex, width, height, mipCount, 1, CrGpuFormat_UnormR8G8B8A8);
-
-	if(dataSize == tex->surfSizeInByte)
-		memcpy(tex->data, data, dataSize);
-
-	crTextureCommit(tex);
+	if(CrFalse == crTextureInit(tex, width, height, mipCount, 1, CrGpuFormat_UnormR8G8B8A8, data)) {
+		crDbgStr("failed to create pvr texture");
+	}
 
 	return tex;
 }

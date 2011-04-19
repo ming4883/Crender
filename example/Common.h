@@ -2,7 +2,6 @@
 #define __EXAMPLE_COMMON_H__
 
 #include "../lib/crender/Platform.h"
-#include "../lib/crender/Framework.h"
 #include "../lib/crender/Vec3.h"
 #include "../lib/crender/Vec4.h"
 #include "../lib/crender/Mat44.h"
@@ -10,6 +9,7 @@
 #include "../lib/crender/GpuState.h"
 #include "../lib/crender/RenderTarget.h"
 
+#include "Framework.h"
 #include "Material.h"
 #include "Stream.h"
 
@@ -44,7 +44,7 @@ typedef struct AppContext
 
 	CrRenderTarget* renderTarget;
 
-	InputStream* inputStream;
+	InputStream* istream;
 
 } AppContext;
 

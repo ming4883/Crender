@@ -53,12 +53,10 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "Label";
-	crAppContext.xres = 400;
-	crAppContext.yres = 300;
-	crAppContext.multiSampling = CrFalse;
-	crAppContext.vsync = CrFalse;
-	crAppContext.apiMajorVer = 3;
-	crAppContext.apiMinorVer = 3;
+	crAppContext.context->xres = 400;
+	crAppContext.context->yres = 300;
+	crAppContext.context->apiMajorVer = 3;
+	crAppContext.context->apiMinorVer = 3;
 }
 
 void crAppFinalize()
@@ -78,7 +76,7 @@ CrBool crAppInitialize()
 	// label
 	{
 		label = Label_alloc();
-		Label_init(label, crAppContext.xres, crAppContext.yres);
+		Label_init(label, crAppContext.context->xres, crAppContext.context->yres);
 		Label_setText(label, utf8);
 		Label_commit(label);
 	}

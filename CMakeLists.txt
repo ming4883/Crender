@@ -1,6 +1,8 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.4 )
 
 PROJECT( crender )
+
+SET( CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/dist" CACHE PATH "Use DESTDIR *instead* of CMAKE_INSTALL_PREFIX" FORCE ) 
 
 FILE( GLOB GLEW lib/glew/*.c lib/glew/*.h )
 FILE( GLOB GLSW lib/glsw/*.c lib/glsw/*.h )
@@ -9,6 +11,7 @@ FILE( GLOB HTTPD lib/httpd/*.c lib/httpd/*.h )
 ADD_DEFINITIONS( -DGLEW_STATIC )
 
 SET( CRENDER_COMMON
+		lib/crender/Context.h
 		lib/crender/Buffer.h
 		lib/crender/GpuFormat.h
 		lib/crender/GpuState.h
@@ -41,8 +44,8 @@ IF( WIN32 )
 	#FILE( GLOB CRENDER lib/crender/*.c lib/crender/*.h )
 	SET( CRENDER
 		${CRENDER_COMMON}
-		lib/crender/API.gl.c
-		lib/crender/API.gl.h
+		lib/crender/Context.windows.gl.c
+		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
 		lib/crender/GpuState.gl.c
@@ -73,8 +76,8 @@ IF( WIN32 )
 
 	SET( CRENDER_D3D9
 		${CRENDER_COMMON}
-		lib/crender/API.d3d9.c
-		lib/crender/API.d3d9.h
+		lib/crender/Context.windows.d3d9.c
+		lib/crender/Context.d3d9.h
 		lib/crender/Buffer.d3d9.c
 		lib/crender/Buffer.d3d9.h
 		lib/crender/GpuState.d3d9.c
@@ -99,7 +102,8 @@ ELSEIF( APPLE )
 
 	SET( CRENDER
 		${CRENDER_COMMON}
-		lib/crender/API.gl.h
+		lib/crender/Context.ios.m
+		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
 		lib/crender/GpuState.gl.c

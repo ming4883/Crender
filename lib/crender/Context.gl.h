@@ -1,5 +1,7 @@
-#ifndef __CRENDER_API_GL_H__
-#define __CRENDER_API_GL_H__
+#ifndef __CRENDER_CONTEXT_GL_H__
+#define __CRENDER_CONTEXT_GL_H__
+
+#include "Context.h"
 
 #ifdef CR_ANDROID
 #	include <GLES2/gl2.h>
@@ -20,25 +22,34 @@
 #	define glDepthRange glDepthRangef
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct CrAPI
+typedef struct CrContextImpl
 {
+	CrContext i;
+
 	unsigned int gpuInputId;
+
+#if defined(CR_WIN32)
+	GLuint hDC;
+    GLuint hRC;
+#endif
+
 #if defined(CR_APPLE_IOS)
+	GLuint eaglContext;
 	GLuint defFBOName;
 	GLuint defColorBufName;
 	GLuint defDepthBufName;
 #endif
-} CrAPI;
 
-extern CrAPI crAPI;
+} CrContextImpl;
+
+CR_API CrContextImpl* crContextImpl();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// __CRENDER_API_GL_H__
+#endif	// __CRENDER_CONTEXT_GL_H__

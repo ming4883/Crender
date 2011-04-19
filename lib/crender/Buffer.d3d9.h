@@ -1,7 +1,7 @@
 #ifndef __CRENDER_BUFFER_D3D9_H__
 #define __CRENDER_BUFFER_D3D9_H__
 
-#include "API.d3d9.h"
+#include "Context.d3d9.h"
 #include "Buffer.h"
 
 #ifdef __cplusplus

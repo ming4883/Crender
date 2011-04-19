@@ -22,10 +22,10 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 
 	// compile shader
 	if(CrGpuShaderType_Vertex == type) {
-		profile = D3DXGetVertexShaderProfile(crAPI.d3ddev);
+		profile = D3DXGetVertexShaderProfile(crContextImpl()->d3ddev);
 	}
 	else if(CrGpuShaderType_Fragment == type) {
-		profile = D3DXGetPixelShaderProfile(crAPI.d3ddev);
+		profile = D3DXGetPixelShaderProfile(crContextImpl()->d3ddev);
 	}
 	else {
 		crDbgStr("d3d9 unsupported shader type %d", type);
@@ -50,13 +50,13 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 
 	// create shader
 	if(CrGpuShaderType_Vertex == type) {
-		hr = IDirect3DDevice9_CreateVertexShader(crAPI.d3ddev,
+		hr = IDirect3DDevice9_CreateVertexShader(crContextImpl()->d3ddev,
 			code->lpVtbl->GetBufferPointer(code),
 			&impl->d3dvs
 			);
 	}
 	else if(CrGpuShaderType_Fragment == type) {
-		hr = IDirect3DDevice9_CreatePixelShader(crAPI.d3ddev,
+		hr = IDirect3DDevice9_CreatePixelShader(crContextImpl()->d3ddev,
 			code->lpVtbl->GetBufferPointer(code),
 			&impl->d3dps
 			);
@@ -245,8 +245,8 @@ CR_API void crGpuProgramPreRender(CrGpuProgram* self)
 		return;
 	}
 
-	IDirect3DDevice9_SetVertexShader(crAPI.d3ddev, impl->d3dvs);
-	IDirect3DDevice9_SetPixelShader(crAPI.d3ddev, impl->d3dps);
+	IDirect3DDevice9_SetVertexShader(crContextImpl()->d3ddev, impl->d3dvs);
+	IDirect3DDevice9_SetPixelShader(crContextImpl()->d3ddev, impl->d3dps);
 }
 
 CR_API CrBool crGpuProgramUniformfv(CrGpuProgram* self, CrHashCode hash, size_t count, const float* value)
@@ -264,12 +264,12 @@ CR_API CrBool crGpuProgramUniformfv(CrGpuProgram* self, CrHashCode hash, size_t 
 	
 	HASH_FIND_INT(impl->cacheVs, &hash, uniform);
 	if(nullptr != uniform) {
-		IDirect3DDevice9_SetVertexShaderConstantF(crAPI.d3ddev, uniform->loc, value, uniform->size * count);
+		IDirect3DDevice9_SetVertexShaderConstantF(crContextImpl()->d3ddev, uniform->loc, value, uniform->size * count);
 	}
 
 	HASH_FIND_INT(impl->cachePs, &hash, uniform);
 	if(nullptr != uniform) {
-		IDirect3DDevice9_SetPixelShaderConstantF(crAPI.d3ddev, uniform->loc, value, uniform->size * count);
+		IDirect3DDevice9_SetPixelShaderConstantF(crContextImpl()->d3ddev, uniform->loc, value, uniform->size * count);
 	}
 	
 	return CrTrue;
@@ -347,18 +347,18 @@ CR_API CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, st
 	
 	HASH_FIND_INT(impl->cacheVs, &hash, uniform);
 	if(nullptr != uniform && -1 != uniform->texunit) {
-		IDirect3DDevice9_SetTexture(crAPI.d3ddev, uniform->texunit, (IDirect3DBaseTexture9*)((CrTextureImpl*)texture)->d3dtex);
+		IDirect3DDevice9_SetTexture(crContextImpl()->d3ddev, uniform->texunit, (IDirect3DBaseTexture9*)((CrTextureImpl*)texture)->d3dtex);
 	}
 
 	HASH_FIND_INT(impl->cachePs, &hash, uniform);
 	if(nullptr != uniform) {
-		IDirect3DDevice9_SetTexture(crAPI.d3ddev, uniform->texunit, (IDirect3DBaseTexture9*)((CrTextureImpl*)texture)->d3dtex);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_MAGFILTER, crD3D9_SAMPLER_MAG_FILTER[sampler->filter]);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_MINFILTER, crD3D9_SAMPLER_MIN_FILTER[sampler->filter]);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_MIPFILTER, crD3D9_SAMPLER_MIP_FILTER[sampler->filter]);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_ADDRESSU, crD3D9_SAMPLER_ADDRESS[sampler->addressU]);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_ADDRESSV, crD3D9_SAMPLER_ADDRESS[sampler->addressV]);
-		IDirect3DDevice9_SetSamplerState(crAPI.d3ddev, uniform->texunit, D3DSAMP_ADDRESSW, crD3D9_SAMPLER_ADDRESS[sampler->addressW]);
+		IDirect3DDevice9_SetTexture(crContextImpl()->d3ddev, uniform->texunit, (IDirect3DBaseTexture9*)((CrTextureImpl*)texture)->d3dtex);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_MAGFILTER, crD3D9_SAMPLER_MAG_FILTER[sampler->filter]);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_MINFILTER, crD3D9_SAMPLER_MIN_FILTER[sampler->filter]);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_MIPFILTER, crD3D9_SAMPLER_MIP_FILTER[sampler->filter]);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_ADDRESSU, crD3D9_SAMPLER_ADDRESS[sampler->addressU]);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_ADDRESSV, crD3D9_SAMPLER_ADDRESS[sampler->addressV]);
+		IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, uniform->texunit, D3DSAMP_ADDRESSW, crD3D9_SAMPLER_ADDRESS[sampler->addressW]);
 	}
 	
 	return CrTrue;
@@ -433,7 +433,7 @@ void crGpuProgramBindBuffer(CrGpuProgram* self, CrGpuProgramInput* inputs, size_
 
 		if(CrBufferType_Index == buffer->i.type) {
 			// bind index buffer
-			IDirect3DDevice9_SetIndices(crAPI.d3ddev, buffer->d3dib);
+			IDirect3DDevice9_SetIndices(crContextImpl()->d3ddev, buffer->d3dib);
 		}
 		else if(CrBufferType_Vertex == buffer->i.type) {
 			// bind vertex buffer
@@ -443,7 +443,7 @@ void crGpuProgramBindBuffer(CrGpuProgram* self, CrGpuProgramInput* inputs, size_
 			if(nullptr != lastBuffer)
 				++stream;
 
-			IDirect3DDevice9_SetStreamSource(crAPI.d3ddev, stream, buffer->d3dvb, 0, m->stride);
+			IDirect3DDevice9_SetStreamSource(crContextImpl()->d3ddev, stream, buffer->d3dvb, 0, m->stride);
 			lastBuffer = buffer;
 		}
 	}
@@ -499,17 +499,17 @@ void crGpuProgramBindVertexDecl(CrGpuProgram* self, size_t gpuInputId, CrGpuProg
 
 		ia = crMemory()->alloc(sizeof(CrGpuProgramInputAssembly), "CrGpuProgram");
 		ia->gpuInputId = gpuInputId;
-		IDirect3DDevice9_CreateVertexDeclaration(crAPI.d3ddev, crD3D9_ELEMS, &ia->d3ddecl);
+		IDirect3DDevice9_CreateVertexDeclaration(crContextImpl()->d3ddev, crD3D9_ELEMS, &ia->d3ddecl);
 
 		HASH_ADD_INT(impl->ias, gpuInputId, ia);
 	}
 
-	IDirect3DDevice9_SetVertexDeclaration(crAPI.d3ddev, ia->d3ddecl);
+	IDirect3DDevice9_SetVertexDeclaration(crContextImpl()->d3ddev, ia->d3ddecl);
 }
 
 CR_API size_t crGenGpuInputId()
 {
-	return ++crAPI.gpuInputId;
+	return ++crContextImpl()->gpuInputId;
 }
 
 CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
@@ -520,31 +520,31 @@ CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 
 CR_API void crGpuDrawPoint(size_t offset, size_t count)
 {
-	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, D3DPT_POINTLIST, offset, count);
+	IDirect3DDevice9_DrawPrimitive(crContextImpl()->d3ddev, D3DPT_POINTLIST, offset, count);
 }
 
 CR_API void crGpuDrawLine(size_t offset, size_t count, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_LINESTRIP : D3DPT_LINELIST;
-	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, mode, offset, count / 2);
+	IDirect3DDevice9_DrawPrimitive(crContextImpl()->d3ddev, mode, offset, count / 2);
 }
 
 CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_LINESTRIP : D3DPT_LINELIST;
-	IDirect3DDevice9_DrawIndexedPrimitive(crAPI.d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 2);
+	IDirect3DDevice9_DrawIndexedPrimitive(crContextImpl()->d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 2);
 }
 
 CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_TRIANGLESTRIP : D3DPT_TRIANGLELIST;
-	IDirect3DDevice9_DrawPrimitive(crAPI.d3ddev, mode, offset, count / 3);
+	IDirect3DDevice9_DrawPrimitive(crContextImpl()->d3ddev, mode, offset, count / 3);
 }
 
 CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx, size_t maxIdx, size_t flags)
 {
 	D3DPRIMITIVETYPE mode = (flags & CrGpuDraw_Stripped) ? D3DPT_TRIANGLESTRIP : D3DPT_TRIANGLELIST;
-	IDirect3DDevice9_DrawIndexedPrimitive(crAPI.d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 3);
+	IDirect3DDevice9_DrawIndexedPrimitive(crContextImpl()->d3ddev, mode, 0, minIdx, maxIdx+1, offset, count / 3);
 }
 
 CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)

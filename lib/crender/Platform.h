@@ -12,13 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef CR_APPLE_IOS
-#include <stddef.h>
-#include <stdint.h>
-#else
-#include "pstdint.h"
-#endif
-
 #if defined(_MSC_VER)
 #	if defined(CR_USE_DLL)
 #		if(CR_DLL_EXPORT)
@@ -39,10 +32,11 @@ extern "C" {
 
 #define nullptr 0
 
-typedef uint8_t CrBool;
+typedef unsigned char CrBool;
 #define CrFalse 0
 #define CrTrue 1
 
+//! Plaform specific debug string output
 CR_API void crDbgStr(const char* str, ...);
 
 #define crCountOf(A) (sizeof(A) / sizeof(A[0]))
@@ -50,6 +44,7 @@ CR_API void crDbgStr(const char* str, ...);
 #define crMin(a, b) (a < b ? a : b)
 
 #define crMax(a, b) (a > b ? a : b)
+
 
 #define CrAllocWithImpl(obj, CLASS, CLASSIMPL) \
 	obj = (CLASS*)malloc(sizeof(CLASS)+sizeof(CLASSIMPL));\

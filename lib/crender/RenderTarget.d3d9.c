@@ -66,9 +66,9 @@ CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t 
 
 	if(format & CrGpuFormat_Depth) {
 		IDirect3DDevice9_CreateDepthStencilSurface(
-			crAPI.d3ddev,
+			crContextImpl()->d3ddev,
 			width, height,
-			crD3D9_DEPTH_FORMAT[CrGpuFormat_Depth & 0xffff],
+			crD3D9_DEPTH_FORMAT[CrGpuFormat_Depth & 0x0000ffff],
 			D3DMULTISAMPLE_NONE, 0,
 			TRUE, 
 			&buffer->d3dsurf,
@@ -106,8 +106,8 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 	size_t bufCnt;
 	CrRenderBuffer** curr;
 	if(nullptr == self) {
-		IDirect3DDevice9_SetRenderTarget(crAPI.d3ddev, 0, crAPI.d3dcolorbuf);
-		IDirect3DDevice9_SetDepthStencilSurface(crAPI.d3ddev, crAPI.d3ddepthbuf);
+		IDirect3DDevice9_SetRenderTarget(crContextImpl()->d3ddev, 0, crContextImpl()->d3dcolorbuf);
+		IDirect3DDevice9_SetDepthStencilSurface(crContextImpl()->d3ddev, crContextImpl()->d3ddepthbuf);
 		return;
 	}
 
@@ -117,7 +117,7 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 		curr = (CrRenderBuffer**)colors;
 		while(*curr != nullptr) {
 			CrRenderBufferImpl* buf = (CrRenderBufferImpl*)*curr;
-			IDirect3DDevice9_SetRenderTarget(crAPI.d3ddev, bufCnt, buf->d3dsurf);
+			IDirect3DDevice9_SetRenderTarget(crContextImpl()->d3ddev, bufCnt, buf->d3dsurf);
 			++curr;
 			++bufCnt;
 		}
@@ -127,10 +127,10 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 	if(depth != nullptr) {
 		CrTexture* tex = depth->texture;
 		CrRenderBufferImpl* buf = (CrRenderBufferImpl*)depth;
-		IDirect3DDevice9_SetDepthStencilSurface(crAPI.d3ddev, buf->d3dsurf);
+		IDirect3DDevice9_SetDepthStencilSurface(crContextImpl()->d3ddev, buf->d3dsurf);
 	}
 	else {
-		IDirect3DDevice9_SetDepthStencilSurface(crAPI.d3ddev, nullptr);
+		IDirect3DDevice9_SetDepthStencilSurface(crContextImpl()->d3ddev, nullptr);
 	}
 }
 
@@ -144,15 +144,15 @@ CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float 
 	vp.MinZ = zmin * 0.5f + 0.5f;
 	vp.MaxZ = zmax * 0.5f + 0.5f;;
 
-	IDirect3DDevice9_SetViewport(crAPI.d3ddev, &vp);
+	IDirect3DDevice9_SetViewport(crContextImpl()->d3ddev, &vp);
 }
 
 CR_API void crRenderTargetClearColor(float r, float g, float b, float a)
 {
-	IDirect3DDevice9_Clear(crAPI.d3ddev, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_COLORVALUE(r, g, b, a), 1, 0);
+	IDirect3DDevice9_Clear(crContextImpl()->d3ddev, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_COLORVALUE(r, g, b, a), 1, 0);
 }
 
 CR_API void crRenderTargetClearDepth(float z)
 {
-	IDirect3DDevice9_Clear(crAPI.d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
+	IDirect3DDevice9_Clear(crContextImpl()->d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
 }

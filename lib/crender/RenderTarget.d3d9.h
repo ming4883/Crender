@@ -1,7 +1,7 @@
 #ifndef __CRENDER_RENDERTARGET_D3D9_H__
 #define __CRENDER_RENDERTARGET_D3D9_H__
 
-#include "API.d3d9.h"
+#include "Context.d3d9.h"
 #include "RenderTarget.h"
 #include "Texture.d3d9.h"
 #include "uthash/utlist.h"

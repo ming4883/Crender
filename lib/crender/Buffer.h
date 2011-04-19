@@ -10,7 +10,7 @@ extern "C" {
 typedef enum CrBufferType
 {
 	CrBufferType_Vertex,	//!< vertex buffer
-	CrBufferType_Index,	//!< 16-bit index buffer
+	CrBufferType_Index,		//!< 16-bit index buffer
 	CrBufferType_Index8,	//!< 8-bit index buffer
 
 #if !defined(CR_GLES_2)

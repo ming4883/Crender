@@ -50,25 +50,25 @@ size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipW
 	return offset;
 }
 
-CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
+CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format, const void* data)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
-	if(self->flags & CrTextureFlag_Inited) {
+	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
-		return;
+		return CrFalse;
 	}
 
 	if(surfCount > 1) {
 		crDbgStr("Current not support surfCount > 1!\n");
-		return;
+		return CrFalse;
 	}
 
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
 	
 	if(nullptr == impl->apiFormatMapping) {
 		crDbgStr("Non supported texture format: %s\n", format);
-		return;
+		return CrFalse;
 	}
 
 	self->format = format;
@@ -82,41 +82,47 @@ CR_API void crTextureInit(CrTexture* self, size_t width, size_t height, size_t m
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
 		self->data = (unsigned char*)crMemory()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
-		memset(self->data, 0, self->surfSizeInByte * self->surfCount);
+
+		if(nullptr != data)
+			memcpy(self->data, data, self->surfSizeInByte * self->surfCount);
+		else
+			memset(self->data, 0, self->surfSizeInByte * self->surfCount);
 	}
 
 	// create texture
 	{
 		HRESULT hr;
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, width, height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
-			return;
+			return CrFalse;
 		}
 	}
 
-	crTextureCommit(self);
+	self->flags = CrTexture_Inited;
+
+	return crTextureCommit(self);
 }
 
-CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
+CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
-	if(self->flags & CrTextureFlag_Inited) {
+	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
-		return;
+		return CrFalse;
 	}
 
 	if(surfCount > 1) {
 		crDbgStr("Current not support surfCount > 1!\n");
-		return;
+		return CrFalse;
 	}
 
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
 	
 	if(nullptr == impl->apiFormatMapping) {
 		crDbgStr("Non supported texture format: %s\n", format);
-		return;
+		return CrFalse;
 	}
 
 	self->format = format;
@@ -135,12 +141,16 @@ CR_API void crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_
 	// create d3d texture
 	{
 		HRESULT hr;
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
-			return;
+			return CrFalse;
 		}
 	}
+
+	self->flags = CrTexture_Inited | CrTexture_RenderTarget;
+
+	return CrTrue;
 }
 
 
@@ -161,25 +171,25 @@ CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, si
 	return self->data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
 }
 
-CR_API void crTextureCommit(CrTexture* self)
+CR_API CrBool crTextureCommit(CrTexture* self)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
 	if(nullptr == self)
-		return;
+		return CrFalse;
 
 	if(nullptr == impl->apiFormatMapping)
-		return;
+		return CrFalse;
 
 	if(self->surfCount == 1) {
 		HRESULT hr;
 		size_t i;
 		IDirect3DTexture9* stageTex;
 
-		hr = IDirect3DDevice9_CreateTexture(crAPI.d3ddev, self->width, self->height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_SYSTEMMEM, &stageTex, nullptr);
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, self->width, self->height, self->mipCount, 0, impl->apiFormatMapping->d3dFormat, D3DPOOL_SYSTEMMEM, &stageTex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
-			return;
+			return CrFalse;
 		}
 
 		for(i=0; i<self->mipCount; ++i) {
@@ -195,10 +205,12 @@ CR_API void crTextureCommit(CrTexture* self)
 			IDirect3DTexture9_UnlockRect(stageTex, i);
 		}
 
-		IDirect3DDevice9_UpdateTexture(crAPI.d3ddev, (IDirect3DBaseTexture9*)stageTex, (IDirect3DBaseTexture9*)impl->d3dtex);
+		IDirect3DDevice9_UpdateTexture(crContextImpl()->d3ddev, (IDirect3DBaseTexture9*)stageTex, (IDirect3DBaseTexture9*)impl->d3dtex);
 
 		IDirect3DTexture9_Release(stageTex);
 	}
+
+	return CrTrue;
 }
 
 CR_API void crTextureFree(CrTexture* self)

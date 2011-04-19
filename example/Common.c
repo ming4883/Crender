@@ -2,13 +2,8 @@
 
 #include "../lib/glsw/glsw.h"
 
-
-void* myOpen(const char* filename);
-void myClose(void* handle);
-size_t myRead(void* buff, size_t elsize, size_t nelem, void* handle);
-
-glswFileSystem myFileSystem = {myRead, myOpen, myClose};
-InputStream myInputStream = {myRead, myOpen, myClose};
+glswFileSystem myFileSystem = {crRead, crOpen, crClose};
+InputStream myInputStream = {crRead, crOpen, crClose};
 
 AppContext* appAlloc()
 {
@@ -25,14 +20,14 @@ void appInit(AppContext* self)
 	self->renderTarget = crRenderTargetAlloc();
 	crRenderTargetInit(self->renderTarget);
 
-	self->inputStream = &myInputStream;
+	self->istream = &myInputStream;
 
-	self->aspect.width = (float)crAppContext.xres;
-	self->aspect.height = (float)crAppContext.yres;
+	self->aspect.width = (float)crAppContext.context->xres;
+	self->aspect.height = (float)crAppContext.context->yres;
 
 	crRenderTargetSetViewport(0, 0, self->aspect.width, self->aspect.height, -1, 1);
 
-	crDbgStr("crender started with %d x %d, api=%s\n", crAppContext.xres, crAppContext.yres, crAppContext.apiName);
+	crDbgStr("crender started with %d x %d, api=%s\n", crAppContext.context->xres, crAppContext.context->yres, crAppContext.context->apiName);
 }
 
 void appFree(AppContext* self)
@@ -46,19 +41,19 @@ void appLoadMaterialBegin(AppContext* self, const char** directives)
 {
 	glswInit(&myFileSystem);
 
-	if(strcmp("gl", crAppContext.apiName) == 0) {
+	if(strcmp("gl", crAppContext.context->apiName) == 0) {
 		glswSetPath("", ".glsl");
-		if(3 == crAppContext.apiMajorVer) {
+		if(3 == crAppContext.context->apiMajorVer) {
 			glswAddDirectiveToken("", "#version 150");
 		}
-		else if(4 == crAppContext.apiMajorVer) {
+		else if(4 == crAppContext.context->apiMajorVer) {
 			glswAddDirectiveToken("", "#version 400");
 		}
 	}
-	else if(strcmp("gles", crAppContext.apiName) == 0) {
+	else if(strcmp("gles", crAppContext.context->apiName) == 0) {
 		glswSetPath("", ".gles");
 	}
-	else if(strcmp("d3d9", crAppContext.apiName) == 0) {
+	else if(strcmp("d3d9", crAppContext.context->apiName) == 0) {
 		glswSetPath("", ".hlsl");
 	}
 

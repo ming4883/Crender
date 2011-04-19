@@ -1,7 +1,7 @@
 #ifndef __CRENDER_GPUSTATE_GL_H__
 #define __CRENDER_GPUSTATE_GL_H__
 
-#include "API.gl.h"
+#include "Context.gl.h"
 #include "GpuState.h"
 
 #ifdef __cplusplus

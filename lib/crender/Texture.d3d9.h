@@ -1,7 +1,7 @@
 #ifndef __CRENDER_TEXTURE_D3D9_H__
 #define __CRENDER_TEXTURE_D3D9_H__
 
-#include "API.d3d9.h"
+#include "Context.d3d9.h"
 #include "Texture.h"
 
 #ifdef __cplusplus

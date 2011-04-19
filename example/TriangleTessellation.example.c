@@ -114,12 +114,9 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "Triangle Tessellation";
-	crAppContext.xres = 800;
-	crAppContext.yres = 600;
-	crAppContext.multiSampling = CrTrue;
-	crAppContext.vsync = CrFalse;
-	crAppContext.apiMajorVer = 4;
-	crAppContext.apiMinorVer = 0;
+	crAppContext.context->msaaLevel = 4;
+	crAppContext.context->apiMajorVer = 4;
+	crAppContext.context->apiMinorVer = 0;
 }
 
 void crAppFinalize()
@@ -177,7 +174,7 @@ CrBool crAppInitialize()
 	// meshs
 	{
 		tessMesh = meshAlloc();
-		meshInitWithObjFile(tessMesh, "monkey.obj", app->inputStream);
+		meshInitWithObjFile(tessMesh, "monkey.obj", app->istream);
 
 		bgMesh = meshAlloc();
 		meshInitWithScreenQuad(bgMesh);

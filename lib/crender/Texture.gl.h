@@ -1,7 +1,7 @@
 #ifndef __CRENDER_TEXTURE_GL_H__
 #define __CRENDER_TEXTURE_GL_H__
 
-#include "API.gl.h"
+#include "Context.gl.h"
 #include "Texture.h"
 
 #ifdef __cplusplus
