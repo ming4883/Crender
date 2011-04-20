@@ -210,6 +210,8 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
+	HASH_CLEAR(hh, impl->cacheVs);
+	HASH_CLEAR(hh, impl->cachePs);
 	crMemory()->free(impl->uniformsVs, "crGpuProgram");
 	crMemory()->free(impl->uniformsPs, "crGpuProgram");
 	

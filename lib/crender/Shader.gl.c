@@ -180,6 +180,7 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
+	HASH_CLEAR(hh, impl->cache);
 	crMemory()->free(impl->uniforms, "CrGpuProgram");
 
 	glDeleteProgram(impl->glName);
