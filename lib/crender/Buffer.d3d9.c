@@ -1,9 +1,9 @@
 #include "Buffer.d3d9.h"
-#include "Memory.h"
+#include "Mem.h"
 
 CR_API CrBuffer* crBufferAlloc()
 {
-	CrBufferImpl* self = crMemory()->alloc(sizeof(CrBufferImpl), "CrBuffer");
+	CrBufferImpl* self = crMem()->alloc(sizeof(CrBufferImpl), "CrBuffer");
 	memset(self, 0, sizeof(CrBufferImpl));
 	return &self->i;
 }
@@ -21,7 +21,7 @@ CR_API void crBufferFree(CrBuffer* self)
 	if(nullptr != impl->d3dib)
 		IDirect3DIndexBuffer9_Release(impl->d3dib);
 
-	crMemory()->free(self, "CrBuffer");
+	crMem()->free(self, "CrBuffer");
 }
 
 CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData)

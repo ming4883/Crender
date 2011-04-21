@@ -1,7 +1,7 @@
 #include "Shader.gl.h"
 #include "Texture.gl.h"
 #include "Buffer.gl.h"
-#include "Memory.h"
+#include "Mem.h"
 #include <stdio.h>
 
 static GLenum crGL_SHADER_TYPE[] = {
@@ -16,7 +16,7 @@ static GLenum crGL_SHADER_TYPE[] = {
 
 CR_API CrGpuShader* crGpuShaderAlloc()
 {
-	CrGpuShaderImpl* self = crMemory()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
+	CrGpuShaderImpl* self = crMem()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
 	memset(self, 0, sizeof(CrGpuShaderImpl));
 	return &self->i;
 }
@@ -44,10 +44,10 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 		GLint len;
 		glGetShaderiv(impl->glName, GL_INFO_LOG_LENGTH, &len);
 		if(len > 0) {
-			char* buf = (char*)crMemory()->alloc(len, "CrGpuShader");
+			char* buf = (char*)crMem()->alloc(len, "CrGpuShader");
 			glGetShaderInfoLog(impl->glName, len, nullptr, buf);
 			crDbgStr("glCompileShader failed: %s", buf);
-			crMemory()->free(buf, "CrGpuShader");
+			crMem()->free(buf, "CrGpuShader");
 		}
 
 		return CrFalse;
@@ -67,12 +67,12 @@ CR_API void crGpuShaderFree(CrGpuShader* self)
 		return;
 
 	glDeleteShader(impl->glName);
-	crMemory()->free(self, "CrGpuShader");
+	crMem()->free(self, "CrGpuShader");
 }
 
 CR_API CrGpuProgram* crGpuProgramAlloc()
 {
-	CrGpuProgramImpl* self = crMemory()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
+	CrGpuProgramImpl* self = crMem()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
 	memset(self, 0, sizeof(CrGpuProgramImpl));
 	return &self->i;
 }
@@ -105,10 +105,10 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 		GLint len;
 		glGetProgramiv(impl->glName, GL_INFO_LOG_LENGTH, &len);
 		if(len > 0) {
-			char* buf = (char*)crMemory()->alloc(len, "CrGpuProgram");
+			char* buf = (char*)crMem()->alloc(len, "CrGpuProgram");
 			glGetProgramInfoLog(impl->glName, len, nullptr, buf);
 			crDbgStr("glLinkProgram failed: %s", buf);
-			crMemory()->free(buf, "CrGpuProgram");
+			crMem()->free(buf, "CrGpuProgram");
 		}
 		return CrFalse;
 	}
@@ -129,7 +129,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 		glGetProgramiv(impl->glName, GL_ACTIVE_UNIFORMS, &uniformCnt);
 
-		impl->uniforms = crMemory()->alloc(sizeof(CrGpuProgramUniform) * uniformCnt, "CrGpuProgram");
+		impl->uniforms = crMem()->alloc(sizeof(CrGpuProgramUniform) * uniformCnt, "CrGpuProgram");
 		memset(impl->uniforms, 0, sizeof(CrGpuProgramUniform) * uniformCnt);
 		crDbgStr("glProgram %d has %d uniforms\n", impl->glName, uniformCnt);
 
@@ -180,7 +180,7 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
-	crMemory()->free(impl->uniforms, "CrGpuProgram");
+	crMem()->free(impl->uniforms, "CrGpuProgram");
 
 	glDeleteProgram(impl->glName);
 
@@ -188,7 +188,7 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	glDeleteVertexArrays(1, &impl->glVertexArray);
 #endif
 
-	crMemory()->free(self, "CrGpuProgram");
+	crMem()->free(self, "CrGpuProgram");
 }
 
 CR_API void crGpuProgramPreRender(CrGpuProgram* self)

@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-#include "../lib/crender/Memory.h"
+#include "../lib/crender/Mem.h"
 #include "../lib/crender/Buffer.h"
 #include "../lib/crender/Shader.h"
 #include "../lib/crender/Vec2.h"
@@ -22,7 +22,7 @@ typedef struct MeshImpl {
 
 Mesh* meshAlloc()
 {
-	MeshImpl* self = crMemory()->alloc(sizeof(MeshImpl), "mesh");
+	MeshImpl* self = crMem()->alloc(sizeof(MeshImpl), "mesh");
 	memset(self, 0, sizeof(MeshImpl));
 
 	return &self->i;

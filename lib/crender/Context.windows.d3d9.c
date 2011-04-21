@@ -1,5 +1,5 @@
 #include "Context.d3d9.h"
-#include "Memory.h"
+#include "Mem.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -18,7 +18,7 @@ CR_API CrContextImpl* crContextImpl()
 
 CR_API CrContext* crContextAlloc()
 {
-	CrContextImpl* self = crMemory()->alloc(sizeof(CrContextImpl), "CrContext");
+	CrContextImpl* self = crMem()->alloc(sizeof(CrContextImpl), "CrContext");
 	memset(self, 0, sizeof(CrContextImpl));
 
 	self->i.apiName = "d3d9";
@@ -102,7 +102,7 @@ CR_API void crContextFree(CrContext* self)
 	IDirect3DDevice9_Release(impl->d3ddev);
 	IDirect3D9_Release(impl->d3d);
 
-	crMemory()->free(self, "CrContext");
+	crMem()->free(self, "CrContext");
 }
 
 CR_API CrBool crContextPreRender(CrContext* self)

@@ -1,9 +1,9 @@
 #include "RenderTarget.d3d9.h"
-#include "Memory.h"
+#include "Mem.h"
 
 CR_API CrRenderTarget* crRenderTargetAlloc()
 {
-	CrRenderTargetImpl* self = crMemory()->alloc(sizeof(CrRenderTargetImpl), "CrRenderTarget");
+	CrRenderTargetImpl* self = crMem()->alloc(sizeof(CrRenderTargetImpl), "CrRenderTarget");
 	memset(self, 0, sizeof(CrRenderTargetImpl));
 	return &self->i;
 }
@@ -20,10 +20,10 @@ CR_API void crRenderTargetFree(CrRenderTarget* self)
 			LL_DELETE(impl->bufferList, it);
 			crTextureFree(it->i.texture);
 			IDirect3DSurface9_Release(it->d3dsurf);
-			crMemory()->free(it, "CrRenderTarget");
+			crMem()->free(it, "CrRenderTarget");
 		}
 	}
-	crMemory()->free(self, "CrRenderTarget");
+	crMem()->free(self, "CrRenderTarget");
 }
 
 CR_API void crRenderTargetInit(CrRenderTarget* self)
@@ -60,7 +60,7 @@ CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t 
 		}
 	}
 
-	buffer = crMemory()->alloc(sizeof(CrRenderBufferImpl), "CrRenderTarget");
+	buffer = crMem()->alloc(sizeof(CrRenderBufferImpl), "CrRenderTarget");
 	memset(buffer, 0, sizeof(CrRenderBufferImpl));
 	buffer->acquired = CrTrue;
 

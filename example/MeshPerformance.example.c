@@ -5,7 +5,7 @@
 #include "red_tile_texture.h"
 
 AppContext* app = nullptr;
-//RemoteConfig* config = nullptr;
+RemoteConfig* config = nullptr;
 CrVec4 bgClr = {0.25f, 0.25f, 0.25f, 1};
 Mesh* mesh = nullptr;
 Mesh* batchMesh = nullptr;
@@ -26,6 +26,7 @@ float t = 0;
 
 void crAppUpdate(unsigned int elapsedMilliseconds)
 {
+	//crDbgStr("dt = %d", elapsedMilliseconds);
 	t += elapsedMilliseconds * 0.0001f;
 	if(t > 1.0f) {
 		t = 0.0f;
@@ -50,9 +51,9 @@ void crAppRender()
 
 	Settings lsettings;
 
-	//remoteConfigLock(config);
+	remoteConfigLock(config);
 	lsettings = settings;
-	//remoteConfigUnlock(config);
+	remoteConfigUnlock(config);
 	
 	crMat44CameraLookAt(&viewMtx, &eyeAt, &lookAt, &eyeUp);
 	crMat44Prespective(&projMtx, 45.0f, app->aspect.width / app->aspect.height, 0.1f, 30.0f);
@@ -136,7 +137,7 @@ void crAppFinalize()
 	meshFree(mesh);
 	crTextureFree(texture);
 	materialFree(mtl);
-	//remoteConfigFree(config);
+	remoteConfigFree(config);
 	appFree(app);
 }
 
@@ -145,8 +146,9 @@ CrBool crAppInitialize()
 	app = appAlloc();
 	appInit(app);
 
-	/*
+	
 	// remote config
+	crDbgStr("init remote config...");
 	{
 		RemoteVarDesc descs[] = {
 			{"size", &settings.size, 1, 100},
@@ -157,8 +159,27 @@ CrBool crAppInitialize()
 		remoteConfigInit(config, 8080, CrTrue);
 		remoteConfigAddVars(config, descs);
 	}
-	*/
-	
+	/**/
+
+	// load materials
+	crDbgStr("loading materials...");
+	{
+		appLoadMaterialBegin(app, nullptr);
+
+		mtl = appLoadMaterial(
+			"MeshPerformance.Scene.Vertex",
+			"MeshPerformance.Scene.Fragment",
+			nullptr, nullptr, nullptr);
+		if(0 == (mtl->flags & MaterialFlag_Inited))
+			return CrFalse;
+		
+		appLoadMaterialEnd(app);
+	}
+
+	crDbgStr("creating textures...");
+	texture = Pvr_createTexture(red_tile_texture);
+
+	crDbgStr("loading meshes...");
 	// load mesh
 	{
 		mesh = meshAlloc();
@@ -168,6 +189,7 @@ CrBool crAppInitialize()
 		crDbgStr("mesh vcnt=%d, icnt=%d\n", mesh->vertexCount, mesh->indexCount);
 	}
 
+	crDbgStr("creating batch meshes...");
 	{
 		size_t instCnt = CNT * CNT;
 		batchMesh = meshAlloc();
@@ -223,23 +245,7 @@ CrBool crAppInitialize()
 		meshCommit(batchMesh);
 	}
 	
-	// load materials
-	{
-		appLoadMaterialBegin(app, nullptr);
-
-		mtl = appLoadMaterial(
-			"MeshPerformance.Scene.Vertex",
-			"MeshPerformance.Scene.Fragment",
-			nullptr, nullptr, nullptr);
-		if(0 == (mtl->flags & MaterialFlag_Inited))
-			return CrFalse;
-		
-		appLoadMaterialEnd(app);
-	}
-
-	texture = Pvr_createTexture(red_tile_texture);
-	
-	crDbgStr("XpRender MeshPerformance example started, batch=%d\n", BATCH_DRAW);
+	crDbgStr("CRender MeshPerformance example started, batch=%d\n", BATCH_DRAW);
 
 	return CrTrue;
 }

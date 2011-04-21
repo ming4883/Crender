@@ -1,5 +1,5 @@
 #include "Buffer.gl.h"
-#include "Memory.h"
+#include "Mem.h"
 
 static GLenum crGL_BUFFER_TARGET[] = {
 	GL_ARRAY_BUFFER,
@@ -22,7 +22,7 @@ static GLenum crGL_BUFFER_MAP_ACCESS[] = {
 
 CR_API CrBuffer* crBufferAlloc()
 {
-	CrBufferImpl* self = crMemory()->alloc(sizeof(CrBufferImpl), "CrBuffer");
+	CrBufferImpl* self = crMem()->alloc(sizeof(CrBufferImpl), "CrBuffer");
 	memset(self, 0, sizeof(CrBufferImpl));
 	return &self->i;
 }
@@ -35,7 +35,7 @@ CR_API void crBufferFree(CrBuffer* self)
 
 	glDeleteBuffers(1, &impl->glName);
 
-	crMemory()->free(self, "CrBuffer");
+	crMem()->free(self, "CrBuffer");
 }
 
 CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData)

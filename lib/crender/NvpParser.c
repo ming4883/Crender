@@ -1,22 +1,22 @@
 #include "NvpParser.h"
-#include "Memory.h"
+#include "Mem.h"
 
 CR_API CrNvpParser* crNvpParserAlloc()
 {
-	CrNvpParser* self = crMemory()->alloc(sizeof(CrNvpParser), "CrNvpParser");
+	CrNvpParser* self = crMem()->alloc(sizeof(CrNvpParser), "CrNvpParser");
 	memset(self, 0, sizeof(CrNvpParser));
 	return self;
 }
 
 CR_API void crNvpParserFree(CrNvpParser* self)
 {
-	crMemory()->free(self->mStr, "CrNvpParser");
-	crMemory()->free(self, "CrNvpParser");
+	crMem()->free(self->mStr, "CrNvpParser");
+	crMem()->free(self, "CrNvpParser");
 }
 
 CR_API void crNvpParserInit(CrNvpParser* self, const char* str)
 {
-	self->mStr = self->mPos = crMemory()->alloc(strlen(str), "CrNvpParser");
+	self->mStr = self->mPos = crMem()->alloc(strlen(str), "CrNvpParser");
 	memcpy(self->mStr, str, strlen(str));
 }
 

@@ -5,7 +5,8 @@
 
 #ifdef CR_ANDROID
 #	include <GLES2/gl2.h>
-#	include <GLES2/glext.h>
+#	include <GLES2/gl2ext.h>
+#	include <EGL/egl.h>
 #	define CR_GLES_2
 
 #elif defined(CR_APPLE_IOS)
@@ -42,6 +43,12 @@ typedef struct CrContextImpl
 	GLuint defFBOName;
 	GLuint defColorBufName;
 	GLuint defDepthBufName;
+#endif
+
+#if defined(CR_ANDROID)
+	EGLDisplay display;
+	EGLSurface surface;
+	EGLContext context;
 #endif
 
 } CrContextImpl;

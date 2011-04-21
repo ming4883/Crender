@@ -1,4 +1,4 @@
-#include "Memory.h"
+#include "Mem.h"
 
 void* crDefaultAlloc(size_t sizeInBytes, const char* id)
 {
@@ -10,13 +10,13 @@ void crDefaultFree(void* ptr, const char* id)
 	realloc(ptr, 0);
 }
 
-static CrMemory _crMemory = 
+static CrMem _crMemory = 
 {
 	crDefaultAlloc,
 	crDefaultFree
 };
 
-CR_API CrMemory* crMemory()
+CR_API CrMem* crMem()
 {
 	return &_crMemory;
 }

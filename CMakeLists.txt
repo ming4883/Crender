@@ -17,8 +17,8 @@ SET( CRENDER_COMMON
 		lib/crender/GpuState.h
 		lib/crender/Mat44.c
 		lib/crender/Mat44.h
-		lib/crender/Memory.c
-		lib/crender/Memory.h
+		lib/crender/Mem.c
+		lib/crender/Mem.h
 		lib/crender/NvpParser.c
 		lib/crender/NvpParser.h
 		lib/crender/Platform.c

@@ -10,13 +10,13 @@ extern "C" {
 typedef void*(* CrAllocFunc) (size_t sizeInBytes, const char* id);
 typedef void(* CrFreeFunc) (void* ptr, const char* id);
 
-typedef struct CrMemory
+typedef struct CrMem
 {
 	CrAllocFunc alloc;
 	CrFreeFunc free;
-} CrMemory;
+} CrMem;
 
-CR_API CrMemory* crMemory();
+CR_API CrMem* crMem();
 
 #ifdef __cplusplus
 }

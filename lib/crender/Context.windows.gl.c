@@ -1,5 +1,5 @@
 #include "Context.gl.h"
-#include "Memory.h"
+#include "Mem.h"
 
 #define _WIN32_WINNT 0x0500
 #define WINVER 0x0500
@@ -22,7 +22,7 @@ CR_API CrContextImpl* crContextImpl()
 
 CR_API CrContext* crContextAlloc()
 {
-	CrContextImpl* self = crMemory()->alloc(sizeof(CrContextImpl), "CrContext");
+	CrContextImpl* self = crMem()->alloc(sizeof(CrContextImpl), "CrContext");
 	memset(self, 0, sizeof(CrContextImpl));
 
 	self->i.apiName = "gl";
@@ -176,7 +176,7 @@ CR_API void crContextFree(CrContext* self)
 {
 	current = nullptr;
 
-	crMemory()->free(self, "CrContext");
+	crMem()->free(self, "CrContext");
 }
 
 CR_API CrBool crContextPreRender(CrContext* self)

@@ -1,12 +1,12 @@
 #include "Shader.d3d9.h"
 #include "Texture.d3d9.h"
 #include "Buffer.d3d9.h"
-#include "Memory.h"
+#include "Mem.h"
 #include <stdio.h>
 
 CR_API CrGpuShader* crGpuShaderAlloc()
 {
-	CrGpuShaderImpl* self = crMemory()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
+	CrGpuShaderImpl* self = crMem()->alloc(sizeof(CrGpuShaderImpl), "CrGpuShader");
 	memset(self, 0, sizeof(CrGpuShaderImpl));
 	return &self->i;
 }
@@ -101,12 +101,12 @@ CR_API void crGpuShaderFree(CrGpuShader* self)
 		impl->constTable->lpVtbl->Release(impl->constTable);
 	}
 
-	crMemory()->free(self, "crGpuShader");
+	crMem()->free(self, "crGpuShader");
 }
 
 CR_API CrGpuProgram* crGpuProgramAlloc()
 {
-	CrGpuProgramImpl* self = crMemory()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
+	CrGpuProgramImpl* self = crMem()->alloc(sizeof(CrGpuProgramImpl), "CrGpuProgram");
 	memset(self, 0, sizeof(CrGpuProgramImpl));
 	return &self->i;
 }
@@ -120,7 +120,7 @@ CR_API void crGpuProgramUniformCollect(CrGpuShader* self, CrGpuProgramUniform** 
 		D3DXCONSTANTTABLE_DESC tblDesc;
 		constTable->lpVtbl->GetDesc(constTable, &tblDesc);
 
-		*uniforms = crMemory()->alloc(sizeof(CrGpuProgramUniform) * tblDesc.Constants, "CrGpuProgram");
+		*uniforms = crMem()->alloc(sizeof(CrGpuProgramUniform) * tblDesc.Constants, "CrGpuProgram");
 		memset(*uniforms, 0, sizeof(CrGpuProgramUniform) * tblDesc.Constants);
 
 		for(i=0; i<tblDesc.Constants; ++i) {
@@ -210,8 +210,8 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
-	crMemory()->free(impl->uniformsVs, "crGpuProgram");
-	crMemory()->free(impl->uniformsPs, "crGpuProgram");
+	crMem()->free(impl->uniformsVs, "crGpuProgram");
+	crMem()->free(impl->uniformsPs, "crGpuProgram");
 	
 	if(nullptr != impl->d3dvs) {
 		IDirect3DVertexShader9_Release(impl->d3dvs);
@@ -226,11 +226,11 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 		HASH_ITER(hh, impl->ias, curr, temp) {
 			HASH_DEL(impl->ias, curr);
 			IDirect3DVertexDeclaration9_Release(curr->d3ddecl);
-			crMemory()->free(curr, "crGpuProgram");
+			crMem()->free(curr, "crGpuProgram");
 		}
 	}
 
-	crMemory()->free(self, "crGpuProgram");
+	crMem()->free(self, "crGpuProgram");
 }
 
 CR_API void crGpuProgramPreRender(CrGpuProgram* self)
@@ -497,7 +497,7 @@ void crGpuProgramBindVertexDecl(CrGpuProgram* self, size_t gpuInputId, CrGpuProg
 		}
 		crD3D9_ELEMS[elem] = crD3D9_ELEM_END;
 
-		ia = crMemory()->alloc(sizeof(CrGpuProgramInputAssembly), "CrGpuProgram");
+		ia = crMem()->alloc(sizeof(CrGpuProgramInputAssembly), "CrGpuProgram");
 		ia->gpuInputId = gpuInputId;
 		IDirect3DDevice9_CreateVertexDeclaration(crContextImpl()->d3ddev, crD3D9_ELEMS, &ia->d3ddecl);
 

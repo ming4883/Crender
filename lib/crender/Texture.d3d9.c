@@ -1,6 +1,6 @@
 #include "Texture.d3d9.h"
 #include "StrUtil.h"
-#include "Memory.h"
+#include "Mem.h"
 
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR8G8B8A8, 4, D3DFMT_A8R8G8B8},
@@ -25,7 +25,7 @@ CrTextureGpuFormatMapping* crTextureGpuFormatMappingGet(CrGpuFormat crFormat)
 
 CR_API CrTexture* crTextureAlloc()
 {
-	CrTextureImpl* self = crMemory()->alloc(sizeof(CrTextureImpl), "CrTexture");
+	CrTextureImpl* self = crMem()->alloc(sizeof(CrTextureImpl), "CrTexture");
 	memset(self, 0, sizeof(CrTextureImpl));
 	return &self->i;
 }
@@ -81,7 +81,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = (unsigned char*)crMemory()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
+		self->data = (unsigned char*)crMem()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
 
 		if(nullptr != data)
 			memcpy(self->data, data, self->surfSizeInByte * self->surfCount);
@@ -221,11 +221,11 @@ CR_API void crTextureFree(CrTexture* self)
 		return;
 
 	if(nullptr != self->data)
-		crMemory()->free(self->data, "CrTexture");
+		crMem()->free(self->data, "CrTexture");
 
 	if(nullptr != impl->d3dtex) {
 		IDirect3DTexture9_Release(impl->d3dtex);
 	}
 	
-	crMemory()->free(self, "CrTexture");
+	crMem()->free(self, "CrTexture");
 }

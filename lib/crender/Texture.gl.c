@@ -1,6 +1,6 @@
 #include "Texture.gl.h"
 #include "StrUtil.h"
-#include "Memory.h"
+#include "Mem.h"
 
 #if defined(CR_GLES_2)
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
@@ -37,7 +37,7 @@ CrTextureGpuFormatMapping* crTextureGpuFormatMappingGet(CrGpuFormat crFormat)
 
 CR_API CrTexture* crTextureAlloc()
 {
-	CrTextureImpl* self = crMemory()->alloc(sizeof(CrTextureImpl), "CrTexture");
+	CrTextureImpl* self = crMem()->alloc(sizeof(CrTextureImpl), "CrTexture");
 	memset(self, 0, sizeof(CrTextureImpl));
 	return &self->i;
 }
@@ -91,7 +91,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = (unsigned char*)crMemory()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
+		self->data = (unsigned char*)crMem()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
 
 		if(nullptr != data)
 			memcpy(self->data, data, self->surfSizeInByte * self->surfCount);
@@ -220,10 +220,10 @@ CR_API void crTextureFree(CrTexture* self)
 		return;
 
 	if(nullptr != self->data)
-		crMemory()->free(self->data, "CrTexture");
+		crMem()->free(self->data, "CrTexture");
 
 	if(0 != impl->glName)
 		glDeleteTextures(1, &impl->glName);
 	
-	crMemory()->free(self, "CrTexture");
+	crMem()->free(self, "CrTexture");
 }

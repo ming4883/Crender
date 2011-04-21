@@ -1,9 +1,9 @@
 #include "GpuState.d3d9.h"
-#include "Memory.h"
+#include "Mem.h"
 
 CR_API CrGpuState* crGpuStateAlloc()
 {
-	CrGpuStateImpl* self = crMemory()->alloc(sizeof(CrGpuStateImpl), "CrGpuState");
+	CrGpuStateImpl* self = crMem()->alloc(sizeof(CrGpuStateImpl), "CrGpuState");
 	memset(self, 0, sizeof(CrGpuStateImpl));
 	return &self->i;
 }
@@ -13,7 +13,7 @@ CR_API void crGpuStateFree(CrGpuState* self)
 	if(nullptr == self)
 		return;
 
-	crMemory()->free(self, "CrGpuState");
+	crMem()->free(self, "CrGpuState");
 }
 
 CR_API void crGpuStateInit(CrGpuState* self)
