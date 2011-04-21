@@ -180,6 +180,7 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
+	HASH_CLEAR(hh, impl->cache);
 	crMem()->free(impl->uniforms, "CrGpuProgram");
 
 	glDeleteProgram(impl->glName);
@@ -430,7 +431,7 @@ CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 
 			if(nullptr != m && -1 != loc) {
 				glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-				glVertexAttribPointer(loc, m->elemCnt, m->elemType, m->normalized, m->stride, (void*)i->offset);
+				glVertexAttribPointer(loc, m->elemCnt, m->elemType, m->normalized, i->stride, (void*)i->offset);
 				glEnableVertexAttribArray(loc);
 			}
 		}

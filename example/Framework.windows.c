@@ -26,6 +26,11 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE ignoreMe0, LPSTR ignoreMe1, INT ig
 	DWORD accumTime = 0;
 	DWORD accumFrame = 0;
 
+#if _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetBreakAlloc(-1);
+#endif
+
 	// allocate CrContext and config
 	crAppContext.context = crContextAlloc();
     crAppConfig();

@@ -13,6 +13,9 @@
 #include <string.h>
 
 #if defined(_MSC_VER)
+
+#	include <crtdbg.h>
+
 #	if defined(CR_USE_DLL)
 #		if(CR_DLL_EXPORT)
 #			define CR_API __declspec(dllexport)
@@ -23,7 +26,9 @@
 #		define CR_API
 #	endif
 #else
+
 #	define CR_API
+
 #endif
 
 #ifdef __cplusplus

@@ -188,6 +188,8 @@ void remoteConfigFree(RemoteConfig* self)
 		remoteVarFree(curr);
 	}
 
+	httpdDestroy(impl->http);
+
 	free(self);
 }
 

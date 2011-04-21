@@ -61,6 +61,7 @@ void crAppConfig()
 
 void crAppFinalize()
 {
+	meshFree(meshBg);
 	materialFree(mtlText);
 	Label_free(label);
 	appFree(app);

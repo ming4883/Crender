@@ -210,9 +210,11 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
+	HASH_CLEAR(hh, impl->cacheVs);
+	HASH_CLEAR(hh, impl->cachePs);
 	crMem()->free(impl->uniformsVs, "crGpuProgram");
 	crMem()->free(impl->uniformsPs, "crGpuProgram");
-	
+
 	if(nullptr != impl->d3dvs) {
 		IDirect3DVertexShader9_Release(impl->d3dvs);
 	}
