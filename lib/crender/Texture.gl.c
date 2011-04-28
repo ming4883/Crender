@@ -91,12 +91,6 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = (unsigned char*)crMem()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
-
-		if(nullptr != data)
-			memcpy(self->data, data, self->surfSizeInByte * self->surfCount);
-		else
-			memset(self->data, 0, self->surfSizeInByte * self->surfCount);
 	}
 
 	glGenTextures(1, &impl->glName);
@@ -110,7 +104,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 
 	self->flags = CrTexture_Inited;
 
-	return crTextureCommit(self);
+	return crTextureCommit(self, data);
 }
 
 CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
@@ -143,7 +137,6 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = nullptr;
 	}
 
 	glGenTextures(1, &impl->glName);
@@ -155,11 +148,11 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 
 	self->flags = CrTexture_Inited | CrTexture_RenderTarget;
 
-	return crTextureCommit(self);
+	return crTextureCommit(self, nullptr);
 }
 
 
-CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
+CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, unsigned char* data, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
 {
 	if(nullptr == self)
 		return nullptr;
@@ -170,10 +163,10 @@ CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, si
 	if(mipIndex > self->mipCount)
 		return nullptr;
 
-	return self->data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
+	return data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
 }
 
-CR_API CrBool crTextureCommit(CrTexture* self)
+CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 {
 	const CrTextureGpuFormatMapping* mapping;
 	CrTextureImpl* impl = (CrTextureImpl*)self;
@@ -191,12 +184,15 @@ CR_API CrBool crTextureCommit(CrTexture* self)
 		size_t i;
 
 		glBindTexture(impl->glTarget, impl->glName);
-		//glTexImage2D(impl->glTarget, 0, mapping->internalFormat, self->width, self->height, 0, mapping->format, mapping->type, self->data);
 		
 		for(i=0; i<self->mipCount+1; ++i) {
 			size_t mipW, mipH;
-			unsigned char* data = crTextureGetMipLevel(self, 0, i, &mipW, &mipH);
-			glTexImage2D(impl->glTarget, i, mapping->internalFormat, mipW, mipH, 0, mapping->format, mapping->type, data);
+
+			unsigned char* mipdata = crTextureGetMipLevel(self, (unsigned char*)data, 0, i, &mipW, &mipH);
+			glTexImage2D(impl->glTarget, i, mapping->internalFormat, 
+				mipW, mipH, 0, 
+				mapping->format, mapping->type, 
+				nullptr == data ? nullptr : mipdata);
 		}
 	}
 
@@ -218,9 +214,6 @@ CR_API void crTextureFree(CrTexture* self)
 
 	if(nullptr == self)
 		return;
-
-	if(nullptr != self->data)
-		crMem()->free(self->data, "CrTexture");
 
 	if(0 != impl->glName)
 		glDeleteTextures(1, &impl->glName);

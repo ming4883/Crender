@@ -81,12 +81,6 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = (unsigned char*)crMem()->alloc(self->surfSizeInByte * self->surfCount, "CrTexture");
-
-		if(nullptr != data)
-			memcpy(self->data, data, self->surfSizeInByte * self->surfCount);
-		else
-			memset(self->data, 0, self->surfSizeInByte * self->surfCount);
 	}
 
 	// create texture
@@ -101,7 +95,11 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 
 	self->flags = CrTexture_Inited;
 
-	return crTextureCommit(self);
+	if(nullptr != data)
+		return crTextureCommit(self, data);
+
+	return CrTrue;
+
 }
 
 CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
@@ -135,7 +133,6 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
-		self->data = nullptr;
 	}
 
 	// create d3d texture
@@ -154,7 +151,7 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 }
 
 
-CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
+CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, unsigned char* data, size_t surfIndex, size_t mipIndex, size_t* mipWidth, size_t* mipHeight)
 {
 	if(nullptr == self)
 		return nullptr;
@@ -165,13 +162,10 @@ CR_API unsigned char* crTextureGetMipLevel(CrTexture* self, size_t surfIndex, si
 	if(mipIndex > self->mipCount)
 		return nullptr;
 
-	//if(nullptr == self->data)
-	//	return nullptr;
-
-	return self->data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
+	return data + (surfIndex * self->surfSizeInByte) + crTextureGetMipLevelOffset(self, mipIndex, mipWidth, mipHeight);
 }
 
-CR_API CrBool crTextureCommit(CrTexture* self)
+CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
@@ -195,19 +189,19 @@ CR_API CrBool crTextureCommit(CrTexture* self)
 		for(i=0; i<self->mipCount; ++i) {
 			size_t mipW, mipH;
 			D3DLOCKED_RECT locked;
-			unsigned char* data = crTextureGetMipLevel(self, 0, i, &mipW, &mipH);
+			unsigned char* mipdata = crTextureGetMipLevel(self, (unsigned char*)data, 0, i, &mipW, &mipH);
 
 			hr = IDirect3DTexture9_LockRect(stageTex, i, &locked, nullptr, 0);
 			if(FAILED(hr))
 				continue;
 
 			if(CrGpuFormat_UnormR8G8B8A8 != self->format) {
-				memcpy(locked.pBits, data, mipW * mipH * impl->apiFormatMapping->pixelSize);
+				memcpy(locked.pBits, mipdata, mipW * mipH * impl->apiFormatMapping->pixelSize);
 			}
 			else {
 				// CrGpuFormat_UnormR8G8B8A8 need to flip the endian since we actually use the OpenGL's layout
 				char* dst = locked.pBits;
-				char* src = data;
+				char* src = mipdata;
 
 				size_t cnt = mipW * mipH;
 				size_t i;
@@ -239,9 +233,6 @@ CR_API void crTextureFree(CrTexture* self)
 
 	if(nullptr == self)
 		return;
-
-	if(nullptr != self->data)
-		crMem()->free(self->data, "CrTexture");
 
 	if(nullptr != impl->d3dtex) {
 		IDirect3DTexture9_Release(impl->d3dtex);
