@@ -34,9 +34,14 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
 	HWND* hWnd = (HWND*)window;
+	WINDOWINFO info;
 
 	D3DPRESENT_PARAMETERS d3dpp;    // create a struct to hold various device information
 	HRESULT hr;
+
+	GetWindowInfo(*hWnd, &info);
+	self->xres = info.rcClient.right - info.rcClient.left;
+	self->yres = info.rcClient.bottom - info.rcClient.top;
 
 	impl->d3d = Direct3DCreate9(D3D_SDK_VERSION);
 

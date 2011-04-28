@@ -38,6 +38,7 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
 	HWND* hWnd = (HWND*)window;
+	WINDOWINFO info;
 	
 	GLenum err;
 	PIXELFORMATDESCRIPTOR pfd;
@@ -45,6 +46,10 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
     HGLRC hRC;
     int pixelFormat;
 	char glVersionStr[64];
+
+	GetWindowInfo(*hWnd, &info);
+	self->xres = info.rcClient.right - info.rcClient.left;
+	self->yres = info.rcClient.bottom - info.rcClient.top;
 
 	// Create the GL context.
     ZeroMemory(&pfd, sizeof(pfd));
@@ -108,12 +113,11 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
         // Win32 allows the pixel format to be set only once per app, so destroy and re-create the app:
 		{
-			WINDOWINFO info;
+			
 			char szName[64];
 			int windowWidth, windowHeight, windowLeft, windowTop;
 			
 			GetClassName(*hWnd, szName, 64);
-			GetWindowInfo(*hWnd, &info);
 
 			windowWidth = info.rcWindow.right - info.rcWindow.left;
 			windowHeight = info.rcWindow.bottom - info.rcWindow.top;
