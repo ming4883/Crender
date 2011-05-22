@@ -18,7 +18,13 @@ typedef enum CrBufferType
 	CrBufferType_Uniform,	//!< shader uniform buffer
 #endif
 
+	CrBufferType_Mask = 0x0000ffff,
+
+	CrBufferType_SysMem	= 0x80000000,	//!< if set data will be held in sysMem 
+
 } CrBufferType;
+
+#define crBufferGetType(self) ((CrBufferType)self->type & CrBufferType_Mask)
 
 typedef enum CrBufferFlag
 {
@@ -38,6 +44,7 @@ typedef struct CrBuffer
 	size_t flags;	// combinations of CrBufferFlag
 	CrBufferType type;
 	size_t sizeInBytes;
+	void* sysMem;	// not null if CrBufferType_SysMem is set in type
 
 } CrBuffer;
 

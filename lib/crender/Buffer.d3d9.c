@@ -31,7 +31,10 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 	self->sizeInBytes = sizeInBytes;
 	self->type = type;
 
-	if(CrBufferType_Vertex == type) {
+	if(self->type & CrBufferType_SysMem) {
+		self->sysMem = crMem()->alloc(sizeInBytes, "CrBuffer");
+	}
+	else if(CrBufferType_Vertex == type) {
 		hr = IDirect3DDevice9_CreateVertexBuffer(crContextImpl()->d3ddev, self->sizeInBytes, 0, 0, D3DPOOL_DEFAULT, &impl->d3dvb, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create vertex buffer %8x", hr);
@@ -57,6 +60,10 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 		return CrFalse;
 	}
 
+	if(nullptr != initialData) {
+		crBufferUpdate(self, 0, sizeInBytes, initialData);
+	}
+
 	self->flags = CrBuffer_Inited;
 	return CrTrue;
 }
@@ -74,6 +81,10 @@ CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBy
 
 	if(offsetInBytes + sizeInBytes > self->sizeInBytes)
 		return;
+
+	if(self->type & CrBufferType_SysMem) {
+		memcpy(((char*)self->sysMem) + offsetInBytes, data, sizeInBytes);
+	}
 
 	if(nullptr != impl->d3dvb) {
 		void* ptr;
@@ -115,6 +126,10 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 	if(0 != (self->flags & CrBuffer_Mapped))
 		return nullptr;
 
+	if(self->type & CrBufferType_SysMem) {
+		ret = self->sysMem;
+	}
+
 	if(nullptr != impl->d3dvb) {
 		hr = IDirect3DVertexBuffer9_Lock(impl->d3dvb, 0, self->sizeInBytes, &ret, lockFlags);
 		if(FAILED(hr)) {
@@ -142,6 +157,10 @@ CR_API void crBufferUnmap(CrBuffer* self)
 
 	if(0 == (self->flags & CrBuffer_Mapped))
 		return;
+
+	if(self->type & CrBufferType_SysMem) {
+		// do nothing
+	}
 
 	if(nullptr != impl->d3dvb) {
 		IDirect3DVertexBuffer9_Unlock(impl->d3dvb);

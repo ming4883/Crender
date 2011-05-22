@@ -419,11 +419,11 @@ CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 		if(nullptr == i->buffer)
 			continue;
 
-		if(CrBufferType_Index == i->buffer->type) {
+		if(CrBufferType_Index == crBufferGetType(i->buffer)) {
 			// bind index buffer
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
 		}
-		else if(CrBufferType_Vertex == i->buffer->type) {
+		else if(CrBufferType_Vertex == crBufferGetType(i->buffer)) {
 			// bind vertex buffer
 			CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 
