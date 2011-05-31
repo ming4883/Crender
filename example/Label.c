@@ -87,6 +87,7 @@ void Label_commit(Label* self)
 
 	{
 		unsigned char* bits;
+		unsigned char* data;
 		BITMAPINFO* bi;
 
 		bi = malloc(sizeof(BITMAPINFOHEADER)+ 256*sizeof(RGBQUAD));
@@ -96,11 +97,12 @@ void Label_commit(Label* self)
 		GetDIBits(hdc, self->impl->hbmp, 0, self->impl->height, nullptr, bi, DIB_RGB_COLORS);
 
 		bits = malloc(GetBitmapBytesS(&bi->bmiHeader));
+		data = malloc(self->texture->surfSizeInByte);
 
 		if(GetDIBits(hdc, self->impl->hbmp, 0, self->impl->height, bits, bi, DIB_RGB_COLORS) == self->impl->height) {
 			
 			unsigned char* srcPixel = bits;
-			unsigned char* dstPixel = self->texture->data;
+			unsigned char* dstPixel = data;
 			size_t i;
 			size_t pixelCnt = (size_t)(bi->bmiHeader.biWidth * bi->bmiHeader.biHeight);
 
@@ -110,8 +112,9 @@ void Label_commit(Label* self)
 				srcPixel += 4;
 			}
 			
-			crTextureCommit(self->texture);
+			crTextureCommit(self->texture, data);
 		}
+		free(data);
 		free(bits);
 		free(bi);
 	}
