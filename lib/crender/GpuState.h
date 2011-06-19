@@ -29,7 +29,29 @@ typedef enum CrGpuStateType
 	// PolygonMode
 	CrGpuState_PolygonMode_Line,
 	CrGpuState_PolygonMode_Fill,
+
+	// FixedTexOp
+	CrGpuState_FixedTexOp_Arg0,
+	CrGpuState_FixedTexOp_Multiply,
+	CrGpuState_FixedTexOp_Add,
+	CrGpuState_FixedTexOp_Subtract,
+
+	// FixedTexArg
+	CrGpuState_FixedTexArg_Current,
+	CrGpuState_FixedTexArg_Texture,
+	CrGpuState_FixedTexArg_Color,
+	CrGpuState_FixedTexArg_Constant,
+
 } CrGpuStateType;
+
+typedef struct CrGpuStateFixedTexDesc
+{
+	CrGpuStateType op;
+	CrGpuStateType argRGB0;
+	CrGpuStateType argRGB1;
+	CrGpuStateType argA0;
+	CrGpuStateType argA1;
+};
 
 typedef struct CrGpuStateDesc
 {
@@ -42,6 +64,10 @@ typedef struct CrGpuStateDesc
 	CrGpuStateType blendFactorSrcA;
 	CrGpuStateType blendFactorDestA;
 	CrGpuStateType polygonMode;
+
+	struct CrGpuStateFixedTexDesc fixedTexStage[2];
+	float fixedTexConstant[4];
+
 } CrGpuStateDesc;
 
 typedef struct CrGpuState

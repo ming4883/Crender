@@ -1,5 +1,6 @@
 #include "GpuState.gl.h"
 #include "Mem.h"
+#include "Context.h"
 
 CR_API CrGpuState* crGpuStateAlloc()
 {
@@ -84,4 +85,11 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 #if !defined(CR_GLES_2)
 	glPolygonMode(GL_FRONT_AND_BACK, CrGpuState_polygonModeMapping[self->desc.polygonMode - CrGpuState_PolygonMode_Line]);
 #endif
+
+	if(crContext()->apiMajorVer < 2) {
+		size_t i;
+		for(i=0; i<2; ++i) {
+			glActiveTexture(GL_TEXTURE0 + i);
+		}
+	}
 }
