@@ -105,7 +105,20 @@ typedef struct CrGpuProgramInput
 
 CR_API size_t crGenGpuInputId();
 
-CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count);
+CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count);
+
+typedef struct CrGpuFixedInput
+{
+	struct CrGpuProgramInput index;
+	struct CrGpuProgramInput position;
+	struct CrGpuProgramInput texcoord;
+	struct CrGpuProgramInput normal;
+	struct CrGpuProgramInput color;
+
+} CrGpuFixedInput;
+
+CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input);
+
 
 typedef enum CrGpuDrawFlag
 {

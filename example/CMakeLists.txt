@@ -111,6 +111,19 @@ ENDIF()
 CREATE_EXAMPLE( example_embedded_httpd "${SRC}" "${RES}" )
 
 #-------------------------------------------------------------------------------
+# example_fixedpipeline
+SET( SRC FixedPipeline.example.c )
+
+SET( RES
+	)
+
+IF( APPLE )
+	LIST( APPEND RES Example.xib ../media/monkey.obj )
+ENDIF()
+
+CREATE_EXAMPLE( example_fixedpipeline "${SRC}" "${RES}" )
+
+#-------------------------------------------------------------------------------
 # example_mesh
 SET( SRC Mesh.example.c )
 

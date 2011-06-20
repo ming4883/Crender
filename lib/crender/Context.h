@@ -21,6 +21,8 @@ typedef struct CrContext
 
 CR_API CrContext* crContext();
 
+CR_API CrBool crContextFixedPipelineOnly();
+
 CR_API CrContext* crContextAlloc();
 
 CR_API CrBool crContextInit(CrContext* self, void** window);

@@ -16,6 +16,11 @@ CR_API CrContextImpl* crContextImpl()
 	return current;
 }
 
+CR_API CrBool crContextFixedPipelineOnly()
+{
+	return 1 == current->i.apiMajorVer;
+}
+
 CR_API CrContext* crContextAlloc()
 {
 	CrContextImpl* self = crMemory()->alloc(sizeof(CrContextImpl), "CrContext");

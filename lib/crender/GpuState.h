@@ -32,25 +32,30 @@ typedef enum CrGpuStateType
 
 	// FixedTexOp
 	CrGpuState_FixedTexOp_Arg0,
-	CrGpuState_FixedTexOp_Multiply,
+	CrGpuState_FixedTexOp_Modulate,
 	CrGpuState_FixedTexOp_Add,
+	CrGpuState_FixedTexOp_AddSigned,
+	CrGpuState_FixedTexOp_Lerp,
 	CrGpuState_FixedTexOp_Subtract,
 
 	// FixedTexArg
-	CrGpuState_FixedTexArg_Current,
 	CrGpuState_FixedTexArg_Texture,
-	CrGpuState_FixedTexArg_Color,
 	CrGpuState_FixedTexArg_Constant,
+	CrGpuState_FixedTexArg_Color,
+	CrGpuState_FixedTexArg_Current,
 
 } CrGpuStateType;
 
 typedef struct CrGpuStateFixedTexDesc
 {
-	CrGpuStateType op;
+	CrGpuStateType opRGB;
 	CrGpuStateType argRGB0;
 	CrGpuStateType argRGB1;
+	CrGpuStateType argRGB2;
+	CrGpuStateType opA;
 	CrGpuStateType argA0;
 	CrGpuStateType argA1;
+	CrGpuStateType argA2;
 };
 
 typedef struct CrGpuStateDesc
@@ -67,6 +72,9 @@ typedef struct CrGpuStateDesc
 
 	struct CrGpuStateFixedTexDesc fixedTexStage[2];
 	float fixedTexConstant[4];
+
+	float fixedTransformModel[16];
+	float fixedTransformProj[16];
 
 } CrGpuStateDesc;
 

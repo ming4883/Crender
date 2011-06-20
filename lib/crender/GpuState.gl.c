@@ -1,6 +1,7 @@
 #include "GpuState.gl.h"
 #include "Mem.h"
 #include "Context.h"
+#include "Mat44.h"
 
 CR_API CrGpuState* crGpuStateAlloc()
 {
@@ -19,6 +20,8 @@ CR_API void crGpuStateFree(CrGpuState* self)
 
 CR_API void crGpuStateInit(CrGpuState* self)
 {
+	size_t i;
+
 	self->desc.depthTest = CrTrue;
 	self->desc.depthWrite = CrTrue;
 	self->desc.cull = CrTrue;
@@ -28,6 +31,22 @@ CR_API void crGpuStateInit(CrGpuState* self)
 	self->desc.blendFactorSrcA = CrGpuState_BlendFactor_One;
 	self->desc.blendFactorDestA = CrGpuState_BlendFactor_Zero;
 	self->desc.polygonMode = CrGpuState_PolygonMode_Fill;
+
+	for(i=0; i<2; ++i) {
+		struct CrGpuStateFixedTexDesc* stage = &self->desc.fixedTexStage[i];
+		stage->opRGB = CrGpuState_FixedTexOp_Arg0;
+		stage->argRGB0 = CrGpuState_FixedTexArg_Texture;
+		stage->argRGB1 = CrGpuState_FixedTexArg_Texture;
+		stage->argRGB2 = CrGpuState_FixedTexArg_Texture;
+
+		stage->opA = CrGpuState_FixedTexOp_Arg0;
+		stage->argA0 = CrGpuState_FixedTexArg_Texture;
+		stage->argA1 = CrGpuState_FixedTexArg_Texture;
+		stage->argA2 = CrGpuState_FixedTexArg_Texture;
+	}
+
+	crMat44SetIdentity((CrMat44*)self->desc.fixedTransformModel);
+	crMat44SetIdentity((CrMat44*)self->desc.fixedTransformProj);
 
 	self->flags = CrGpuState_Inited;
 }
@@ -51,6 +70,22 @@ static GLenum CrGpuState_polygonModeMapping[] = {
 	GL_FILL,
 };
 #endif
+
+static GLenum CrGpuState_fixedTexOpMapping[] = {
+	GL_REPLACE,
+	GL_MODULATE,
+	GL_ADD,
+	GL_ADD_SIGNED,
+	GL_INTERPOLATE,
+	GL_SUBTRACT,
+};
+
+static GLenum CrGpuState_fixedTexArgMapping[] = {
+	GL_TEXTURE,
+	GL_CONSTANT,
+	GL_PRIMARY_COLOR,
+	GL_PREVIOUS,
+};
 
 CR_API void crGpuStatePreRender(CrGpuState* self)
 {
@@ -86,10 +121,44 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 	glPolygonMode(GL_FRONT_AND_BACK, CrGpuState_polygonModeMapping[self->desc.polygonMode - CrGpuState_PolygonMode_Line]);
 #endif
 
-	if(crContext()->apiMajorVer < 2) {
+	if(crContextFixedPipelineOnly()) {
 		size_t i;
+		CrMat44 m;
 		for(i=0; i<2; ++i) {
+			struct CrGpuStateFixedTexDesc* stage = &self->desc.fixedTexStage[i];
+			
+			GLenum opRGB = CrGpuState_fixedTexOpMapping[stage->opRGB - CrGpuState_FixedTexOp_Arg0];
+			GLenum argRGB0 = CrGpuState_fixedTexArgMapping[stage->argRGB0 - CrGpuState_FixedTexArg_Texture];
+			GLenum argRGB1 = CrGpuState_fixedTexArgMapping[stage->argRGB1 - CrGpuState_FixedTexArg_Texture];
+			GLenum argRGB2 = CrGpuState_fixedTexArgMapping[stage->argRGB2 - CrGpuState_FixedTexArg_Texture];
+			
+			GLenum opA = CrGpuState_fixedTexOpMapping[stage->opA - CrGpuState_FixedTexOp_Arg0];
+			GLenum argA0 = CrGpuState_fixedTexArgMapping[stage->argA0 - CrGpuState_FixedTexArg_Texture];
+			GLenum argA1 = CrGpuState_fixedTexArgMapping[stage->argA1 - CrGpuState_FixedTexArg_Texture];
+			GLenum argA2 = CrGpuState_fixedTexArgMapping[stage->argA2 - CrGpuState_FixedTexArg_Texture];
+
 			glActiveTexture(GL_TEXTURE0 + i);
+			glEnable(GL_TEXTURE_2D);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, opRGB);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, argRGB0);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, argRGB1);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, argRGB2);
+
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, opA);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, argA0);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_ALPHA, argA1);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, argA2);
+
+			glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, self->desc.fixedTexConstant);
 		}
+
+		glMatrixMode(GL_MODELVIEW);
+		crMat44Transpose(&m, (CrMat44*)self->desc.fixedTransformModel);
+		glLoadMatrixf((float*)&m);
+
+		glMatrixMode(GL_PROJECTION);
+		crMat44Transpose(&m, (CrMat44*)self->desc.fixedTransformProj);
+		glLoadMatrixf((float*)&m);
 	}
 }

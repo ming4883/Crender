@@ -403,7 +403,7 @@ CR_API size_t crGenGpuInputId()
 	return ++crContextImpl()->gpuInputId;
 }
 
-CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
+CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
@@ -436,6 +436,67 @@ CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 			}
 		}
 	}
+}
+
+CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
+{
+	if(input->index.buffer) {
+		CrGpuProgramInput* i = &input->index;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+	}
+
+	if(input->position.buffer) {
+		CrGpuProgramInput* i = &input->position;
+		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
+		if(nullptr != m) {
+			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glVertexPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			glEnableClientState(GL_VERTEX_ARRAY);
+		}
+	}
+	else {
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
+	if(input->normal.buffer) {
+		CrGpuProgramInput* i = &input->normal;
+		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
+		if(nullptr != m) {
+			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glNormalPointer(m->elemType, i->stride, (void*)i->offset);
+			glEnableClientState(GL_NORMAL_ARRAY);
+		}
+	}
+	else {
+		glDisableClientState(GL_NORMAL_ARRAY);
+	}
+
+	if(input->color.buffer) {
+		CrGpuProgramInput* i = &input->color;
+		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
+		if(nullptr != m) {
+			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glColorPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			glEnableClientState(GL_COLOR_ARRAY);
+		}
+	}
+	else {
+		glDisableClientState(GL_COLOR_ARRAY);
+	}
+
+	if(input->texcoord.buffer) {
+		CrGpuProgramInput* i = &input->texcoord;
+		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
+		if(nullptr != m) {
+			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glTexCoordPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		}
+	}
+	else {
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+	
 }
 
 static GLenum crGL_INDEX_TYPE[] = {

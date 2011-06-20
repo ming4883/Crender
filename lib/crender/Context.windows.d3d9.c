@@ -16,6 +16,11 @@ CR_API CrContextImpl* crContextImpl()
 	return current;
 }
 
+CR_API CrBool crContextFixedPipelineOnly()
+{
+	return 0 == current->i.apiMinorVer;
+}
+
 CR_API CrContext* crContextAlloc()
 {
 	CrContextImpl* self = crMem()->alloc(sizeof(CrContextImpl), "CrContext");
@@ -86,6 +91,8 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 			crDbgStr("even software vertex processing device is not support :-(");
 			return CrFalse;
 		}
+
+		self->apiMinorVer = 0;
 	}
 
 	IDirect3DDevice9_GetBackBuffer(impl->d3ddev, 0, 0, D3DBACKBUFFER_TYPE_MONO, &impl->d3dcolorbuf);

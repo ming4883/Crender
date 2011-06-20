@@ -514,10 +514,23 @@ CR_API size_t crGenGpuInputId()
 	return ++crContextImpl()->gpuInputId;
 }
 
-CR_API void crGpuProgramBindInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
+CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	crGpuProgramBindBuffer(self, inputs, count);
 	crGpuProgramBindVertexDecl(self, gpuInputId, inputs, count);
+}
+
+CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
+{
+	/*
+	if(input->index.buffer) crGpuProgramBindBuffer(nullptr, &input->index, 1);
+	if(input->position.buffer) crGpuProgramBindBuffer(nullptr, &input->position, 1);
+	if(input->normal.buffer) crGpuProgramBindBuffer(nullptr, &input->normal, 1);
+	if(input->texcoord.buffer) crGpuProgramBindBuffer(nullptr, &input->texcoord, 1);
+	if(input->color.buffer) crGpuProgramBindBuffer(nullptr, &input->color, 1);
+
+	crGpuProgramBindVertexDecl(nullptr, gpuInputId, (CrGpuProgramInput*)input, 5);
+	*/
 }
 
 CR_API void crGpuDrawPoint(size_t offset, size_t count)

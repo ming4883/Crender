@@ -1,6 +1,7 @@
 #include "Mesh.h"
 
 #include "../lib/crender/Mem.h"
+#include "../lib/crender/Context.h"
 #include "../lib/crender/Buffer.h"
 #include "../lib/crender/Shader.h"
 #include "../lib/crender/Vec2.h"
@@ -148,7 +149,19 @@ void meshPreRender(Mesh* self, struct CrGpuProgram* program)
 		{impl->tcBuffer[1], self->texcoord[1].shaderName, 0, sizeof(CrVec2), CrGpuFormat_FloatR32G32},
 	};
 
-	crGpuProgramBindInput(program, impl->gpuInputId, inputs, crCountOf(inputs));
+	if(CrTrue == crContextFixedPipelineOnly()) {
+		CrGpuFixedInput input;
+		input.index = inputs[0];
+		input.position = inputs[1];
+		input.normal = inputs[2];
+		input.color = inputs[3];
+		input.texcoord = inputs[4];
+
+		crGpuBindFixedInput(impl->gpuInputId, &input);
+	}
+	else {
+		crGpuBindProgramInput(program, impl->gpuInputId, inputs, crCountOf(inputs));
+	}
 }
 
 void meshRenderTriangles(Mesh* self)
