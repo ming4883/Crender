@@ -1,5 +1,5 @@
 #include "Context.gl.h"
-#include "Memory.h"
+#include "Mem.h"
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
@@ -23,7 +23,7 @@ CR_API CrBool crContextFixedPipelineOnly()
 
 CR_API CrContext* crContextAlloc()
 {
-	CrContextImpl* self = crMemory()->alloc(sizeof(CrContextImpl), "CrContext");
+	CrContextImpl* self = crMem()->alloc(sizeof(CrContextImpl), "CrContext");
 	memset(self, 0, sizeof(CrContextImpl));
 
 	self->i.apiName = "gles";
@@ -89,7 +89,7 @@ CR_API void crContextFree(CrContext* self)
 {
 	current = nullptr;
 
-	crMemory()->free(self, "CrContext");
+	crMem()->free(self, "CrContext");
 }
 
 CR_API CrBool crContextPreRender(CrContext* self)

@@ -1,5 +1,5 @@
 #import "Framework.h"
-#import "../lib/crender/Memory.h"
+#import "../lib/crender/Mem.h"
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
@@ -127,7 +127,7 @@
 	crAppRender();
 
 	crContextPostRender(crAppContext.context);
-	
+
 	crContextSwapBuffers(crAppContext.context);
 }
 
@@ -309,7 +309,7 @@ void* crOpen(const char* filename)
 	if(nil == data)
 		return nil;
 
-	iosFILE* file = crMemory()->alloc(sizeof(iosFILE), "io");
+	iosFILE* file = crMem()->alloc(sizeof(iosFILE), "io");
 	file->offset = 0;
 	file->data = data;
 	return file;
@@ -322,7 +322,7 @@ void crClose(void* handle)
 
 	iosFILE* file = handle;
 	[file->data release];
-	crMemory()->free(file, "io");
+	crMem()->free(file, "io");
 }
 
 size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
