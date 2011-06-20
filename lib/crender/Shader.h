@@ -119,6 +119,7 @@ typedef struct CrGpuFixedInput
 
 CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input);
 
+CR_API void crGpuBindFixedTexture(size_t unit, struct CrTexture* texture, const struct CrSampler* sampler);
 
 typedef enum CrGpuDrawFlag
 {

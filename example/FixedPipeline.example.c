@@ -1,11 +1,14 @@
 #include "Common.h"
 #include "Remote.h"
 #include "Mesh.h"
+#include "Pvr.h"
+#include "red_tile_texture.h"
 
 AppContext* app = nullptr;
 RemoteConfig* config = nullptr;
 CrVec4 bgClr = {1, 0.25f, 0.25f, 1};
 Mesh* mesh = nullptr;
+CrTexture* texture = nullptr;
 
 typedef struct Settings
 {
@@ -79,20 +82,27 @@ void crAppRender()
 
 		gpuState->depthTest = CrTrue;
 		gpuState->cull = CrTrue;
-		gpuState->fixedTexStage[0].opRGB = CrGpuState_FixedTexOp_Arg0;
+		gpuState->fixedTexStage[0].opRGB = CrGpuState_FixedTexOp_Modulate;
 		gpuState->fixedTexStage[0].argRGB0 = CrGpuState_FixedTexArg_Constant;
+		gpuState->fixedTexStage[0].argRGB1 = CrGpuState_FixedTexArg_Texture;
 		gpuState->fixedTexStage[0].opA = CrGpuState_FixedTexOp_Arg0;
 		gpuState->fixedTexStage[0].argA0 = CrGpuState_FixedTexArg_Constant;
-
-		gpuState->fixedTexStage[1].opRGB = CrGpuState_FixedTexOp_Arg0;
-		gpuState->fixedTexStage[1].argRGB0 = CrGpuState_FixedTexArg_Current;
-		gpuState->fixedTexStage[1].opA = CrGpuState_FixedTexOp_Arg0;
-		gpuState->fixedTexStage[1].argA0 = CrGpuState_FixedTexArg_Current;
+		
 		gpuState->fixedTexConstant[0] = 0.5f;
 		gpuState->fixedTexConstant[1] = 1.0f;
 		gpuState->fixedTexConstant[2] = 1.0f;
 		gpuState->fixedTexConstant[3] = 0.5f;
+
 		crGpuStatePreRender(app->gpuState);
+
+		{
+			CrSampler sampler = {
+				CrSamplerFilter_MagMinMip_Linear, 
+				CrSamplerAddress_Wrap, 
+				CrSamplerAddress_Wrap
+			};
+			crGpuBindFixedTexture(0, texture, &sampler);
+		}
 
 		meshPreRender(mesh, nullptr);
 		meshRenderTriangles(mesh);
@@ -108,6 +118,7 @@ void crAppConfig()
 
 void crAppFinalize()
 {
+	crTextureFree(texture);
 	meshFree(mesh);
 	remoteConfigFree(config);
 	appFree(app);
@@ -135,6 +146,11 @@ CrBool crAppInitialize()
 		mesh = meshAlloc();
 		if(!meshInitWithObjFile(mesh, "monkey.obj", app->istream))
 			return CrFalse;
+	}
+
+	// load texture
+	{
+		texture = Pvr_createTexture(red_tile_texture);
 	}
 
 	bgClr = crVec4(0.25f, 1, 0.25f, 1);

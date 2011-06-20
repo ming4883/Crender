@@ -499,6 +499,30 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 	
 }
 
+CR_API void crGpuBindFixedTexture(size_t unit, struct CrTexture* texture, const struct CrSampler* sampler)
+{
+	glActiveTexture(GL_TEXTURE0 + unit);
+	if(nullptr == texture) {
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	else {
+		int gltarget = ((CrTextureImpl*)texture)->glTarget;
+		int glname = ((CrTextureImpl*)texture)->glName;
+		glEnable(gltarget);
+		glBindTexture(gltarget, glname);
+		glTexParameteri(gltarget, GL_TEXTURE_MAG_FILTER, crGL_SAMPLER_MAG_FILTER[sampler->filter]);
+		glTexParameteri(gltarget, GL_TEXTURE_MIN_FILTER, crGL_SAMPLER_MIN_FILTER[sampler->filter]);
+		glTexParameteri(gltarget, GL_TEXTURE_WRAP_S, crGL_SAMPLER_ADDRESS[sampler->addressU]);
+		glTexParameteri(gltarget, GL_TEXTURE_WRAP_T, crGL_SAMPLER_ADDRESS[sampler->addressV]);
+#if !defined(CR_GLES_2)
+		if(GL_TEXTURE_2D != gltarget) {
+			glTexParameteri(gltarget, GL_TEXTURE_WRAP_R, crGL_SAMPLER_ADDRESS[sampler->addressW]);
+		}
+#endif
+	}
+}
+
 static GLenum crGL_INDEX_TYPE[] = {
 	GL_UNSIGNED_SHORT,
 	GL_UNSIGNED_BYTE,

@@ -533,6 +533,22 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 	*/
 }
 
+CR_API void crGpuBindFixedTexture(size_t unit, struct CrTexture* texture, const struct CrSampler* sampler)
+{
+	if(nullptr == texture) {
+		IDirect3DDevice9_SetTexture(crContextImpl()->d3ddev, unit, nullptr);
+		return;
+	}
+
+	IDirect3DDevice9_SetTexture(crContextImpl()->d3ddev, unit, (IDirect3DBaseTexture9*)((CrTextureImpl*)texture)->d3dtex);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_MAGFILTER, crD3D9_SAMPLER_MAG_FILTER[sampler->filter]);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_MINFILTER, crD3D9_SAMPLER_MIN_FILTER[sampler->filter]);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_MIPFILTER, crD3D9_SAMPLER_MIP_FILTER[sampler->filter]);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_ADDRESSU, crD3D9_SAMPLER_ADDRESS[sampler->addressU]);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_ADDRESSV, crD3D9_SAMPLER_ADDRESS[sampler->addressV]);
+	IDirect3DDevice9_SetSamplerState(crContextImpl()->d3ddev, unit, D3DSAMP_ADDRESSW, crD3D9_SAMPLER_ADDRESS[sampler->addressW]);
+}
+
 CR_API void crGpuDrawPoint(size_t offset, size_t count)
 {
 	IDirect3DDevice9_DrawPrimitive(crContextImpl()->d3ddev, D3DPT_POINTLIST, offset, count);
