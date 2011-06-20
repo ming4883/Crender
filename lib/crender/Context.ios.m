@@ -41,7 +41,16 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
 	CAEAGLLayer** eaglLayer = (CAEAGLLayer**)window;
 
-	EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+	EAGLRenderingAPI api = kEAGLRenderingAPIOpenGLES2;
+	if(self->apiMajorVer == 1)
+		api = kEAGLRenderingAPIOpenGLES1;
+
+	EAGLContext* context = [[EAGLContext alloc] initWithAPI:api];
+
+	if(!context) {
+		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+		crDbgStr("fall back to gles1.0");
+	}
 
 	if (!context || ![EAGLContext setCurrentContext:context])
 		return CrFalse;

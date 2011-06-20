@@ -26,7 +26,7 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 
 void crAppHandleMouse(int x, int y, int action)
 {
-	crDbgStr("handle mouse x=%d, y=%d, a=%d\n", x, y, action); 
+	crDbgStr("handle mouse x=%d, y=%d, a=%d\n", x, y, action);
 }
 
 void crAppRender()
@@ -45,18 +45,18 @@ void crAppRender()
 	remoteConfigLock(config);
 	lsettings = settings;
 	remoteConfigUnlock(config);
-	
+
 	crMat44CameraLookAt(&viewMtx, &eyeAt, &lookAt, &eyeUp);
 	crMat44Prespective(&projMtx, 45.0f, app->aspect.width / app->aspect.height, 0.1f, 30.0f);
 	crMat44AdjustToAPIDepthRange(&projMtx);
 	crMat44Mult(&viewProjMtx, &projMtx, &viewMtx);
-	
+
 	// clear
 	{
 		crRenderTargetClearColor(bgClr.x, bgClr.y, bgClr.z, bgClr.w);
 		crRenderTargetClearDepth(1);
 	}
-	
+
 	// draw scene
 	{
 		app->shaderContext.matDiffuse = crVec4(1.0f, 0.88f, 0.33f, 1);
@@ -101,12 +101,9 @@ void crAppRender()
 
 void crAppConfig()
 {
-	crAppContext.appName = "Mesh";
+	crAppContext.appName = "FixedPipeline";
 
-	if(strcmp(crAppContext.context->apiName, "gl") == 0) {
-		crAppContext.context->apiMajorVer = 1;
-		crAppContext.context->apiMinorVer = 3;
-	}
+	crAppContext.context->apiMajorVer = 1;
 }
 
 void crAppFinalize()
@@ -127,21 +124,21 @@ CrBool crAppInitialize()
 			{"size", &settings.size, 1, 100},
 			{nullptr, nullptr, 0, 0}
 		};
-		
+
 		config = remoteConfigAlloc();
 		remoteConfigInit(config, 8080, CrTrue);
 		remoteConfigAddVars(config, descs);
 	}
-	
+
 	// load mesh
 	{
 		mesh = meshAlloc();
 		if(!meshInitWithObjFile(mesh, "monkey.obj", app->istream))
 			return CrFalse;
 	}
-	
+
 	bgClr = crVec4(0.25f, 1, 0.25f, 1);
-	
+
 	crDbgStr("CRender FixedPipeline example started");
 
 	return CrTrue;
