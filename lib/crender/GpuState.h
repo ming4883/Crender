@@ -56,7 +56,7 @@ typedef struct CrGpuStateFixedTexDesc
 	CrGpuStateType argA0;
 	CrGpuStateType argA1;
 	CrGpuStateType argA2;
-};
+} CrGpuStateFixedTexDesc;
 
 typedef struct CrGpuStateDesc
 {
