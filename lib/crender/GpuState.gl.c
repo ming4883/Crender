@@ -106,12 +106,19 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 
 	if(self->desc.blend) {
 		glEnable(GL_BLEND);
-		
-		glBlendFuncSeparate(
-			CrGpuState_blendFactorMapping[self->desc.blendFactorSrcRGB - CrGpuState_BlendFactor_One],
-			CrGpuState_blendFactorMapping[self->desc.blendFactorDestRGB - CrGpuState_BlendFactor_One],
-			CrGpuState_blendFactorMapping[self->desc.blendFactorSrcA - CrGpuState_BlendFactor_One],
-			CrGpuState_blendFactorMapping[self->desc.blendFactorDestA - CrGpuState_BlendFactor_One]);
+
+		if(crContextFixedPipelineOnly()) {
+			glBlendFunc(
+				CrGpuState_blendFactorMapping[self->desc.blendFactorSrcRGB - CrGpuState_BlendFactor_One],
+				CrGpuState_blendFactorMapping[self->desc.blendFactorDestRGB - CrGpuState_BlendFactor_One]);
+		}
+		else{
+			glBlendFuncSeparate(
+				CrGpuState_blendFactorMapping[self->desc.blendFactorSrcRGB - CrGpuState_BlendFactor_One],
+				CrGpuState_blendFactorMapping[self->desc.blendFactorDestRGB - CrGpuState_BlendFactor_One],
+				CrGpuState_blendFactorMapping[self->desc.blendFactorSrcA - CrGpuState_BlendFactor_One],
+				CrGpuState_blendFactorMapping[self->desc.blendFactorDestA - CrGpuState_BlendFactor_One]);
+		}
 	}
 	else {
 		glDisable(GL_BLEND);
@@ -124,15 +131,15 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 	if(crContextFixedPipelineOnly()) {
 		CrMat44 m;
 		size_t i;
-		
+
 		for(i=0; i<1; ++i) {
 			struct CrGpuStateFixedTexDesc* stage = &self->desc.fixedTexStage[i];
-			
+
 			GLenum opRGB = CrGpuState_fixedTexOpMapping[stage->opRGB - CrGpuState_FixedTexOp_Arg0];
 			GLenum argRGB0 = CrGpuState_fixedTexArgMapping[stage->argRGB0 - CrGpuState_FixedTexArg_Texture];
 			GLenum argRGB1 = CrGpuState_fixedTexArgMapping[stage->argRGB1 - CrGpuState_FixedTexArg_Texture];
 			GLenum argRGB2 = CrGpuState_fixedTexArgMapping[stage->argRGB2 - CrGpuState_FixedTexArg_Texture];
-			
+
 			GLenum opA = CrGpuState_fixedTexOpMapping[stage->opA - CrGpuState_FixedTexOp_Arg0];
 			GLenum argA0 = CrGpuState_fixedTexArgMapping[stage->argA0 - CrGpuState_FixedTexArg_Texture];
 			GLenum argA1 = CrGpuState_fixedTexArgMapping[stage->argA1 - CrGpuState_FixedTexArg_Texture];
@@ -157,9 +164,9 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
 		}
-		
+
 		glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, self->desc.fixedTexConstant);
-		
+
 		glDisable(GL_LIGHTING);
 
 		glMatrixMode(GL_MODELVIEW);
@@ -170,6 +177,6 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 		crMat44Transpose(&m, (CrMat44*)self->desc.fixedTransformProj);
 		glLoadMatrixf((float*)&m);
 
-		
+
 	}
 }

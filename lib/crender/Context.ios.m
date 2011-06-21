@@ -49,6 +49,7 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
 	if(!context) {
 		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+		self->apiMajorVer = 1;
 		crDbgStr("fall back to gles1.0");
 	}
 

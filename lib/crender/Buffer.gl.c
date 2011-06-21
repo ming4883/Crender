@@ -47,6 +47,9 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 
+	if(crContextFixedPipelineOnly())
+		type |= CrBufferType_SysMem;
+
 	self->sizeInBytes = sizeInBytes;
 	self->type = type;
 
@@ -89,13 +92,13 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 	void* ret = nullptr;
-	
+
 	if(nullptr == self)
 		return nullptr;
 
 	if(0 != (self->flags & CrBuffer_Mapped))
 		return nullptr;
-	
+
 	if(self->type & CrBufferType_SysMem) {
 		ret = self->sysMem;
 	}
@@ -105,7 +108,7 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 		ret = glMapBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], crGL_BUFFER_MAP_ACCESS[access]);
 #endif
 	}
-	
+
 	self->flags |= CrBuffer_Mapped;
 
 	return ret;

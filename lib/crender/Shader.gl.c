@@ -438,19 +438,25 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 	}
 }
 
+void* crGpuFixedIndexPtr = nullptr;
+
 CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 {
 	if(input->index.buffer) {
 		CrGpuProgramInput* i = &input->index;
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+		crGpuFixedIndexPtr = i->buffer->sysMem;
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i->buffer->sysMem);
+	}
+	else {
+		crGpuFixedIndexPtr = nullptr;
 	}
 
 	if(input->position.buffer) {
 		CrGpuProgramInput* i = &input->position;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glVertexPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glVertexPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_VERTEX_ARRAY);
 		}
 	}
@@ -462,8 +468,8 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->normal;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glNormalPointer(m->elemType, i->stride, (void*)i->offset);
+			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glNormalPointer(m->elemType, i->stride, i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_NORMAL_ARRAY);
 		}
 	}
@@ -475,8 +481,8 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->color;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glColorPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			glColorPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_COLOR_ARRAY);
 		}
 	}
@@ -488,15 +494,16 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->texcoord;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
+			glActiveTexture(GL_TEXTURE0);
 			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glTexCoordPointer(m->elemCnt, m->elemType, i->stride, (void*)i->offset);
+			glTexCoordPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		}
 	}
 	else {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-	
+
 }
 
 CR_API void crGpuBindFixedTexture(size_t unit, struct CrTexture* texture, const struct CrSampler* sampler)
@@ -544,11 +551,18 @@ CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, siz
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_LINE_STRIP : GL_LINES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
+
+	if(crContextFixedPipelineOnly()) {
+		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + offset);
+	}
+	else {
+
 #if defined(CR_GLES_2)
-	glDrawElements(mode, count, indexType, (void*)offset);
+		glDrawElements(mode, count, indexType, (void*)offset);
 #else
-	glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
+		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
 #endif
+	}
 }
 
 CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
@@ -561,11 +575,18 @@ CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx,
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
+
+	if(crContextFixedPipelineOnly()) {
+		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + offset);
+	}
+	else {
+
 #if defined(CR_GLES_2)
-	glDrawElements(mode, count, indexType, (void*)offset);
+		glDrawElements(mode, count, indexType, (void*)offset);
 #else
-	glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
+		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
 #endif
+	}
 }
 
 CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)
