@@ -6,6 +6,7 @@
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR8G8B8A8, 4, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE},
 	{CrGpuFormat_UnormR8, 1, GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE},
+	{CrGpuFormat_UnormA8, 1, GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE},
 	{CrGpuFormat_UnormR5G5B5A1, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1},
 	{CrGpuFormat_UnormR5G6B5, 2, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5},
 	{CrGpuFormat_UnormR4G4B4A4, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4},
@@ -18,7 +19,7 @@ CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_FloatR32, 4, GL_R32F, GL_RED, GL_FLOAT},
 	{CrGpuFormat_FloatR16G16B16A16, 8, GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT},
 	{CrGpuFormat_FloatR32G32B32A32, 16, GL_RGBA32F, GL_RGBA, GL_FLOAT},
-	{CrGpuFormat_Depth16, 2, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT},  
+	{CrGpuFormat_Depth16, 2, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT},
 	{CrGpuFormat_Depth32, 4, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT},
 };
 #endif
@@ -47,10 +48,10 @@ size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipW
 	size_t i = 0;
 	size_t offset = 0;
 	CrTextureImpl* impl = (CrTextureImpl*)self;
-	
+
 	*mipWidth = self->width;
 	*mipHeight = self->height;
-	
+
 	do {
 		if(i < mipIndex) {
 			offset += impl->apiFormatMapping->pixelSize * (*mipWidth) * (*mipHeight);
@@ -76,7 +77,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	}
 
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
-	
+
 	if(nullptr == impl->apiFormatMapping) {
 		crDbgStr("Non supported texture format: %s\n", format);
 		return CrFalse;
@@ -94,7 +95,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	}
 
 	glGenTextures(1, &impl->glName);
-	
+
 	if(self->surfCount == 1) {
 		impl->glTarget = GL_TEXTURE_2D;
 		glBindTexture(impl->glTarget, impl->glName);
@@ -122,7 +123,7 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	}
 
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
-	
+
 	if(nullptr == impl->apiFormatMapping) {
 		crDbgStr("Non supported texture format: %s\n", format);
 		return CrFalse;
@@ -140,7 +141,7 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	}
 
 	glGenTextures(1, &impl->glName);
-	
+
 	if(self->surfCount == 1) {
 		impl->glTarget = GL_TEXTURE_2D;
 		glBindTexture(impl->glTarget, impl->glName);
@@ -176,22 +177,22 @@ CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 
 	if(nullptr == impl->apiFormatMapping)
 		return CrFalse;
-	
+
 	mapping = impl->apiFormatMapping;
 
 	if(self->surfCount == 1) {
-		
+
 		size_t i;
 
 		glBindTexture(impl->glTarget, impl->glName);
-		
+
 		for(i=0; i<self->mipCount+1; ++i) {
 			size_t mipW, mipH;
 
 			unsigned char* mipdata = crTextureGetMipLevel(self, (unsigned char*)data, 0, i, &mipW, &mipH);
-			glTexImage2D(impl->glTarget, i, mapping->internalFormat, 
-				mipW, mipH, 0, 
-				mapping->format, mapping->type, 
+			glTexImage2D(impl->glTarget, i, mapping->internalFormat,
+				mipW, mipH, 0,
+				mapping->format, mapping->type,
 				nullptr == data ? nullptr : mipdata);
 		}
 	}
@@ -217,6 +218,6 @@ CR_API void crTextureFree(CrTexture* self)
 
 	if(0 != impl->glName)
 		glDeleteTextures(1, &impl->glName);
-	
+
 	crMem()->free(self, "CrTexture");
 }

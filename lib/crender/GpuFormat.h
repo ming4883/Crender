@@ -6,6 +6,7 @@ typedef enum CrGpuFormat
 	// uncompressed formats
 	CrGpuFormat_UnormR8G8B8A8,
 	CrGpuFormat_UnormR8,
+	CrGpuFormat_UnormA8,
 	CrGpuFormat_UnormR5G5B5A1,
 	CrGpuFormat_UnormR5G6B5,
 	CrGpuFormat_UnormR4G4B4A4,
