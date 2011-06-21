@@ -438,14 +438,13 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 	}
 }
 
-void* crGpuFixedIndexPtr = nullptr;
+char* crGpuFixedIndexPtr = nullptr;
 
 CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 {
 	if(input->index.buffer) {
 		CrGpuProgramInput* i = &input->index;
-		crGpuFixedIndexPtr = i->buffer->sysMem;
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i->buffer->sysMem);
+		crGpuFixedIndexPtr = (char*)i->buffer->sysMem;
 	}
 	else {
 		crGpuFixedIndexPtr = nullptr;
@@ -455,8 +454,7 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->position;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glVertexPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
+			glVertexPointer(m->elemCnt, m->elemType, i->stride, (char*)i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_VERTEX_ARRAY);
 		}
 	}
@@ -468,8 +466,7 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->normal;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glNormalPointer(m->elemType, i->stride, i->buffer->sysMem + i->offset);
+			glNormalPointer(m->elemType, i->stride, (char*)i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_NORMAL_ARRAY);
 		}
 	}
@@ -481,8 +478,7 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		CrGpuProgramInput* i = &input->color;
 		CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
 		if(nullptr != m) {
-			//glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glColorPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
+			glColorPointer(m->elemCnt, m->elemType, i->stride, (char*)i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_COLOR_ARRAY);
 		}
 	}
@@ -496,7 +492,7 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 		if(nullptr != m) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-			glTexCoordPointer(m->elemCnt, m->elemType, i->stride, i->buffer->sysMem + i->offset);
+			glTexCoordPointer(m->elemCnt, m->elemType, i->stride, (char*)i->buffer->sysMem + i->offset);
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		}
 	}
