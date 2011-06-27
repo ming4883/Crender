@@ -71,6 +71,8 @@ static GLenum CrGpuState_polygonModeMapping[] = {
 };
 #endif
 
+#ifndef CR_ANDROID
+
 static GLenum CrGpuState_fixedTexOpMapping[] = {
 	GL_REPLACE,
 	GL_MODULATE,
@@ -86,6 +88,8 @@ static GLenum CrGpuState_fixedTexArgMapping[] = {
 	GL_PRIMARY_COLOR,
 	GL_PREVIOUS,
 };
+
+#endif
 
 CR_API void crGpuStatePreRender(CrGpuState* self)
 {
@@ -128,6 +132,7 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 	glPolygonMode(GL_FRONT_AND_BACK, CrGpuState_polygonModeMapping[self->desc.polygonMode - CrGpuState_PolygonMode_Line]);
 #endif
 
+#ifndef CR_ANDROID
 	if(crContextFixedPipelineOnly()) {
 		CrMat44 m;
 		size_t i;
@@ -176,7 +181,6 @@ CR_API void crGpuStatePreRender(CrGpuState* self)
 		glMatrixMode(GL_PROJECTION);
 		crMat44Transpose(&m, (CrMat44*)self->desc.fixedTransformProj);
 		glLoadMatrixf((float*)&m);
-
-
 	}
+#endif
 }

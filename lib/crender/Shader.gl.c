@@ -442,6 +442,7 @@ char* crGpuFixedIndexPtr = nullptr;
 
 CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 {
+#ifndef CR_ANDROID
 	if(input->index.buffer) {
 		CrGpuProgramInput* i = &input->index;
 		crGpuFixedIndexPtr = (char*)i->buffer->sysMem;
@@ -499,7 +500,7 @@ CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 	else {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-
+#endif
 }
 
 CR_API void crGpuBindFixedTexture(size_t unit, struct CrTexture* texture, const struct CrSampler* sampler)
