@@ -215,7 +215,7 @@ CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yre
 	GetWindowRect(hWnd, &rcWindow);
 	ptDiff.x = (rcWindow.right - rcWindow.left) - rcClient.right;
 	ptDiff.y = (rcWindow.bottom - rcWindow.top) - rcClient.bottom;
-	MoveWindow(hWnd, rcWindow.left, rcWindow.top, xres + ptDiff.x, yres + ptDiff.y, TRUE);
+	SetWindowPos(hWnd, 0, rcWindow.left, rcWindow.top, xres + ptDiff.x, yres + ptDiff.y, SWP_NOMOVE|SWP_NOZORDER);
 
 	self->xres = xres;
 	self->yres = yres;
