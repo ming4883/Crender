@@ -126,3 +126,8 @@ CR_API void crContextSwapBuffers(CrContext* self)
 	CrContextImpl* impl = (CrContextImpl*)self;
 	eglSwapBuffers(impl->display, impl->surface);
 }
+
+CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres)
+{
+	return CrFalse;
+}

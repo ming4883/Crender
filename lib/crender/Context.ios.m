@@ -120,3 +120,8 @@ CR_API void crContextSwapBuffers(CrContext* self)
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defColorBufName);
     [context presentRenderbuffer:GL_RENDERBUFFER];
 }
+
+CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres)
+{
+	return CrFalse;
+}
