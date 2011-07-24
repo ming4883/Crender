@@ -37,6 +37,15 @@ void appFree(AppContext* self)
 	free(self);
 }
 
+void appResize(AppContext* self, size_t xres, size_t yres)
+{
+	self->aspect.width = (float)xres;
+	self->aspect.height = (float)yres;
+
+	crContextChangeResolution(crContext(), xres, yres);
+	crRenderTargetSetViewport(0, 0, (float)xres, (float)yres, -1, 1);
+}
+
 void appLoadMaterialBegin(AppContext* self, const char** directives)
 {
 	glswInit(&myFileSystem);

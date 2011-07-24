@@ -49,8 +49,9 @@ typedef struct AppContext
 } AppContext;
 
 AppContext* appAlloc();
-void appInit(AppContext* sel);
+void appInit(AppContext* self);
 void appFree(AppContext* self);
+void appResize(AppContext* self, size_t xres, size_t yres);
 
 void appLoadMaterialBegin(AppContext* self, const char** directives);
 Material* appLoadMaterial(const char* vsKey, const char* fsKey, const char* tcKey, const char* teKey, const char* gsKey);

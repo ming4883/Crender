@@ -110,6 +110,7 @@ CrBool crAppInitialize()
 {
 	app = appAlloc();
 	appInit(app);
+	appResize(app, 320, 240);
 
 	// remote config
 	{

@@ -35,6 +35,8 @@ CR_API void crContextPostRender(CrContext* self);
 
 CR_API void crContextSwapBuffers(CrContext* self);
 
+CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres);
+
 #ifdef __cplusplus
 }
 #endif

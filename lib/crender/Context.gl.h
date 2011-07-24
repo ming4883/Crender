@@ -37,7 +37,8 @@ typedef struct CrContextImpl
 
 #if defined(CR_WIN32)
 	GLuint hDC;
-    GLuint hRC;
+	GLuint hRC;
+	void* hwnd;
 #endif
 
 #if defined(CR_APPLE_IOS)

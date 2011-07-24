@@ -48,6 +48,7 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 	self->xres = info.rcClient.right - info.rcClient.left;
 	self->yres = info.rcClient.bottom - info.rcClient.top;
 
+	impl->hwnd = *hWnd;
 	impl->d3d = Direct3DCreate9(D3D_SDK_VERSION);
 
 	memset(&d3dpp, 0, sizeof(d3dpp));    // clear out the struct for use
@@ -133,4 +134,10 @@ CR_API void crContextSwapBuffers(CrContext* self)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
 	IDirect3DDevice9_Present(impl->d3ddev, nullptr, nullptr, nullptr, nullptr);
+}
+
+CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres)
+{
+	// todo: impl change resolution
+	return CrFalse;
 }

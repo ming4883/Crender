@@ -14,10 +14,12 @@ typedef struct CrContextImpl
 {
 	CrContext i;
 
+	HWND hwnd;
 	IDirect3D9* d3d;
 	IDirect3DDevice9* d3ddev;
 	IDirect3DSurface9* d3dcolorbuf;
 	IDirect3DSurface9* d3ddepthbuf;
+	IDirect3DSwapChain9* d3dswapchain;
 	unsigned int gpuInputId;
 } CrContextImpl;
 
