@@ -169,6 +169,14 @@ void objVertexCacheInit(ObjVertexCache* self, ObjFace* faces, size_t faceCnt, si
 
 void objVertexCacheFree(ObjVertexCache* self)
 {
+	{	// delete all entries in cache to free hash-table memory
+		struct ObjVertexEntry *entry, *tmp;
+
+		HASH_ITER(hh, self->cache, entry, tmp) {
+			HASH_DEL(self->cache, entry);
+		}
+	}
+
 	free(self->entryBuf);
 	free(self->vertexBuf);
 	free(self->indexBuf);

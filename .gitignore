@@ -11,3 +11,4 @@ msvc/*
 */android/.classpath
 */android/.project
 */android/default.properties
+*.PIXExp
