@@ -97,6 +97,9 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 
 	size_t bufCnt;
 	CrRenderBuffer** curr;
+
+	crCheckGLError();	// clear any unhandled gl errors
+
 	if(nullptr == self) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return;

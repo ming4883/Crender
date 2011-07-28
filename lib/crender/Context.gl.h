@@ -58,6 +58,8 @@ typedef struct CrContextImpl
 
 CR_API CrContextImpl* crContextImpl();
 
+#define crCheckGLError() {GLenum err = glGetError(); if(GL_NO_ERROR != err) crDbgStr("unhandled GL error %08x", err); }
+
 #ifdef __cplusplus
 }
 #endif

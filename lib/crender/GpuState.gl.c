@@ -93,6 +93,8 @@ static GLenum CrGpuState_fixedTexArgMapping[] = {
 
 CR_API void crGpuStatePreRender(CrGpuState* self)
 {
+	crCheckGLError();	// clear any unhandled gl errors
+
 	if(self->desc.depthTest)
 		glEnable(GL_DEPTH_TEST);
 	else

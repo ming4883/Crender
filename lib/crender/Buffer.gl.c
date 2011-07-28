@@ -59,6 +59,7 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 			memcpy(self->sysMem, initialData, sizeInBytes);
 	}
 	else {
+		crCheckGLError();	// clear any unhandled gl errors
 		glGenBuffers(1, &impl->glName);
 		glBindBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], impl->glName);
 		glBufferData(crGL_BUFFER_TARGET[crBufferGetType(self)], self->sizeInBytes, initialData, GL_STREAM_DRAW);
@@ -83,6 +84,7 @@ CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBy
 		memcpy(((char*)self->sysMem) + offsetInBytes, data, sizeInBytes);
 	}
 	else {
+		crCheckGLError();	// clear any unhandled gl errors
 		glBindBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], impl->glName);
 		glBufferSubData(crGL_BUFFER_TARGET[crBufferGetType(self)], offsetInBytes, sizeInBytes, data);
 	}
@@ -104,6 +106,7 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 	}
 	else {
 #if !defined(CR_GLES_2)
+		crCheckGLError();	// clear any unhandled gl errors
 		glBindBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], impl->glName);
 		ret = glMapBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], crGL_BUFFER_MAP_ACCESS[access]);
 #endif
@@ -129,6 +132,7 @@ CR_API void crBufferUnmap(CrBuffer* self)
 	}
 	else {
 #if !defined(CR_GLES_2)
+		crCheckGLError();	// clear any unhandled gl errors
 		glBindBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)], impl->glName);
 		glUnmapBuffer(crGL_BUFFER_TARGET[crBufferGetType(self)]);
 #endif

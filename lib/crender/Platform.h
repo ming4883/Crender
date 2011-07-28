@@ -35,7 +35,9 @@
 extern "C" {
 #endif
 
+#ifndef nullptr
 #define nullptr 0
+#endif
 
 typedef unsigned char CrBool;
 #define CrFalse 0

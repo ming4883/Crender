@@ -31,6 +31,8 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 		return CrFalse;
 	}
 
+	crCheckGLError();	// clear any unhandled gl errors
+
 	self->flags = 0;
 	self->type = type;
 	impl->glName = glCreateShader(crGL_SHADER_TYPE[self->type]);
@@ -87,6 +89,8 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 		crDbgStr("CrGpuProgram already inited!\n");
 		return CrFalse;
 	}
+
+	crCheckGLError();	// clear any unhandled gl errors
 
 	impl->glName = glCreateProgram();
 
@@ -203,6 +207,8 @@ CR_API void crGpuProgramPreRender(CrGpuProgram* self)
 		//crDbgStr("CrGpuProgram is not inited!\n");
 		return;
 	}
+
+	crCheckGLError();	// clear any unhandled gl errors
 
 	glUseProgram(impl->glName);
 }

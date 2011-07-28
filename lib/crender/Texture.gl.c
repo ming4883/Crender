@@ -10,6 +10,8 @@ CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR5G5B5A1, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1},
 	{CrGpuFormat_UnormR5G6B5, 2, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5},
 	{CrGpuFormat_UnormR4G4B4A4, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4},
+	{CrGpuFormat_CompPVRTC2, 2, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG, 0, 0},	// glCompressedTexImage2D does not need format & type
+	{CrGpuFormat_CompPVRTC4, 1, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG, 0, 0},
 };
 #else
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
@@ -54,7 +56,14 @@ size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipW
 
 	do {
 		if(i < mipIndex) {
-			offset += impl->apiFormatMapping->pixelSize * (*mipWidth) * (*mipHeight);
+			size_t mipSize = (*mipWidth) * (*mipHeight);
+
+			if(CrGpuFormat_Compressed & self->format)
+				mipSize = mipSize >> impl->apiFormatMapping->pixelSize;
+			else
+				mipSize = mipSize * impl->apiFormatMapping->pixelSize;
+
+			offset += mipSize;
 			if(*mipWidth > 1) *mipWidth /= 2;
 			if(*mipHeight > 1) *mipHeight /= 2;
 		}
@@ -82,6 +91,8 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 		crDbgStr("Non supported texture format: %s\n", format);
 		return CrFalse;
 	}
+
+	crCheckGLError();	// clear any unhandled gl errors
 
 	self->format = format;
 	self->width = width;
@@ -128,6 +139,8 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 		crDbgStr("Non supported texture format: %s\n", format);
 		return CrFalse;
 	}
+
+	crCheckGLError();	// clear any unhandled gl errors
 
 	self->format = format;
 	self->width = width;
@@ -178,6 +191,8 @@ CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 	if(nullptr == impl->apiFormatMapping)
 		return CrFalse;
 
+	crCheckGLError();	// clear any unhandled gl errors
+
 	mapping = impl->apiFormatMapping;
 
 	if(self->surfCount == 1) {
@@ -190,10 +205,20 @@ CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 			size_t mipW, mipH;
 
 			unsigned char* mipdata = crTextureGetMipLevel(self, (unsigned char*)data, 0, i, &mipW, &mipH);
-			glTexImage2D(impl->glTarget, i, mapping->internalFormat,
-				mipW, mipH, 0,
-				mapping->format, mapping->type,
-				nullptr == data ? nullptr : mipdata);
+
+			if(CrGpuFormat_Compressed &mapping->crFormat) {
+				size_t imgSize = (mipW * mipH) >> mapping->pixelSize;
+				glCompressedTexImage2D(impl->glTarget, i, mapping->internalFormat, 
+					mipW, mipH, 0,
+					imgSize,
+					nullptr == data ? nullptr : mipdata);
+			}
+			else {
+				glTexImage2D(impl->glTarget, i, mapping->internalFormat,
+					mipW, mipH, 0,
+					mapping->format, mapping->type,
+					nullptr == data ? nullptr : mipdata);
+			}
 		}
 	}
 
