@@ -539,6 +539,12 @@ static GLenum crGL_INDEX_TYPE[] = {
 	GL_UNSIGNED_INT,
 };
 
+static size_t crGL_INDEX_SIZE[] = {
+	sizeof(short),
+	sizeof(char),
+	sizeof(int),
+};
+
 CR_API void crGpuDrawPoint(size_t offset, size_t count)
 {
 	glDrawArrays(GL_POINTS, offset, count);
@@ -554,16 +560,17 @@ CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, siz
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_LINE_STRIP : GL_LINES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
+	size_t byteOffset = offset * crGL_INDEX_SIZE[flags & 0x000F];
 
 	if(crContextFixedPipelineOnly()) {
-		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + offset);
+		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + byteOffset);
 	}
 	else {
 
 #if defined(CR_GLES_2)
-		glDrawElements(mode, count, indexType, (void*)offset);
+		glDrawElements(mode, count, indexType, (void*)byteOffset);
 #else
-		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
+		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)byteOffset);
 #endif
 	}
 }
@@ -578,16 +585,17 @@ CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx,
 {
 	GLenum mode = (flags & CrGpuDraw_Stripped) ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
+	size_t byteOffset = offset * crGL_INDEX_SIZE[flags & 0x000F];
 
 	if(crContextFixedPipelineOnly()) {
-		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + offset);
+		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + byteOffset);
 	}
 	else {
 
 #if defined(CR_GLES_2)
-		glDrawElements(mode, count, indexType, (void*)offset);
+		glDrawElements(mode, count, indexType, (void*)byteOffset);
 #else
-		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
+		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)byteOffset);
 #endif
 	}
 }
@@ -608,9 +616,10 @@ CR_API void crGpuDrawPatchIndexed(size_t offset, size_t count, size_t minIdx, si
 #if !defined(CR_GLES_2)
 	GLenum mode = GL_PATCHES;
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
+	size_t byteOffset = offset * crGL_INDEX_SIZE[flags & 0x000F];
 	if(nullptr != glPatchParameteri) {
 		glPatchParameteri(GL_PATCH_VERTICES, vertexPerPatch);
-		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)offset);
+		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)byteOffset);
 	}
 #endif
 }

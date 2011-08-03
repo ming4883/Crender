@@ -139,7 +139,9 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 
 CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
 {
+	glEnable(GL_SCISSOR_TEST);
 	glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
+	glScissor((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
 	glDepthRange(zmin, zmax);
 }
 
