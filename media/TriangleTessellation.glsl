@@ -1,4 +1,4 @@
--- Scene.Vertex.gl
+-- Scene.Vertex
 in vec4 i_vertex;
 in vec3 i_normal;
 in vec2 i_texcoord0;
@@ -13,7 +13,7 @@ void main() {
 	v_texcoord0 = i_texcoord0;
 }
 
--- Scene.TessControl.gl
+-- Scene.TessControl
 layout(vertices = 3) out;
 
 in vec4 v_vertex[];
@@ -42,7 +42,7 @@ void main()
     }
 }
 
--- Scene.TessEvaluation.gl
+-- Scene.TessEvaluation
 layout(triangles, equal_spacing, ccw) in;
 
 in vec4 tc_vertex[];
@@ -99,7 +99,7 @@ void main()
 	f_texcoord = te_texcoord0;
 }
 
--- Scene.Fragment.gl
+-- Scene.Fragment
 in vec3 f_normal;
 in vec3 f_pos;
 in vec2 f_texcoord;

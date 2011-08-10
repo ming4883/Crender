@@ -151,9 +151,7 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 	crDbgStr("OpenGL Version: %s\n", glGetString(GL_VERSION));
 
 	if (!self->vsync)
-	{
 		wglSwapIntervalEXT(0);
-	}
 
 	sprintf(glVersionStr, "GL_VERSION_%d_%d", self->apiMajorVer, self->apiMinorVer);
 	if ((self->apiMajorVer > 2) && glewIsSupported(glVersionStr))

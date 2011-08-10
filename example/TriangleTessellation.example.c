@@ -114,9 +114,8 @@ void crAppRender()
 void crAppConfig()
 {
 	crAppContext.appName = "Triangle Tessellation";
-	crAppContext.context->msaaLevel = 4;
 	crAppContext.context->apiMajorVer = 4;
-	crAppContext.context->apiMinorVer = 0;
+	crAppContext.context->apiMinorVer = 1;
 }
 
 void crAppFinalize()

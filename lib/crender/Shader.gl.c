@@ -138,8 +138,16 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 		crDbgStr("glProgram %d has %d uniforms\n", impl->glName, uniformCnt);
 
 		for(i=0; i<uniformCnt; ++i) {
+			size_t c;
 			CrGpuProgramUniform* uniform;
 			glGetActiveUniform(impl->glName, i, crCountOf(uniformName), &uniformLength, &uniformSize, &uniformType, uniformName);
+			for(c=0; c<sizeof(uniformName); ++c) {
+				// for array uniform, some driver may return var_name[0] :-<
+				if(uniformName[c] == '[') {
+					uniformName[c] = '\0';
+					break;
+				}
+			}
 			uniform = &impl->uniforms[i];
 			uniform->hash = CrHash(uniformName);
 			uniform->loc = glGetUniformLocation(impl->glName, uniformName);
