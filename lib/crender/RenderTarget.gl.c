@@ -38,6 +38,11 @@ CR_API void crRenderTargetInit(CrRenderTarget* self)
 		return;
 	}
 
+	if(!glGenFramebuffers) {
+		crDbgStr("render target is not supported!\n");
+		return;
+	}
+
 	glGenFramebuffers(1, &impl->glName);
 	
 	self->flags |= CrRenderTarget_Inited;
@@ -49,6 +54,10 @@ CR_API CrRenderBuffer* crRenderTargetAcquireBuffer(CrRenderTarget* self, size_t 
 
 	CrRenderBufferImpl* buffer;
 	CrRenderBufferImpl* it;
+	
+	if(0 == (self->flags & CrRenderTarget_Inited))
+		return nullptr;
+
 	LL_FOREACH(impl->bufferList, it) {
 		CrTexture* tex = it->i.texture;
 		if(!it->acquired && (width == tex->width) && (height == tex->height) && (format == tex->format)) {
@@ -101,9 +110,14 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 	crCheckGLError();	// clear any unhandled gl errors
 
 	if(nullptr == self) {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		if(nullptr != glBindFramebuffer)
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return;
 	}
+
+	if(0 == (self->flags & CrRenderTarget_Inited))
+		return;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, impl->glName);
 	
