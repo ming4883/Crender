@@ -1,0 +1,46 @@
+<html>
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript">
+var gl;
+function initGL(canvas) {
+	try {
+		//gl = canvas.getContext("experimental-webgl");
+		gl = WebGLUtils.setupWebGL(canvas);
+		gl.viewport(0, 0, canvas.width, canvas.height);
+	}
+	catch(e) {
+	}
+	if (!gl) {
+		alert("Could not initialise WebGL, sorry :-(");
+	}
+}
+
+var t = 0.0;
+
+function tick() {
+	requestAnimFrame(tick);
+	
+	var c = t / 255.0;
+	gl.clearColor(c, 1.0 - c, 0.0, 1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
+	t += 1.0;
+	if(t > 255.0) t = 0.0;
+	
+	document.getElementById("info").innerHTML = t;
+}
+
+function main() {
+	var canvas = document.getElementById("the-canvas");
+	initGL(canvas);
+	
+	tick();
+}
+</script>
+
+<body onload="main();">
+<div id="info">testing</div>
+<canvas id="the-canvas" style="border: none;" width="800" height="480"></canvas>
+</body>
+</html>
