@@ -1,0 +1,71 @@
+<html>
+<script type="text/javascript" src="3rd/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="3rd/webgl-utils.js"></script>
+<script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
+
+<script type="text/javascript" src="crender.js"></script>
+
+<script id="shader-fs" type="x-shader/x-fragment"> 
+precision highp float;
+
+void main(void) {
+	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+</script> 
+ 
+<script id="shader-vs" type="x-shader/x-vertex"> 
+attribute vec3 aVertexPosition;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+
+void main(void) {
+	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+}
+</script>
+
+<script type="text/javascript">
+
+var prog;
+
+function log(x) {
+	var logger = document.getElementById("logger");
+	if(logger) {
+		logger.innerHTML = logger.innerHTML + "<br/>" + x;
+	}
+}
+
+function init() {
+	
+	var shaders = [
+		crCreateShaderDOM("shader-vs"),
+		crCreateShaderDOM("shader-fs")
+	];
+	
+	prog = crCreateProgram(shaders);
+	
+	crLog("init complete");
+}
+
+function tick() {
+	requestAnimFrame(tick);
+	
+	crClearColorBuffer(0.2, 0.2, 0.2, 1.0);
+	crClearDepthBuffer(1.0);
+}
+
+function main() {
+	crLog = log;
+	var canvas = document.getElementById("the-canvas");
+	crInit(canvas);
+	init();
+	tick();
+}
+
+</script>
+
+<body onload="main();">
+<canvas id="the-canvas" style="border: none;" width="800" height="480"></canvas>
+<div id="logger">Logger</div>
+</body>
+</html>
