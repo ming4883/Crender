@@ -14,19 +14,25 @@ void main(void) {
 </script> 
  
 <script id="shader-vs" type="x-shader/x-vertex"> 
-attribute vec3 aVertexPosition;
+attribute vec3 i_vertex;
 
-uniform mat4 uMVMatrix;
-uniform mat4 uPMatrix;
+uniform mat4 u_mvpMatrix;
 
 void main(void) {
-	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+	gl_Position = u_mvpMatrix * vec4(i_vertex, 1.0);
 }
 </script>
 
 <script type="text/javascript">
 
 var prog;
+var vb;
+
+var vertices = [
+	 0.0,  1.0,  0.0,
+	-1.0, -1.0,  0.0,
+	 1.0, -1.0,  0.0
+];
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -43,15 +49,42 @@ function init() {
 	];
 	
 	prog = crCreateProgram(shaders);
+	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
+	vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
 	
 	crLog("init complete");
 }
 
-function tick() {
-	requestAnimFrame(tick);
-	
+var pMatrix = mat4.create();
+var mvMatrix = mat4.create();
+var mvpMatrix = mat4.create();
+
+function render() {
 	crClearColorBuffer(0.2, 0.2, 0.2, 1.0);
 	crClearDepthBuffer(1.0);
+	
+	mat4.identity(mvMatrix);
+	mat4.scale(mvMatrix, [0.5, 0.5, 0.5]);
+	
+	mat4.identity(pMatrix);
+	mat4.translate(pMatrix, [-0.5, 0.0, 0.0]);
+	
+	//mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+	
+	gl.useProgram(prog);
+	gl.uniformMatrix4fv(prog.u_mvpMatrix, false, mat4.multiply(mvMatrix, pMatrix));
+	
+	i_vertex = gl.getAttribLocation(prog, "i_vertex");
+	gl.enableVertexAttribArray(i_vertex);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+	gl.vertexAttribPointer(i_vertex, 3, gl.FLOAT, false, 0, 0);
+	gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+function tick() {
+	requestAnimFrame(tick);
+	render();
 }
 
 function main() {
