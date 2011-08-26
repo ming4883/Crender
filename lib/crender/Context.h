@@ -7,6 +7,82 @@
 extern "C" {
 #endif
 
+typedef enum CrGpuStateType
+{
+	// BlendFactor
+	CrGpuState_BlendFactor_One,
+	CrGpuState_BlendFactor_Zero,
+	CrGpuState_BlendFactor_SrcColor,
+	CrGpuState_BlendFactor_OneMinusSrcColor,
+	CrGpuState_BlendFactor_DestColor,
+	CrGpuState_BlendFactor_OneMinusDestColor,
+	CrGpuState_BlendFactor_SrcAlpha,
+	CrGpuState_BlendFactor_OneMinusSrcAlpha,
+	CrGpuState_BlendFactor_DestAlpha,
+	CrGpuState_BlendFactor_OneMinusDestAlpha,
+
+	// PolygonMode
+	CrGpuState_PolygonMode_Line,
+	CrGpuState_PolygonMode_Fill,
+
+} CrGpuStateType;
+
+typedef struct CrGpuState
+{
+	CrBool depthTest;
+	CrBool depthWrite;
+	CrBool cull;
+	CrBool blend;
+	CrGpuStateType blendFactorSrcRGB;
+	CrGpuStateType blendFactorDestRGB;
+	CrGpuStateType blendFactorSrcA;
+	CrGpuStateType blendFactorDestA;
+	CrGpuStateType polygonMode;
+
+} CrGpuState;
+
+typedef enum CrFfpStateType
+{
+	// TexOp
+	CrFfpState_TexOp_Arg0,
+	CrFfpState_TexOp_Modulate,
+	CrFfpState_TexOp_Add,
+	CrFfpState_TexOp_AddSigned,
+	CrFfpState_TexOp_Lerp,
+	CrFfpState_TexOp_Subtract,
+
+	// TexArg
+	CrFfpState_TexArg_Texture,
+	CrFfpState_TexArg_Constant,
+	CrFfpState_TexArg_Color,
+	CrFfpState_TexArg_Current,
+
+} CrFfpStateType;
+
+typedef struct CrFfpTexStage
+{
+	CrFfpStateType opRGB;
+	CrFfpStateType argRGB0;
+	CrFfpStateType argRGB1;
+	CrFfpStateType argRGB2;
+	CrFfpStateType opA;
+	CrFfpStateType argA0;
+	CrFfpStateType argA1;
+	CrFfpStateType argA2;
+
+} CrFfpTexStage;
+
+#define CR_MAX_FFP_TEX_STAGE 2
+typedef struct CrFfpState
+{
+	float transformModel[16];
+	float transformProj[16];
+	
+	float texConstant[4];
+	struct CrFfpTexStage texStage[CR_MAX_FFP_TEX_STAGE];
+
+} CrFfpState;
+
 typedef struct CrContext
 {
 	const char* apiName;
@@ -16,6 +92,9 @@ typedef struct CrContext
 	size_t yres;
 	size_t msaaLevel;
 	CrBool vsync;
+	
+	struct CrGpuState gpuState;
+	struct CrFfpState ffpState;
 
 } CrContext;
 
@@ -36,6 +115,10 @@ CR_API void crContextPostRender(CrContext* self);
 CR_API void crContextSwapBuffers(CrContext* self);
 
 CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres);
+
+CR_API void crContextApplyGpuState(CrContext* self);
+
+CR_API void crContextApplyFfpState(CrContext* self);
 
 #ifdef __cplusplus
 }

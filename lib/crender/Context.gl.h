@@ -57,6 +57,8 @@ typedef struct CrContextImpl
 } CrContextImpl;
 
 CR_API CrContextImpl* crContextImpl();
+CR_API void crGpuStateInit(CrGpuState* self);
+CR_API void crFfpStateInit(CrFfpState* self);
 
 #define crCheckGLError() {GLenum err = glGetError(); if(GL_NO_ERROR != err) crDbgStr("unhandled GL error 0x%04x before %s %d\n", err, __FILE__, __LINE__); }
 

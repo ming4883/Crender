@@ -41,7 +41,8 @@ void crAppRender()
 	CrMat44 projMtx;
 	CrMat44 viewProjMtx;
 
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
+	CrFfpState* ffpState = &crContext()->ffpState;
 
 	Settings lsettings;
 
@@ -77,23 +78,25 @@ void crAppRender()
 			crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &app->shaderContext.worldMtx);
 			crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &app->shaderContext.worldMtx);
 
-			memcpy(gpuState->fixedTransformProj, &app->shaderContext.worldViewProjMtx, sizeof(CrMat44));
+			memcpy(ffpState->transformProj, &app->shaderContext.worldViewProjMtx, sizeof(CrMat44));
 		}
 
 		gpuState->depthTest = CrTrue;
 		gpuState->cull = CrTrue;
-		gpuState->fixedTexStage[0].opRGB = CrGpuState_FixedTexOp_Modulate;
-		gpuState->fixedTexStage[0].argRGB0 = CrGpuState_FixedTexArg_Constant;
-		gpuState->fixedTexStage[0].argRGB1 = CrGpuState_FixedTexArg_Texture;
-		gpuState->fixedTexStage[0].opA = CrGpuState_FixedTexOp_Arg0;
-		gpuState->fixedTexStage[0].argA0 = CrGpuState_FixedTexArg_Constant;
-		
-		gpuState->fixedTexConstant[0] = 0.5f;
-		gpuState->fixedTexConstant[1] = 1.0f;
-		gpuState->fixedTexConstant[2] = 1.0f;
-		gpuState->fixedTexConstant[3] = 0.5f;
+		ffpState->texStage[0].opRGB = CrFfpState_TexOp_Modulate;
+		ffpState->texStage[0].argRGB0 = CrFfpState_TexArg_Constant;
+		ffpState->texStage[0].argRGB1 = CrFfpState_TexArg_Texture;
 
-		crGpuStatePreRender(app->gpuState);
+		ffpState->texStage[0].opA = CrFfpState_TexOp_Arg0;
+		ffpState->texStage[0].argA0 = CrFfpState_TexArg_Constant;
+		
+		ffpState->texConstant[0] = 0.5f;
+		ffpState->texConstant[1] = 1.0f;
+		ffpState->texConstant[2] = 1.0f;
+		ffpState->texConstant[3] = 0.5f;
+
+		crContextApplyGpuState(crContext());
+		crContextApplyFfpState(crContext());
 
 		{
 			CrSampler sampler = {

@@ -14,7 +14,7 @@ SET( CRENDER_COMMON
 		lib/crender/Context.h
 		lib/crender/Buffer.h
 		lib/crender/GpuFormat.h
-		lib/crender/GpuState.h
+#		lib/crender/GpuState.h
 		lib/crender/Mat44.c
 		lib/crender/Mat44.h
 		lib/crender/Mem.c
@@ -45,11 +45,12 @@ IF( WIN32 )
 	SET( CRENDER
 		${CRENDER_COMMON}
 		lib/crender/Context.windows.gl.c
+		lib/crender/Context.gl.c
 		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
-		lib/crender/GpuState.gl.c
-		lib/crender/GpuState.gl.h
+#		lib/crender/GpuState.gl.c
+#		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
 		lib/crender/RenderTarget.gl.c
 		lib/crender/RenderTarget.gl.h
@@ -80,8 +81,8 @@ IF( WIN32 )
 		lib/crender/Context.d3d9.h
 		lib/crender/Buffer.d3d9.c
 		lib/crender/Buffer.d3d9.h
-		lib/crender/GpuState.d3d9.c
-		lib/crender/GpuState.d3d9.h
+#		lib/crender/GpuState.d3d9.c
+#		lib/crender/GpuState.d3d9.h
 		lib/crender/Mat44.d3d9.c
 		lib/crender/RenderTarget.d3d9.c
 		lib/crender/RenderTarget.d3d9.h
@@ -103,11 +104,12 @@ ELSEIF( APPLE )
 	SET( CRENDER
 		${CRENDER_COMMON}
 		lib/crender/Context.ios.m
+		lib/crender/Context.gl.c
 		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
-		lib/crender/GpuState.gl.c
-		lib/crender/GpuState.gl.h
+#		lib/crender/GpuState.gl.c
+#		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
 		lib/crender/RenderTarget.gl.c
 		lib/crender/RenderTarget.gl.h

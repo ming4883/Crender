@@ -6,7 +6,8 @@ LOCAL_MODULE	:= crender
 
 LOCAL_SRC_FILES	+= crender/Buffer.gl.c
 LOCAL_SRC_FILES	+= crender/Context.android.c
-LOCAL_SRC_FILES	+= crender/GpuState.gl.c
+LOCAL_SRC_FILES	+= crender/Context.gl.c
+//LOCAL_SRC_FILES	+= crender/GpuState.gl.c
 LOCAL_SRC_FILES	+= crender/Mat44.c
 LOCAL_SRC_FILES	+= crender/Mat44.gl.c
 LOCAL_SRC_FILES	+= crender/Mem.c

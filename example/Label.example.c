@@ -19,7 +19,7 @@ void crAppHandleMouse(int x, int y, int action)
 
 void crAppRender()
 {
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 
 	// render to texture
 	crRenderTargetClearDepth(1);
@@ -31,7 +31,7 @@ void crAppRender()
 	gpuState->blendFactorDestRGB = CrGpuState_BlendFactor_OneMinusSrcAlpha;
 	gpuState->blendFactorSrcA = CrGpuState_BlendFactor_SrcAlpha;
 	gpuState->blendFactorDestA = CrGpuState_BlendFactor_OneMinusSrcAlpha;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 	
 	crGpuProgramPreRender(mtlText->program);
 	{

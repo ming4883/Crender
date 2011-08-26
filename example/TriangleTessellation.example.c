@@ -28,11 +28,11 @@ void drawBackground()
 		{0.57f, 0.85f, 1.0f, 1.0f},
 	};
 
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 	
 	gpuState->depthTest = CrFalse;
 	gpuState->cull = CrTrue;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(bgMtl->program);
 	crGpuProgramUniform4fv(bgMtl->program, CrHash("u_colors"), 4, (const float*)c);
@@ -49,7 +49,7 @@ void drawScene(Settings* settings)
 	CrMat44 viewMtx;
 	CrMat44 projMtx;
 	CrMat44 viewProjMtx;
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 	
 	crMat44CameraLookAt(&viewMtx, &eyeAt, &lookAt, &eyeUp);
 	crMat44Prespective(&projMtx, 45.0f, app->aspect.width / app->aspect.height, 0.1f, 30.0f);
@@ -59,7 +59,7 @@ void drawScene(Settings* settings)
 	gpuState->depthTest = CrTrue;
 	gpuState->cull = CrTrue;
 	//gpuState->polygonMode = CrGpuState_PolygonMode_Line;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(tessMtl->program);
 	

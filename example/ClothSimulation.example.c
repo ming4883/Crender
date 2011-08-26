@@ -127,11 +127,11 @@ void drawBackground()
 		{0.57f, 0.85f, 1.0f, 1.0f},
 		{0.57f, 0.85f, 1.0f, 1.0f},
 	};
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 
 	gpuState->depthTest = CrFalse;
 	gpuState->cull = CrTrue;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(bgMtl->program);
 	crGpuProgramUniform4fv(bgMtl->program, CrHash("u_colors"), 4, (const float*)c);
@@ -142,7 +142,7 @@ void drawBackground()
 
 void drawShadowMap()
 {
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 	
 	CrRenderBuffer* bufs[] = {shadowMap, nullptr};
 	crRenderTargetPreRender(app->renderTarget, bufs, shadowMapZ);
@@ -159,7 +159,7 @@ void drawShadowMap()
 	
 	gpuState->cull = CrTrue;
 	gpuState->depthTest = CrTrue;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(shadowMapMtl->program);
 	crGpuProgramUniform4fv(shadowMapMtl->program, CrHash("u_shadowMapParam"), 1, shadowMapParam.v);
@@ -181,7 +181,7 @@ void drawShadowMap()
 	// draw cloth
 	{	
 		gpuState->cull = CrFalse;
-		crGpuStatePreRender(app->gpuState);
+		crContextApplyGpuState(crContext());
 		{
 			CrMat44 m;
 			crMat44SetIdentity(&m);
@@ -194,7 +194,7 @@ void drawShadowMap()
 		meshRenderTriangles(cloth->mesh);
 		
 		gpuState->cull = CrTrue;
-		crGpuStatePreRender(app->gpuState);
+		crContextApplyGpuState(crContext());
 	}
 
 	// draw balls
@@ -229,7 +229,7 @@ void drawScene()
 	CrMat44 projMtx;
 	CrMat44 viewProjMtx;
 
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 	
 	crMat44CameraLookAt(&viewMtx, &eyeAt, &lookAt, &eyeUp);
 	crMat44Prespective(&projMtx, 45.0f, app->aspect.width / app->aspect.height, 0.1f, 30.0f);
@@ -238,7 +238,7 @@ void drawScene()
 
 	gpuState->cull = CrTrue;
 	gpuState->depthTest = CrTrue;
-	crGpuStatePreRender(app->gpuState);
+	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(sceneMtl->program);
 	{	
@@ -292,7 +292,7 @@ void drawScene()
 		app->shaderContext.matShininess = 32;
 
 		gpuState->cull = CrFalse;
-		crGpuStatePreRender(app->gpuState);
+		crContextApplyGpuState(crContext());
 		{
 			CrMat44 m;
 			crMat44SetIdentity(&m);
@@ -307,7 +307,7 @@ void drawScene()
 		meshRenderTriangles(cloth->mesh);
 		
 		gpuState->cull = CrTrue;
-		crGpuStatePreRender(app->gpuState);
+		crContextApplyGpuState(crContext());
 	}
 
 	// draw balls

@@ -47,7 +47,7 @@ void crAppRender()
 	CrMat44 projMtx;
 	CrMat44 viewProjMtx;
 
-	CrGpuStateDesc* gpuState = &app->gpuState->desc;
+	CrGpuState* gpuState = &crContext()->gpuState;
 
 	Settings lsettings;
 
@@ -70,7 +70,7 @@ void crAppRender()
 	{
 		gpuState->depthTest = CrTrue;
 		gpuState->cull = CrTrue;
-		crGpuStatePreRender(app->gpuState);
+		crContextApplyGpuState(crContext());
 
 		crGpuProgramPreRender(mtl->program);
 		{	

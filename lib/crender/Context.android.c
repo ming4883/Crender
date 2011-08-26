@@ -28,6 +28,9 @@ CR_API CrContext* crContextAlloc()
 	self->i.apiMinorVer = 0;
 	self->i.xres = 800;
 	self->i.yres = 480;
+	
+	crGpuStateInit(&self->i.gpuState);
+	crFfpStateInit(&self->i.ffpState);
 
 	return &self->i;
 }

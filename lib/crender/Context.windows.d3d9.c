@@ -1,5 +1,6 @@
 #include "Context.d3d9.h"
 #include "Mem.h"
+#include "Mat44.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -31,6 +32,9 @@ CR_API CrContext* crContextAlloc()
 	self->i.apiMinorVer = 3;
 	self->i.xres = 853;
 	self->i.yres = 480;
+
+	crGpuStateInit(&self->i.gpuState);
+	crFfpStateInit(&self->i.ffpState);
 
 	return &self->i;
 }
@@ -224,4 +228,90 @@ CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yre
 	self->yres = yres;
 
 	return crContextCreateFrameBuffers(self);;
+}
+
+CR_API void crGpuStateInit(CrGpuState* self)
+{
+	self->depthTest = CrTrue;
+	self->depthWrite = CrTrue;
+	self->cull = CrTrue;
+	self->blend = CrFalse;
+	self->blendFactorSrcRGB = CrGpuState_BlendFactor_One;
+	self->blendFactorDestRGB = CrGpuState_BlendFactor_Zero;
+	self->blendFactorSrcA = CrGpuState_BlendFactor_One;
+	self->blendFactorDestA = CrGpuState_BlendFactor_Zero;
+	self->polygonMode = CrGpuState_PolygonMode_Fill;
+
+}
+
+CR_API void crFfpStateInit(CrFfpState* self)
+{
+	size_t i;
+	for(i=0; i<CR_MAX_FFP_TEX_STAGE; ++i) {
+		struct CrFfpTexStage* stage = &self->texStage[i];
+		
+		stage->opRGB = CrFfpState_TexOp_Arg0;
+		stage->argRGB0 = CrFfpState_TexArg_Texture;
+		stage->argRGB1 = CrFfpState_TexArg_Texture;
+		stage->argRGB2 = CrFfpState_TexArg_Texture;
+
+		stage->opA = CrFfpState_TexOp_Arg0;
+		stage->argA0 = CrFfpState_TexArg_Texture;
+		stage->argA1 = CrFfpState_TexArg_Texture;
+		stage->argA2 = CrFfpState_TexArg_Texture;
+	}
+
+	memset(self->texConstant, 0, sizeof(self->texConstant));
+	crMat44SetIdentity((CrMat44*)self->transformModel);
+	crMat44SetIdentity((CrMat44*)self->transformProj);
+}
+
+static D3DBLEND CrGpuState_blendFactorMapping[] = {
+	D3DBLEND_ONE,
+	D3DBLEND_ZERO,
+	D3DBLEND_SRCCOLOR,
+	D3DBLEND_INVSRCCOLOR,
+	D3DBLEND_DESTCOLOR,
+	D3DBLEND_INVDESTCOLOR,
+	D3DBLEND_SRCALPHA,
+	D3DBLEND_INVSRCALPHA,
+	D3DBLEND_DESTALPHA,
+	D3DBLEND_INVDESTALPHA,
+};
+
+static D3DFILLMODE CrGpuState_polygonModeMapping[] = {
+	D3DFILL_WIREFRAME,
+	D3DFILL_SOLID,
+};
+
+
+CR_API void crContextApplyGpuState(CrContext* self)
+{
+	IDirect3DDevice9* d3ddev = current->d3ddev;
+
+	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ZENABLE, (BOOL)self->gpuState.depthTest);
+	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ZWRITEENABLE, (BOOL)self->gpuState.depthWrite);
+	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_CULLMODE, self->gpuState.cull ? D3DCULL_CW : D3DCULL_NONE);
+	
+	if(self->gpuState.blend) {
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, TRUE);
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_SEPARATEALPHABLENDENABLE, TRUE);
+
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_SRCBLEND, CrGpuState_blendFactorMapping[self->gpuState.blendFactorSrcRGB - CrGpuState_BlendFactor_One]);
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_DESTBLEND, CrGpuState_blendFactorMapping[self->gpuState.blendFactorDestRGB - CrGpuState_BlendFactor_One]);
+		
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_SRCBLENDALPHA, CrGpuState_blendFactorMapping[self->gpuState.blendFactorSrcA - CrGpuState_BlendFactor_One]);
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_DESTBLENDALPHA, CrGpuState_blendFactorMapping[self->gpuState.blendFactorDestA - CrGpuState_BlendFactor_One]);
+		
+	}
+	else {
+		IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
+	}
+
+	IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_FILLMODE, CrGpuState_polygonModeMapping[self->gpuState.polygonMode - CrGpuState_PolygonMode_Line]);
+}
+/**/
+
+CR_API void crContextApplyFfpState(CrContext* self)
+{
 }

@@ -24,6 +24,8 @@ typedef struct CrContextImpl
 } CrContextImpl;
 
 CR_API CrContextImpl* crContextImpl();
+CR_API void crGpuStateInit(CrGpuState* self);
+CR_API void crFfpStateInit(CrFfpState* self);
 
 #ifdef __cplusplus
 }

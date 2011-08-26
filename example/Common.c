@@ -14,9 +14,6 @@ AppContext* appAlloc()
 
 void appInit(AppContext* self)
 {
-	self->gpuState = crGpuStateAlloc();
-	crGpuStateInit(self->gpuState);
-
 	self->renderTarget = crRenderTargetAlloc();
 	crRenderTargetInit(self->renderTarget);
 
@@ -33,7 +30,6 @@ void appInit(AppContext* self)
 void appFree(AppContext* self)
 {
 	crRenderTargetFree(self->renderTarget);
-	crGpuStateFree(self->gpuState);
 	free(self);
 }
 

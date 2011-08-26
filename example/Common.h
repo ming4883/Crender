@@ -6,7 +6,6 @@
 #include "../lib/crender/Vec4.h"
 #include "../lib/crender/Mat44.h"
 #include "../lib/crender/Shader.h"
-#include "../lib/crender/GpuState.h"
 #include "../lib/crender/RenderTarget.h"
 
 #include "Framework.h"
@@ -39,8 +38,6 @@ typedef struct AppContext
 	} aspect;
 
 	ShaderContext shaderContext;
-
-	CrGpuState* gpuState;
 
 	CrRenderTarget* renderTarget;
 
