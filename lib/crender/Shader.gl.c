@@ -83,6 +83,8 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 {
 	size_t i;
 	int linkStatus;
+	GLint uniformCnt;
+	GLint attrCnt;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
 	if(self->flags & CrGpuProgram_Inited) {
@@ -124,7 +126,6 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 	// query all uniforms
 	{
 		GLint i;
-		GLint uniformCnt;
 		GLsizei uniformLength;
 		GLint uniformSize;
 		GLenum uniformType;
@@ -135,7 +136,6 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 		impl->uniforms = crMem()->alloc(sizeof(CrGpuProgramUniform) * uniformCnt, "CrGpuProgram");
 		memset(impl->uniforms, 0, sizeof(CrGpuProgramUniform) * uniformCnt);
-		crDbgStr("glProgram %d has %d uniforms\n", impl->glName, uniformCnt);
 
 		for(i=0; i<uniformCnt; ++i) {
 			size_t c;
@@ -154,7 +154,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 			uniform->size = uniformSize;
 			uniform->texunit = texunit;
 
-			HASH_ADD_INT(impl->cache, hash, uniform);
+			HASH_ADD_INT(impl->uniformCache, hash, uniform);
 
 			switch(uniformType) {
 				case GL_SAMPLER_2D:
@@ -175,11 +175,47 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 			}
 			//crDbgStr("%s %d %d 0x%04x %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
 		}
-
 	}
 
+	// query all attributes
+	{
+		GLint i;
+		GLsizei attrLength;
+		GLint attrSize;
+		GLenum attrType;
+		char attrName[32];
+
+		glGetProgramiv(impl->glName, GL_ACTIVE_ATTRIBUTES, &attrCnt);
+
+		impl->attrs = crMem()->alloc(sizeof(CrGpuProgramAttribute) * attrCnt, "CrGpuProgram");
+		memset(impl->attrs, 0, sizeof(CrGpuProgramAttribute) * attrCnt);
+
+		for(i=0; i<attrCnt; ++i) {
+			size_t c;
+			CrGpuProgramAttribute* attr;
+			glGetActiveAttrib(impl->glName, i, crCountOf(attrName), &attrLength, &attrSize, &attrType, attrName);
+			for(c=0; c<sizeof(attrName); ++c) {
+				// for array uniform, some driver may return var_name[0] :-<
+				if(attrName[c] == '[') {
+					attrName[c] = '\0';
+					break;
+				}
+			}
+			attr = &impl->attrs[i];
+			attr->hash = CrHash(attrName);
+			attr->loc = glGetAttribLocation(impl->glName, attrName);
+
+			HASH_ADD_INT(impl->attrCache, hash, attr);
+
+			//crDbgStr("%s %d %d 0x%04x %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
+		}
+	}
+
+	crDbgStr("glProgram %d has %d uniforms %d attributes\n", impl->glName, uniformCnt, attrCnt);
+
+
 #if !defined(CR_GLES_2)
-	glGenVertexArrays(1, &impl->glVertexArray);
+	//glGenVertexArrays(1, &impl->glVertexArray);
 #endif
 
 	return CrTrue;
@@ -192,13 +228,16 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 	if(nullptr == self)
 		return;
 
-	HASH_CLEAR(hh, impl->cache);
+	HASH_CLEAR(hh, impl->uniformCache);
 	crMem()->free(impl->uniforms, "CrGpuProgram");
+
+	HASH_CLEAR(hh, impl->attrCache);
+	crMem()->free(impl->attrs, "CrGpuProgram");
 
 	glDeleteProgram(impl->glName);
 
 #if !defined(CR_GLES_2)
-	glDeleteVertexArrays(1, &impl->glVertexArray);
+	//glDeleteVertexArrays(1, &impl->glVertexArray);
 #endif
 
 	crMem()->free(self, "CrGpuProgram");
@@ -234,7 +273,7 @@ CR_API CrBool crGpuProgramUniform1fv(CrGpuProgram* self, CrHashCode hash, size_t
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -255,7 +294,7 @@ CR_API CrBool crGpuProgramUniform2fv(CrGpuProgram* self, CrHashCode hash, size_t
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -276,7 +315,7 @@ CR_API CrBool crGpuProgramUniform3fv(CrGpuProgram* self, CrHashCode hash, size_t
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -297,7 +336,7 @@ CR_API CrBool crGpuProgramUniform4fv(CrGpuProgram* self, CrHashCode hash, size_t
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -318,7 +357,7 @@ CR_API CrBool crGpuProgramUniformMtx4fv(CrGpuProgram* self, CrHashCode hash, siz
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -363,7 +402,7 @@ CR_API CrBool crGpuProgramUniformTexture(CrGpuProgram* self, CrHashCode hash, st
 		return CrFalse;
 	}
 
-	HASH_FIND_INT(impl->cache, &hash, uniform);
+	HASH_FIND_INT(impl->uniformCache, &hash, uniform);
 	if(nullptr == uniform)
 		return CrFalse;
 
@@ -417,6 +456,8 @@ CR_API size_t crGenGpuInputId()
 	return ++crContextImpl()->gpuInputId;
 }
 
+char* crGpuFixedIndexPtr = nullptr;
+
 CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -424,7 +465,7 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 	size_t attri = 0;
 
 #if !defined(CR_GLES_2)
-	glBindVertexArray(impl->glVertexArray);
+	//glBindVertexArray(impl->glVertexArray);
 #endif
 
 	for(attri=0; attri<count; ++attri) {
@@ -435,24 +476,40 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 
 		if(CrBufferType_Index == crBufferGetType(i->buffer)) {
 			// bind index buffer
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			if(i->buffer->type & CrBufferType_SysMem) {
+				crGpuFixedIndexPtr = (char*)i->buffer->sysMem;
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			}
+			else {
+				crGpuFixedIndexPtr = nullptr;
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+			}
 		}
 		else if(CrBufferType_Vertex == crBufferGetType(i->buffer)) {
 			// bind vertex buffer
 			CrInputGpuFormatMapping* m = crInputGpuFormatMappingGet(i->format);
+			CrGpuProgramAttribute* a = nullptr;
 
-			int loc = glGetAttribLocation(impl->glName, i->name);
+			if(0 == i->nameHash)
+				i->nameHash = CrHash(i->name);
+			HASH_FIND_INT(impl->attrCache, &i->nameHash, a);
 
-			if(nullptr != m && -1 != loc) {
-				glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
-				glVertexAttribPointer(loc, m->elemCnt, m->elemType, m->normalized, i->stride, (void*)i->offset);
-				glEnableVertexAttribArray(loc);
+			if(nullptr != a) {
+
+				if(i->buffer->type & CrBufferType_SysMem) {
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+					glVertexAttribPointer(a->loc, m->elemCnt, m->elemType, m->normalized, i->stride, (char*)i->buffer->sysMem + i->offset);
+					glEnableVertexAttribArray(a->loc);
+				}
+				else {
+					glBindBuffer(GL_ARRAY_BUFFER, ((CrBufferImpl*)i->buffer)->glName);
+					glVertexAttribPointer(a->loc, m->elemCnt, m->elemType, m->normalized, i->stride, (void*)i->offset);
+					glEnableVertexAttribArray(a->loc);
+				}
 			}
 		}
 	}
 }
-
-char* crGpuFixedIndexPtr = nullptr;
 
 CR_API void crGpuBindFixedInput(size_t gpuInputId, CrGpuFixedInput* input)
 {
@@ -570,17 +627,14 @@ CR_API void crGpuDrawLineIndexed(size_t offset, size_t count, size_t minIdx, siz
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
 	size_t byteOffset = offset * crGL_INDEX_SIZE[flags & 0x000F];
 
-	if(crContextFixedPipelineOnly()) {
-		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + byteOffset);
+	if(nullptr != crGpuFixedIndexPtr) {
+		byteOffset += (size_t)crGpuFixedIndexPtr;
 	}
-	else {
-
 #if defined(CR_GLES_2)
 		glDrawElements(mode, count, indexType, (void*)byteOffset);
 #else
 		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)byteOffset);
 #endif
-	}
 }
 
 CR_API void crGpuDrawTriangle(size_t offset, size_t count, size_t flags)
@@ -595,17 +649,14 @@ CR_API void crGpuDrawTriangleIndexed(size_t offset, size_t count, size_t minIdx,
 	GLenum indexType = crGL_INDEX_TYPE[flags & 0x000F];
 	size_t byteOffset = offset * crGL_INDEX_SIZE[flags & 0x000F];
 
-	if(crContextFixedPipelineOnly()) {
-		glDrawElements(mode, count, indexType, crGpuFixedIndexPtr + byteOffset);
+	if(nullptr != crGpuFixedIndexPtr) {
+		byteOffset += (size_t)crGpuFixedIndexPtr;
 	}
-	else {
-
 #if defined(CR_GLES_2)
 		glDrawElements(mode, count, indexType, (void*)byteOffset);
 #else
 		glDrawRangeElements(mode, minIdx, maxIdx, count, indexType, (void*)byteOffset);
 #endif
-	}
 }
 
 CR_API void crGpuDrawPatch(size_t offset, size_t count, size_t vertexPerPatch, size_t flags)

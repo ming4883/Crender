@@ -27,14 +27,24 @@ typedef struct CrGpuProgramUniform
 
 } CrGpuProgramUniform;
 
+typedef struct CrGpuProgramAttribute
+{
+	CrHashCode hash;
+	GLuint loc;
+	UT_hash_handle hh;
+
+} CrGpuProgramAttribute;
+
 typedef struct CrGpuProgramImpl
 {
 	CrGpuProgram i;
 
 	GLuint glName;
-	GLuint glVertexArray;
-	CrGpuProgramUniform* cache;
+	//GLuint glVertexArray;
+	CrGpuProgramUniform* uniformCache;
 	CrGpuProgramUniform* uniforms;
+	CrGpuProgramAttribute* attrCache;
+	CrGpuProgramAttribute* attrs;
 
 } CrGpuProgramImpl;
 

@@ -47,7 +47,9 @@ CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 
+#if !defined(CR_APPLE_IOS)
 	if(crContextFixedPipelineOnly())
+#endif
 		type |= CrBufferType_SysMem;
 
 	self->sizeInBytes = sizeInBytes;
@@ -92,7 +94,10 @@ CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBy
 
 CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 {
+#if !defined(CR_GLES_2)
 	CrBufferImpl* impl = (CrBufferImpl*)self;
+#endif
+
 	void* ret = nullptr;
 
 	if(nullptr == self)
@@ -119,7 +124,9 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 
 CR_API void crBufferUnmap(CrBuffer* self)
 {
+#if !defined(CR_GLES_2)
 	CrBufferImpl* impl = (CrBufferImpl*)self;
+#endif
 
 	if(nullptr == self)
 		return;

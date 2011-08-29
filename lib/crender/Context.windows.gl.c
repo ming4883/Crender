@@ -180,6 +180,8 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
 	current = impl;
 
+	glBindVertexArray(0);
+
 	return CrTrue;
 }
 
