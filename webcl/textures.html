@@ -4,34 +4,41 @@
 
 <script type="text/javascript" src="crender.js"></script>
 
-<script id="shader-fs" type="x-shader/x-fragment"> 
-precision highp float;
-
-void main(void) {
-	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-}
-</script> 
- 
 <script id="shader-vs" type="x-shader/x-vertex"> 
 attribute vec3 i_vertex;
+attribute vec2 i_texcrd;
 
 uniform mat4 u_mvpMatrix;
+varying vec2 v_texcrd;
 
 void main(void) {
 	gl_Position = u_mvpMatrix * vec4(i_vertex, 1.0);
+	v_texcrd = i_texcrd;
 }
 </script>
 
+<script id="shader-fs" type="x-shader/x-fragment"> 
+precision highp float;
+varying vec2 v_texcrd;
+uniform sampler2D u_tex;
+
+void main(void) {
+	gl_FragColor = texture2D(u_tex, v_texcrd);
+}
+</script> 
+ 
 <script type="text/javascript">
 
 var prog;
 var vb;
 
 var vertices = [
-	 0.0,  1.0,  0.0,
-	-1.0, -1.0,  0.0,
-	 1.0, -1.0,  0.0
+	 0.0,  1.0,  0.0,  0.5,  1.0,
+	-1.0, -1.0,  0.0,  0.0,  0.0,
+	 1.0, -1.0,  0.0,  1.0,  0.0,
 ];
+
+var tex;
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -49,7 +56,12 @@ function init() {
 	
 	prog = crCreateProgram(shaders);
 	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
+	prog.u_tex = gl.getUniformLocation(prog, "u_tex");
+	prog.i_vertex = gl.getAttribLocation(prog, "i_vertex");
+	prog.i_texcrd = gl.getAttribLocation(prog, "i_texcrd");
+	
 	vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
+	tex = crCreateTexture2DFromUrl("textures/nehe.gif", true);
 	
 	crLog("init complete");
 }
@@ -79,16 +91,29 @@ function render() {
 	gl.useProgram(prog);
 	
 	// input
-	i_vertex = gl.getAttribLocation(prog, "i_vertex");
-	gl.enableVertexAttribArray(i_vertex);
-	
+	gl.enableVertexAttribArray(prog.i_vertex);
 	gl.bindBuffer(gl.ARRAY_BUFFER, vb);
-	gl.vertexAttribPointer(i_vertex, 3, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(prog.i_vertex, 3, gl.FLOAT, false, 20, 0);
+	
+	gl.enableVertexAttribArray(prog.i_texcrd);
+	gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+	gl.vertexAttribPointer(prog.i_texcrd, 2, gl.FLOAT, false, 20, 12);
 	
 	// draw calls
 	var dist = [-2.0, 0.0, 2.0];
 	var ang = rot * Math.PI / 180.0;
 	rot += 1.0;
+	
+	// bind texture
+	gl.uniform1i(prog.u_tex, 0);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	if(true == tex.ready) {
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	} else {
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
 	
 	for(i=0; i<dist.length; ++i) {
 		

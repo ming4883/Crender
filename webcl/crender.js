@@ -93,3 +93,33 @@ function crCreateIndexBuffer(data, hint) {
 	
 	return buffer;
 }
+
+function crCreateTexture2DFromUrl(url, flipY) {
+	var tex = gl.createTexture();
+	tex.ready = false;
+	tex.image = new Image();
+	
+	tex.image.onload = function() {
+	
+		try {
+			gl.bindTexture(gl.TEXTURE_2D, tex);
+			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.image);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		}
+		catch(err) {
+			if(crLog) crLog("failed to load texture2d '" + url + "'");
+			if(crLog) crLog(err);
+		}
+		
+		if(crLog) crLog("loaded texture2d '" + url + "'");
+		tex.ready = true;
+	}
+	
+	if(crLog) crLog("loading texture2d '" + url + "'...");
+	
+	tex.image.src = url;
+	return tex;
+}
