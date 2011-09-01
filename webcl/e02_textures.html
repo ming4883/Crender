@@ -61,7 +61,7 @@ function init() {
 	prog.i_texcrd = gl.getAttribLocation(prog, "i_texcrd");
 	
 	vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
-	tex = crCreateTexture2DFromUrl("textures/nehe.gif", true);
+	tex = crCreateTexture2DFromUrl("media/nehe.gif", true);
 	
 	crLog("init complete");
 }

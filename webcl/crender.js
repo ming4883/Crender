@@ -94,6 +94,27 @@ function crCreateIndexBuffer(data, hint) {
 	return buffer;
 }
 
+function crLoadJson(url, callback) {
+	var request = new XMLHttpRequest();
+	request.open("GET", url);
+	request.onreadystatechange = function () {
+		if (request.readyState == 4) {
+			try {
+				var ret = JSON.parse(request.responseText);
+				callback(ret);
+				if(crLog) crLog("loaded json '" + url + "'");
+			}
+			catch(err) {
+				if(crLog) crLog("failed to load json '" + url + "'");
+				if(crLog) crLog(err);
+			}
+		}
+	}
+	
+	if(crLog) crLog("loading json '" + url + "'");
+	request.send();
+}
+
 function crCreateTexture2DFromUrl(url, flipY) {
 	var tex = gl.createTexture();
 	tex.ready = false;
@@ -123,3 +144,53 @@ function crCreateTexture2DFromUrl(url, flipY) {
 	tex.image.src = url;
 	return tex;
 }
+
+function crCreateFBOTexture2D(width, height, options) {
+
+	options = options || {};
+	
+	tex = gl.createTexture();
+	tex.width = width;
+	tex.height = height;
+	tex.format = options.format || gl.RGBA;
+	tex.type = options.type || gl.UNSIGNED_BYTE;
+	
+	gl.bindTexture(gl.TEXTURE_2D, tex);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	
+	gl.texImage2D(gl.TEXTURE_2D, 0, tex.format, width, height, 0, tex.format, tex.type, null);
+	
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	return tex;
+}
+
+var framebuffer;
+var renderbuffer;
+
+function crRenderToTexture(fboTex, callback)
+{
+	var v = gl.getParameter(gl.VIEWPORT);
+	framebuffer = framebuffer || gl.createFramebuffer();
+	renderbuffer = renderbuffer || gl.createRenderbuffer();
+	
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+	gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+	
+	if (fboTex.width != renderbuffer.width || fboTex.height != renderbuffer.height) {
+		renderbuffer.width = fboTex.width;
+		renderbuffer.height = fboTex.height;
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fboTex.width, fboTex.height);
+	}
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fboTex, 0);
+	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+	gl.viewport(0, 0, fboTex.width, fboTex.height);
+
+	callback();
+
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+	gl.viewport(v[0], v[1], v[2], v[3]);
+}
+

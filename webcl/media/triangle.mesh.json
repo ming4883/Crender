@@ -1,0 +1,13 @@
+{
+	"attributes" : [
+	{"name" : "i_vertex", "count" : 3, "byteOffset" : 0},
+	{"name" : "i_texcrd", "count" : 2, "byteOffset" : 12}
+	],
+	"vertexStride" : 20,
+	"vertexBuffer" : [
+	0.0,  1.0,  0.0,  0.5, 1.0, 
+	-1.0, -1.0,  0.0,  0.0,  0.0, 
+	1.0, -1.0,  0.0,  1.0,  0.0
+	],
+	"indexBuffer" : [0, 1, 2]
+}
