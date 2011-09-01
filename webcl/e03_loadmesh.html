@@ -84,7 +84,7 @@ function render() {
 	gl.disable(gl.DEPTH_TEST);
 	
 	mat4.identity(vMatrix);
-	mat4.translate(vMatrix, [0.0, 0.0, -10.0]);
+	mat4.translate(vMatrix, [0.0, 0.0, -5.0]);
 	
 	mat4.identity(pMatrix);
 	mat4.perspective(45.0, 1.3333, 0.1, 100.0, pMatrix);
@@ -114,7 +114,8 @@ function render() {
 	gl.activeTexture(gl.TEXTURE0);
 	if(true == tex.ready) {
 		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 	} else {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
