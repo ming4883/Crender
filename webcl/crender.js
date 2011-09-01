@@ -102,7 +102,6 @@ function crLoadJson(url, callback) {
 			try {
 				var ret = JSON.parse(request.responseText);
 				callback(ret);
-				if(crLog) crLog("loaded json '" + url + "'");
 			}
 			catch(err) {
 				if(crLog) crLog("failed to load json '" + url + "'");
@@ -111,8 +110,49 @@ function crLoadJson(url, callback) {
 		}
 	}
 	
-	if(crLog) crLog("loading json '" + url + "'");
 	request.send();
+}
+
+function crMeshDrawBegin(prog) {
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ib);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+	
+	for(i=0; i<this.attributes.length; ++i) {
+		var loc = gl.getAttribLocation(prog, this.attributes[i].name);
+		if(-1 != loc) {
+			gl.enableVertexAttribArray(loc);
+			gl.vertexAttribPointer(loc, this.attributes[i].count, gl.FLOAT, false, this.vbStride, this.attributes[i].byteOffset);
+		}
+	}
+}
+
+function crMeshDraw() {
+	gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_SHORT, 0);
+}
+
+function crMeshDrawEnd() {
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+}
+
+function crLoadMesh(url, callback) {
+
+	if(crLog) crLog("loading mesh '" + url + "'");
+	crLoadJson(url, function(data) {
+	
+		var mesh = {
+			attributes : data.attributes,
+			vbStride : data.vertexStride,
+			indexCount : data.indexBuffer.length,
+			vb : crCreateVertexBuffer(new Float32Array(data.vertexBuffer), gl.STATIC_DRAW), 
+			ib : crCreateIndexBuffer(new Uint16Array(data.indexBuffer), gl.STATIC_DRAW),
+			drawBegin : crMeshDrawBegin,
+			draw : crMeshDraw,
+			drawEnd : crMeshDrawEnd,
+		};
+		if(crLog) crLog("loaded mesh '" + url + "'");
+		callback(mesh);
+	});
 }
 
 function crCreateTexture2DFromUrl(url, flipY) {

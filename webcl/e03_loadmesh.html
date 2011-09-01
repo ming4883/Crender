@@ -30,20 +30,13 @@ void main(void) {
 <script type="text/javascript">
 
 var prog;
-var vb;
-
-var vertices = [
-	 0.0,  1.0,  0.0,  0.5,  1.0,
-	-1.0, -1.0,  0.0,  0.0,  0.0,
-	 1.0, -1.0,  0.0,  1.0,  0.0,
-];
-
+var mesh;
 var tex;
 
 function log(x) {
 	var logger = document.getElementById("logger");
 	if(logger) {
-		logger.innerHTML = logger.innerHTML + "<br/>" + x;
+		logger.innerHTML = logger.innerHTML + "\n" + x;
 	}
 }
 
@@ -57,14 +50,12 @@ function init() {
 	prog = crCreateProgram(shaders);
 	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
 	prog.u_tex = gl.getUniformLocation(prog, "u_tex");
-	prog.i_vertex = gl.getAttribLocation(prog, "i_vertex");
-	prog.i_texcrd = gl.getAttribLocation(prog, "i_texcrd");
 	
-	vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
 	tex = crCreateTexture2DFromUrl("media/nehe.gif", true);
 	
-	crLoadJson("media/triangle.mesh.json", function(ret) {
-		console.debug(ret);
+	crLoadMesh("media/triangle.mesh.json", function(ret) {
+		mesh = ret;
+		console.debug(mesh);
 	});
 	
 	crLog("init complete");
@@ -76,6 +67,12 @@ var vpMatrix = mat4.create();
 var rot = 0.0;
 
 function render() {
+	
+	var dist = [-2.0, 0.0, 2.0];
+	var ang = rot * Math.PI / 180.0;
+	rot += 1.0;
+	
+	// clear
 	crClearColorBuffer(0.2, 0.2, 0.2, 1.0);
 	crClearDepthBuffer(1.0);
 	
@@ -94,46 +91,35 @@ function render() {
 	// program
 	gl.useProgram(prog);
 	
-	// input
-	gl.enableVertexAttribArray(prog.i_vertex);
-	gl.bindBuffer(gl.ARRAY_BUFFER, vb);
-	gl.vertexAttribPointer(prog.i_vertex, 3, gl.FLOAT, false, 20, 0);
-	
-	gl.enableVertexAttribArray(prog.i_texcrd);
-	gl.bindBuffer(gl.ARRAY_BUFFER, vb);
-	gl.vertexAttribPointer(prog.i_texcrd, 2, gl.FLOAT, false, 20, 12);
-	
-	// draw calls
-	var dist = [-2.0, 0.0, 2.0];
-	var ang = rot * Math.PI / 180.0;
-	rot += 1.0;
-	
 	// bind texture
 	gl.uniform1i(prog.u_tex, 0);
-	
 	gl.activeTexture(gl.TEXTURE0);
-	if(true == tex.ready) {
+	if(true == tex.ready)
 		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-	} else {
-		gl.bindTexture(gl.TEXTURE_2D, null);
-	}
+	else
+		gl.bindTexture(gl.TEXTURE_2D, null);	
 	
-	for(i=0; i<dist.length; ++i) {
+	// draw mesh at different pos
+	if(mesh) {
+		mesh.drawBegin(prog);
 		
-		var mMatrix = mat4.create();
-		mat4.identity(mMatrix);
-		mat4.rotateY(mMatrix, ang, mMatrix);
-		mMatrix[12] = dist[i];
-		mMatrix[13] = 0.0;
-		mMatrix[14] = 0.0;
+		for(i=0; i<dist.length; ++i) {
+			
+			var mMatrix = mat4.create();
+			mat4.identity(mMatrix);
+			mat4.rotateY(mMatrix, ang, mMatrix);
+			mMatrix[12] = dist[i];
+			mMatrix[13] = 0.0;
+			mMatrix[14] = 0.0;
+			
+			var mvpMatrix = mat4.create();
+			mat4.multiply(vpMatrix, mMatrix, mvpMatrix);
+			
+			gl.uniformMatrix4fv(prog.u_mvpMatrix, false, mvpMatrix);
+			mesh.draw();
+		}
 		
-		var mvpMatrix = mat4.create();
-		mat4.multiply(vpMatrix, mMatrix, mvpMatrix);
-		
-		gl.uniformMatrix4fv(prog.u_mvpMatrix, false, mvpMatrix);
-		gl.drawArrays(gl.TRIANGLES, 0, 3);
+		mesh.drawEnd();
 	}
 }
 
@@ -153,7 +139,8 @@ function main() {
 </script>
 
 <body onload="main();">
-<canvas id="the-canvas" style="border: none;" width="640" height="480"></canvas>
-<div id="logger">Logger</div>
+<canvas id="the-canvas" style="border: none;" width="640" height="480"></canvas><br/>
+Log<br/>
+<textarea id="logger" rows="5" cols="80"></textarea>
 </body>
 </html>
