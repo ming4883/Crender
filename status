@@ -1,0 +1,33 @@
+[1mdiff --git a/webcl/e03_loadmesh.html b/webcl/e03_loadmesh.html[m
+[1mindex 1c7f094..67c90f1 100644[m
+[1m--- a/webcl/e03_loadmesh.html[m
+[1m+++ b/webcl/e03_loadmesh.html[m
+[36m@@ -53,7 +53,7 @@[m [mfunction init() {[m
+ 	[m
+ 	tex = crCreateTexture2DFromUrl("media/nehe.gif", true);[m
+ 	[m
+[31m-	crLoadMesh("media/triangle.mesh.json", function(ret) {[m
+[32m+[m	[32mcrLoadMesh("media/box.mesh.json", function(ret) {[m
+ 		mesh = ret;[m
+ 		console.debug(mesh);[m
+ 	});[m
+[36m@@ -77,8 +77,8 @@[m [mfunction render() {[m
+ 	crClearDepthBuffer(1.0);[m
+ 	[m
+ 	// render states[m
+[31m-	gl.disable(gl.CULL_FACE);[m
+[31m-	gl.disable(gl.DEPTH_TEST);[m
+[32m+[m	[32mgl.enable(gl.CULL_FACE);[m
+[32m+[m	[32mgl.enable(gl.DEPTH_TEST);[m
+ 	[m
+ 	mat4.identity(vMatrix);[m
+ 	mat4.translate(vMatrix, [0.0, 0.0, -5.0]);[m
+[36m@@ -97,7 +97,7 @@[m [mfunction render() {[m
+ 	if(true == tex.ready)[m
+ 		gl.bindTexture(gl.TEXTURE_2D, tex);[m
+ 	else[m
+[31m-		gl.bindTexture(gl.TEXTURE_2D, null);	[m
+[32m+[m		[32mgl.bindTexture(gl.TEXTURE_2D, null);[m
+ 	[m
+ 	// draw mesh at different pos[m
+ 	if(mesh) {[m
