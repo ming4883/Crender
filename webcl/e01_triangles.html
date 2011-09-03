@@ -36,7 +36,7 @@ var vertices = [
 function log(x) {
 	var logger = document.getElementById("logger");
 	if(logger) {
-		logger.innerHTML = logger.innerHTML + "<br/>" + x;
+		logger.innerHTML = logger.innerHTML + x + "\n";
 	}
 }
 
@@ -71,7 +71,7 @@ function render() {
 	mat4.translate(vMatrix, [0.0, 0.0, -10.0]);
 	
 	mat4.identity(pMatrix);
-	mat4.perspective(45.0, 1.3333, 0.1, 100.0, pMatrix);
+	mat4.perspective(45.0, gl.canvasWidth / gl.canvasHeight, 0.1, 100.0, pMatrix);
 	
 	mat4.multiply(pMatrix, vMatrix, vpMatrix);
 	
@@ -122,8 +122,9 @@ function main() {
 
 </script>
 
-<body onload="main();">
-<canvas id="the-canvas" style="border: none;" width="640" height="480"></canvas>
-<div id="logger">Logger</div>
+<body onload="main();" style="background-color:#030303;color:#ffffff;">
+<canvas id="the-canvas" style="border: none;" width="640" height="360"></canvas><br/>
+Log<br/>
+<textarea id="logger" rows="5" cols="80"></textarea>
 </body>
 </html>

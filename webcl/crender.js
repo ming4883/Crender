@@ -6,6 +6,8 @@ function crInit(canvas) {
 		//gl = canvas.getContext("experimental-webgl");
 		gl = WebGLUtils.setupWebGL(canvas);
 		gl.viewport(0, 0, canvas.width, canvas.height);
+		gl.canvasWidth = canvas.width;
+		gl.canvasHeight = canvas.height;
 	}
 	catch(e) {
 	}
@@ -29,6 +31,8 @@ function crCreateShaderDOM(id) {
 	if (!shaderScript) {
 		return null;
 	}
+	
+	if(crLog) crLog("loading shader from DOM '" + id + "'");
 	
 	var str = "";
 	var k = shaderScript.firstChild;
