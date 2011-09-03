@@ -1,5 +1,7 @@
 <html>
-<!--script type="text/javascript">var gliEmbedDebug = true;</script>
+<!--script type="text/javascript">
+var gliEmbedDebug = true;
+</script>
 <script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script-->
 <script type="text/javascript" src="3rd/webgl-utils.js"></script>
 <script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
@@ -96,7 +98,7 @@ function init() {
 		mesh = ret;
 	});
 	
-	rttex = crCreateFBOTexture2D(512, 512, {type:gl.UNSIGNED_BYTE});
+	rttex = crCreateFBOTexture2D(512, 512, {type:gl.FLOAT});
 	
 	squad = crCreateScreenQuad();
 	

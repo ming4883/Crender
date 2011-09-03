@@ -8,6 +8,7 @@ function crInit(canvas) {
 		gl.viewport(0, 0, canvas.width, canvas.height);
 		gl.canvasWidth = canvas.width;
 		gl.canvasHeight = canvas.height;
+		gl.hasFloatTex = gl.getExtension('OES_texture_float');	// need this call to enable OES_texture_float
 	}
 	catch(e) {
 	}
