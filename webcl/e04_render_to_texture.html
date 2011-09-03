@@ -1,10 +1,12 @@
 <html>
+<!--script type="text/javascript">var gliEmbedDebug = true;</script>
+<script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script-->
 <script type="text/javascript" src="3rd/webgl-utils.js"></script>
 <script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
 
 <script type="text/javascript" src="crender.js"></script>
 
-<script id="shader-vs" type="x-shader/x-vertex"> 
+<script id="scene-vs" type="x-shader/x-vertex"> 
 attribute vec3 i_vertex;
 attribute vec3 i_normal;
 attribute vec2 i_texcrd;
@@ -21,22 +23,44 @@ void main(void) {
 }
 </script>
 
-<script id="shader-fs" type="x-shader/x-fragment"> 
+<script id="scene-fs" type="x-shader/x-fragment"> 
 precision highp float;
 varying vec2 v_texcrd;
 varying vec3 v_normal;
 
 void main(void) {
-	gl_FragColor.xyz = v_normal;
+	gl_FragColor.xyz = vec3(1, 1, 1) * max(0.0, dot(normalize(v_normal), vec3(0, 0, 1)));
 	gl_FragColor.w;
+}
+</script>
+
+<script id="invert-vs" type="x-shader/x-vertex"> 
+attribute vec3 i_vertex;
+
+varying vec2 v_texcrd;
+
+void main(void) {
+	gl_Position = vec4(i_vertex, 1.0);
+	v_texcrd = i_vertex.xy * 0.5 + 0.5;
+}
+</script>
+
+<script id="invert-fs" type="x-shader/x-fragment"> 
+precision highp float;
+varying vec2 v_texcrd;
+uniform sampler2D u_tex;
+
+void main(void) {
+	gl_FragColor = vec4(1, 1, 1, 1) - texture2D(u_tex, v_texcrd);
 }
 </script> 
  
 <script type="text/javascript">
 
-var prog;
+var prog = {};
 var mesh;
-var rt;
+var rttex;
+var squad;
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -47,19 +71,34 @@ function log(x) {
 
 function init() {
 	
-	var shaders = [
-		crCreateShaderDOM("shader-vs"),
-		crCreateShaderDOM("shader-fs")
-	];
+	{
+		var shaders = [
+			crCreateShaderDOM("scene-vs"),
+			crCreateShaderDOM("scene-fs")
+		];
+		
+		prog.scene = crCreateProgram(shaders);
+		prog.scene.u_mvpMatrix = gl.getUniformLocation(prog.scene, "u_mvpMatrix");
+		prog.scene.u_mMatrix = gl.getUniformLocation(prog.scene, "u_mMatrix");
+	}
 	
-	prog = crCreateProgram(shaders);
-	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
-	prog.u_mMatrix = gl.getUniformLocation(prog, "u_mMatrix");
+	{
+		var shaders = [
+			crCreateShaderDOM("invert-vs"),
+			crCreateShaderDOM("invert-fs")
+		];
+		
+		prog.invert = crCreateProgram(shaders);
+		prog.invert.u_tex = gl.getUniformLocation(prog.invert, "u_tex");
+	}
 	
 	crLoadMesh("media/box.mesh.json", function(ret) {
 		mesh = ret;
-		console.debug(mesh);
 	});
+	
+	rttex = crCreateFBOTexture2D(512, 512, {type:gl.UNSIGNED_BYTE});
+	
+	squad = crCreateScreenQuad();
 	
 	crLog("init complete");
 }
@@ -92,11 +131,11 @@ function drawScene() {
 	mat4.multiply(pMatrix, vMatrix, vpMatrix);
 	
 	// program
-	gl.useProgram(prog);
+	gl.useProgram(prog.scene);
 	
 	// draw mesh at different pos
 	if(mesh) {
-		mesh.drawBegin(prog);
+		mesh.drawBegin(prog.scene);
 		
 		for(i=0; i<dist.length; ++i) {
 			
@@ -110,8 +149,8 @@ function drawScene() {
 			var mvpMatrix = mat4.create();
 			mat4.multiply(vpMatrix, mMatrix, mvpMatrix);
 			
-			gl.uniformMatrix4fv(prog.u_mvpMatrix, false, mvpMatrix);
-			gl.uniformMatrix4fv(prog.u_mMatrix, false, mMatrix);
+			gl.uniformMatrix4fv(prog.scene.u_mvpMatrix, false, mvpMatrix);
+			gl.uniformMatrix4fv(prog.scene.u_mMatrix, false, mMatrix);
 			mesh.draw();
 		}
 		
@@ -119,8 +158,33 @@ function drawScene() {
 	}
 }
 
+function drawRTTex() {
+	
+	crClearColorBuffer(0.2, 0.2, 0.2, 1.0);
+	
+	gl.disable(gl.CULL_FACE);
+	gl.disable(gl.DEPTH_TEST);
+	
+	// program
+	gl.useProgram(prog.invert);
+	
+	// bind texture
+	gl.uniform1i(prog.invert.u_tex, 0);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, rttex);
+	
+	// draw squad at different pos
+	squad.drawBegin(prog.invert);
+		
+	squad.draw();
+	
+	squad.drawEnd();
+}
+
 function render() {
-	drawScene();
+
+	crRenderToTexture(rttex, drawScene);
+	drawRTTex();
 }
 
 function tick() {

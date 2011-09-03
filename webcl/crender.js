@@ -159,6 +159,30 @@ function crLoadMesh(url, callback) {
 	});
 }
 
+function crCreateScreenQuad() {
+	
+	var v = [
+		-1, 1, 0,
+		-1,-1, 0,
+		 1, 1, 0,
+		 1,-1, 0
+	];
+	
+	var i = [0, 1, 2, 3, 2, 1];
+	
+	var mesh = {
+		attributes : [{name : "i_vertex", count : 3, byteOffset : 0}],
+		vbStride : 12,
+		indexCount : i.length,
+		vb : crCreateVertexBuffer(new Float32Array(v), gl.STATIC_DRAW), 
+		ib : crCreateIndexBuffer(new Uint16Array(i), gl.STATIC_DRAW),
+		drawBegin : crMeshDrawBegin,
+		draw : crMeshDraw,
+		drawEnd : crMeshDrawEnd,
+	};
+	return mesh;
+}
+
 function crCreateTexture2DFromUrl(url, flipY) {
 	var tex = gl.createTexture();
 	tex.ready = false;
@@ -202,6 +226,8 @@ function crCreateFBOTexture2D(width, height, options) {
 	gl.bindTexture(gl.TEXTURE_2D, tex);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	
 	gl.texImage2D(gl.TEXTURE_2D, 0, tex.format, width, height, 0, tex.format, tex.type, null);
 	
