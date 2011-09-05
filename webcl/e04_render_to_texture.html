@@ -98,7 +98,7 @@ function init() {
 		mesh = ret;
 	});
 	
-	rttex = crCreateFBOTexture2D(512, 512, {type:gl.FLOAT});
+	rttex = crCreateFBOTexture2D(512, 512, {type:gl.FLOAT, mag_filter:gl.LINEAR, min_filter:gl.LINEAR});
 	
 	squad = crCreateScreenQuad();
 	
