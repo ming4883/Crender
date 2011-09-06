@@ -7,6 +7,7 @@ var gliEmbedDebug = true;
 <script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
 
 <script type="text/javascript" src="crender.js"></script>
+<script type="text/javascript" src="cloth.js"></script>
 
 <script id="scene-vs" type="x-shader/x-vertex"> 
 attribute vec3 i_vertex;
@@ -36,32 +37,10 @@ void main(void) {
 }
 </script>
 
-<script id="invert-vs" type="x-shader/x-vertex"> 
-attribute vec3 i_vertex;
-
-varying vec2 v_texcrd;
-
-void main(void) {
-	gl_Position = vec4(i_vertex, 1.0);
-	v_texcrd = i_vertex.xy * 0.5 + 0.5;
-}
-</script>
-
-<script id="invert-fs" type="x-shader/x-fragment"> 
-precision highp float;
-varying vec2 v_texcrd;
-uniform sampler2D u_tex;
-
-void main(void) {
-	gl_FragColor = vec4(1, 1, 1, 1) - texture2D(u_tex, v_texcrd);
-}
-</script> 
- 
 <script type="text/javascript">
 
 var prog = {};
 var mesh;
-var rttex;
 var squad;
 
 function log(x) {
@@ -77,12 +56,7 @@ function init() {
 	prog.scene.u_mvpMatrix = gl.getUniformLocation(prog.scene, "u_mvpMatrix");
 	prog.scene.u_mMatrix = gl.getUniformLocation(prog.scene, "u_mMatrix");
 	
-	prog.invert = crCreateProgramDOM(["invert-vs", "invert-fs"]);
-	prog.invert.u_tex = gl.getUniformLocation(prog.invert, "u_tex");
-	
 	crLoadMesh("media/box.mesh.json", function(ret) {mesh = ret;});
-	
-	rttex = crCreateFBOTexture2D(512, 512, {type:gl.FLOAT, mag_filter:gl.LINEAR, min_filter:gl.LINEAR});
 	
 	squad = crCreateScreenQuad();
 	
@@ -144,33 +118,8 @@ function drawScene() {
 	}
 }
 
-function drawRTTex() {
-	
-	crClearColorBuffer(0.2, 0.2, 0.2, 1.0);
-	
-	gl.disable(gl.CULL_FACE);
-	gl.disable(gl.DEPTH_TEST);
-	
-	// program
-	gl.useProgram(prog.invert);
-	
-	// bind texture
-	gl.uniform1i(prog.invert.u_tex, 0);
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, rttex);
-	
-	// draw squad at different pos
-	squad.drawBegin(prog.invert);
-		
-	squad.draw();
-	
-	squad.drawEnd();
-}
-
 function render() {
-
-	crRenderToTexture(rttex, drawScene);
-	drawRTTex();
+	drawScene();
 }
 
 function tick() {

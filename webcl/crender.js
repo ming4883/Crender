@@ -27,6 +27,21 @@ function crClearDepthBuffer(z) {
 	gl.clear(gl.DEPTH_BUFFER_BIT);
 }
 
+function crCreateShader(str, type) {
+	
+	var shader = gl.createShader(type);
+	
+	gl.shaderSource(shader, str);
+	gl.compileShader(shader);
+
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+		if(crLog) crLog(gl.getShaderInfoLog(shader));
+		return null;
+	}
+
+	return shader;
+}
+
 function crCreateShaderDOM(id) {
 	var shaderScript = document.getElementById(id);
 	if (!shaderScript) {
@@ -43,25 +58,17 @@ function crCreateShaderDOM(id) {
 		k = k.nextSibling;
 	}
 	
-	var shader;
+	var type;
 	if (shaderScript.type == "x-shader/x-fragment") {
-		shader = gl.createShader(gl.FRAGMENT_SHADER);
+		type = gl.FRAGMENT_SHADER;
 	} else if (shaderScript.type == "x-shader/x-vertex") {
-		shader = gl.createShader(gl.VERTEX_SHADER);
+		type = gl.VERTEX_SHADER;
 	} else {
 		if(crLog) crLog("none supported shader type:" + shaderScript.type);
 		return null;
 	}
 
-	gl.shaderSource(shader, str);
-	gl.compileShader(shader);
-
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		if(crLog) crLog(gl.getShaderInfoLog(shader));
-		return null;
-	}
-
-	return shader;
+	return crCreateShader(str, type);
 }
 
 function crCreateProgram(shaders) {
@@ -79,6 +86,16 @@ function crCreateProgram(shaders) {
 	}
 	
 	return shaderProgram;
+}
+
+function crCreateProgramDOM(ids) {
+	var shaders = new Array(ids.length);
+	
+	for (i=0; i<shaders.length; ++i) {
+		shaders[i] = crCreateShaderDOM(ids[i]);
+	}
+	
+	return crCreateProgram(shaders);
 }
 
 function crCreateVertexBuffer(data, hint) {

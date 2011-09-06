@@ -42,12 +42,7 @@ function log(x) {
 
 function init() {
 	
-	var shaders = [
-		crCreateShaderDOM("shader-vs"),
-		crCreateShaderDOM("shader-fs")
-	];
-	
-	prog = crCreateProgram(shaders);
+	prog = crCreateProgramDOM(["shader-vs", "shader-fs"]);
 	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
 	prog.u_tex = gl.getUniformLocation(prog, "u_tex");
 	
