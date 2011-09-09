@@ -1,6 +1,8 @@
 function Cloth(width, height, segments) {
 	
-	var c = {width:width, height:height, segments:segments};
+	this.width = width;
+	this.height = height;
+	this.segments = segments;
 	
 	var stride = segments + 1;
 	var segments_rcp = 1.0 / segments;
@@ -38,8 +40,12 @@ function Cloth(width, height, segments) {
 		}
 	}
 	
-	c.vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
-	c.ib = crCreateIndexBuffer(new Uint16Array(indices), gl.STATIC_DRAW),
-	
-	return c;
+	this.vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
+	this.ib = crCreateIndexBuffer(new Uint16Array(indices), gl.STATIC_DRAW);
+	this.indexCount = indices.length;
+	this.vbStride = 8;
+	this.attributes = [{name : "i_vertex", count : 2, byteOffset : 0}];
+	this.drawBegin = crMeshDrawBegin;
+	this.draw = crMeshDraw;
+	this.drawEnd = crMeshDrawEnd;
 }

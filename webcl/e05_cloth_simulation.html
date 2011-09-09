@@ -1,8 +1,8 @@
 <html>
-<!--script type="text/javascript">
+<script type="text/javascript">
 var gliEmbedDebug = true;
 </script>
-<script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script-->
+<script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script>
 <script type="text/javascript" src="3rd/webgl-utils.js"></script>
 <script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
 
@@ -37,10 +37,27 @@ void main(void) {
 }
 </script>
 
+<script id="cloth-draw-vs" type="x-shader/x-vertex"> 
+attribute vec2 i_vertex;
+
+uniform mat4 u_mvpMatrix;
+uniform mat4 u_mMatrix;
+varying vec2 v_texcrd;
+varying vec3 v_normal;
+
+void main(void) {
+	vec3 pos = vec3(i_vertex.xy * 2.0, 0);
+	gl_Position = u_mvpMatrix * vec4(pos, 1.0);
+	v_texcrd = i_vertex;
+	v_normal = (u_mMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
+}
+</script>
+
 <script type="text/javascript">
 
 var prog = {};
 var mesh;
+var cloth;
 var squad;
 
 function log(x) {
@@ -56,7 +73,13 @@ function init() {
 	prog.scene.u_mvpMatrix = gl.getUniformLocation(prog.scene, "u_mvpMatrix");
 	prog.scene.u_mMatrix = gl.getUniformLocation(prog.scene, "u_mMatrix");
 	
+	prog.cloth = crCreateProgramDOM(["cloth-draw-vs", "scene-fs"]);
+	prog.cloth.u_mvpMatrix = gl.getUniformLocation(prog.cloth, "u_mvpMatrix");
+	prog.cloth.u_mMatrix = gl.getUniformLocation(prog.cloth, "u_mMatrix");
+	
 	crLoadMesh("media/box.mesh.json", function(ret) {mesh = ret;});
+	
+	cloth = new Cloth(2, 2, 3);
 	
 	squad = crCreateScreenQuad();
 	
@@ -70,7 +93,7 @@ var rot = 0.0;
 
 function drawScene() {
 	
-	var dist = [-3.0, 0.0, 3.0];
+	var dist = [-3.0, 3.0];
 	var ang = rot * Math.PI / 180.0;
 	rot += 1.0;
 	
@@ -116,6 +139,26 @@ function drawScene() {
 		
 		mesh.drawEnd();
 	}
+	
+	// cloth
+	gl.useProgram(prog.cloth);
+	
+	if(cloth) {
+		cloth.drawBegin(prog.cloth);
+		
+		var mMatrix = mat4.create();
+		mat4.identity(mMatrix);
+		
+		var mvpMatrix = mat4.create();
+		mat4.multiply(vpMatrix, mMatrix, mvpMatrix);
+		
+		gl.uniformMatrix4fv(prog.cloth.u_mvpMatrix, false, mvpMatrix);
+		gl.uniformMatrix4fv(prog.cloth.u_mMatrix, false, mMatrix);
+		cloth.draw();
+		
+		cloth.drawEnd();
+	}
+
 }
 
 function render() {
