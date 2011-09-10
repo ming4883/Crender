@@ -1,3 +1,30 @@
+var Cloth_squad;
+
+function Cloth_init(prog) {
+
+	Cloth_squad = Cloth_squad || crCreateScreenQuad();
+
+	crRenderToTexture(this.posBuf[0], function() {
+	
+		gl.disable(gl.CULL_FACE);
+		gl.disable(gl.DEPTH_TEST);
+		
+		gl.useProgram(prog);
+		
+		Cloth_squad.drawBegin(prog);
+		Cloth_squad.draw();
+		Cloth_squad.drawEnd();
+	});
+}
+
+function Cloth_draw(prog) {
+
+	this._drawBegin(prog);
+	this._draw();
+	this._drawEnd();
+	
+}
+
 function Cloth(width, height, segments) {
 	
 	this.width = width;
@@ -45,7 +72,15 @@ function Cloth(width, height, segments) {
 	this.indexCount = indices.length;
 	this.vbStride = 8;
 	this.attributes = [{name : "i_vertex", count : 2, byteOffset : 0}];
-	this.drawBegin = crMeshDrawBegin;
-	this.draw = crMeshDraw;
-	this.drawEnd = crMeshDrawEnd;
+	this._drawBegin = crMeshDrawBegin;
+	this._draw = crMeshDraw;
+	this._drawEnd = crMeshDrawEnd;
+	
+	this.posBuf = [
+		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST}),
+		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST})
+	];
+	
+	this.init = Cloth_init;
+	this.draw = Cloth_draw;
 }

@@ -37,6 +37,28 @@ void main(void) {
 }
 </script>
 
+
+<script id="cloth-process-vs" type="x-shader/x-vertex"> 
+attribute vec3 i_vertex;
+
+varying vec2 v_texcrd;
+
+void main(void) {
+	gl_Position = vec4(i_vertex, 1.0);
+	v_texcrd = i_vertex.xy * 0.5 + 0.5;
+}
+</script>
+
+<script id="cloth-init-fs" type="x-shader/x-fragment"> 
+precision highp float;
+varying vec2 v_texcrd;
+
+void main(void) {
+	gl_FragColor = vec4(v_texcrd * 2, 1, 1);
+}
+</script>
+
+
 <script id="cloth-draw-vs" type="x-shader/x-vertex"> 
 attribute vec2 i_vertex;
 
@@ -58,7 +80,6 @@ void main(void) {
 var prog = {};
 var mesh;
 var cloth;
-var squad;
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -80,8 +101,6 @@ function init() {
 	crLoadMesh("media/box.mesh.json", function(ret) {mesh = ret;});
 	
 	cloth = new Cloth(2, 2, 3);
-	
-	squad = crCreateScreenQuad();
 	
 	crLog("init complete");
 }
@@ -142,10 +161,7 @@ function drawScene() {
 	
 	// cloth
 	gl.useProgram(prog.cloth);
-	
 	if(cloth) {
-		cloth.drawBegin(prog.cloth);
-		
 		var mMatrix = mat4.create();
 		mat4.identity(mMatrix);
 		
@@ -154,9 +170,8 @@ function drawScene() {
 		
 		gl.uniformMatrix4fv(prog.cloth.u_mvpMatrix, false, mvpMatrix);
 		gl.uniformMatrix4fv(prog.cloth.u_mMatrix, false, mMatrix);
-		cloth.draw();
 		
-		cloth.drawEnd();
+		cloth.draw(prog.cloth);
 	}
 
 }
