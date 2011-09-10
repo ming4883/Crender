@@ -1,17 +1,20 @@
 var Cloth_squad;
 
-function Cloth_init(prog) {
+function Cloth_init() {
 
 	Cloth_squad = Cloth_squad || crCreateScreenQuad();
+	var p = this.prog.init;
+	var sz = this.size;
 
 	crRenderToTexture(this.posBuf[0], function() {
 	
 		gl.disable(gl.CULL_FACE);
 		gl.disable(gl.DEPTH_TEST);
 		
-		gl.useProgram(prog);
+		gl.useProgram(p);
+		gl.uniform2fv(p.u_clothSize, sz);
 		
-		Cloth_squad.drawBegin(prog);
+		Cloth_squad.drawBegin(p);
 		Cloth_squad.draw();
 		Cloth_squad.drawEnd();
 	});
@@ -19,6 +22,10 @@ function Cloth_init(prog) {
 
 function Cloth_draw(prog) {
 
+	gl.uniform1i(prog.u_posBuf, 0);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.posBuf[0]);
+	
 	this._drawBegin(prog);
 	this._draw();
 	this._drawEnd();
@@ -27,8 +34,7 @@ function Cloth_draw(prog) {
 
 function Cloth(width, height, segments) {
 	
-	this.width = width;
-	this.height = height;
+	this.size = new Float32Array([width, height]);
 	this.segments = segments;
 	
 	var stride = segments + 1;
@@ -80,6 +86,13 @@ function Cloth(width, height, segments) {
 		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST}),
 		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST})
 	];
+	
+	this.prog = {};
+	{
+		var p = crCreateProgramDOM(["cloth-process-vs", "cloth-init-fs"]);
+		p.u_clothSize = gl.getUniformLocation(p, "u_clothSize");
+		this.prog.init = p;
+	}
 	
 	this.init = Cloth_init;
 	this.draw = Cloth_draw;
