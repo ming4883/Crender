@@ -1,8 +1,8 @@
 <html>
-<script type="text/javascript">
+<!--script type="text/javascript">
 var gliEmbedDebug = true;
 </script>
-<script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script>
+<script type="text/javascript" src="3rd/webgl-inspector/core/embed.js"></script-->
 <script type="text/javascript" src="3rd/webgl-utils.js"></script>
 <script type="text/javascript" src="3rd/glMatrix-0.9.5.min.js"></script>
 
@@ -59,6 +59,26 @@ void main(void) {
 	gl_FragColor.y = (v_texcrd.y * 2.0 - 1.0) * u_clothSize.y;
 	gl_FragColor.z = 0.0;
 	gl_FragColor.w = 1.0;
+}
+</script>
+
+<script id="cloth-addforce-fs" type="x-shader/x-fragment"> 
+precision highp float;
+varying vec2 v_texcrd;
+
+uniform vec2 u_clothSize;
+uniform vec3 u_force;	// a * dt * dt
+uniform vec3 u_dumping;
+uniform sampler2D u_currBuf;
+uniform sampler2D u_lastBuf;
+
+void main(void) {
+	vec3 curr = texture2D(u_currBuf, v_texcrd).xyz;
+	vec3 last = texture2D(u_lastBuf, v_texcrd).xyz;
+	
+	curr += (curr - last) * u_dumping + u_force;
+	
+	gl_FragColor = vec4(curr, 1.0);
 }
 </script>
 

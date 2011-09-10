@@ -20,6 +20,26 @@ function Cloth_init() {
 	});
 }
 
+function Cloth_addforce(force) {
+
+	Cloth_squad = Cloth_squad || crCreateScreenQuad();
+	var p = this.prog.addforce;
+	var sz = this.size;
+
+	crRenderToTexture(this.posBuf[0], function() {
+	
+		gl.disable(gl.CULL_FACE);
+		gl.disable(gl.DEPTH_TEST);
+		
+		gl.useProgram(p);
+		gl.uniform2fv(p.u_clothSize, sz);
+		
+		Cloth_squad.drawBegin(p);
+		Cloth_squad.draw();
+		Cloth_squad.drawEnd();
+	});
+}
+
 function Cloth_draw(prog) {
 
 	gl.uniform1i(prog.u_posBuf, 0);
@@ -84,6 +104,7 @@ function Cloth(width, height, segments) {
 	
 	this.posBuf = [
 		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST}),
+		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST}),
 		crCreateFBOTexture2D(stride, stride, {type:gl.FLOAT, mag_filter:gl.NEAREST, min_filter:gl.NEAREST})
 	];
 	
@@ -93,7 +114,17 @@ function Cloth(width, height, segments) {
 		p.u_clothSize = gl.getUniformLocation(p, "u_clothSize");
 		this.prog.init = p;
 	}
+	{
+		var p = crCreateProgramDOM(["cloth-process-vs", "cloth-addforce-fs"]);
+		p.u_clothSize = gl.getUniformLocation(p, "u_clothSize");
+		p.u_force = gl.getUniformLocation(p, "u_force");
+		p.u_dumping = gl.getUniformLocation(p, "u_dumping");
+		p.u_currBuf = gl.getUniformLocation(p, "u_currBuf");
+		p.u_lastBuf = gl.getUniformLocation(p, "u_lastBuf");
+		this.prog.addforce = p;
+	}
 	
 	this.init = Cloth_init;
+	this.addforce = Cloth_addforce;
 	this.draw = Cloth_draw;
 }
