@@ -19,12 +19,12 @@ void appInit(AppContext* self)
 
 	self->istream = &myInputStream;
 
-	self->aspect.width = (float)crAppContext.context->xres;
-	self->aspect.height = (float)crAppContext.context->yres;
+	self->aspect.width = (float)crContext()->xres;
+	self->aspect.height = (float)crContext()->yres;
 
-	crRenderTargetSetViewport(0, 0, self->aspect.width, self->aspect.height, -1, 1);
+	crContextSetViewport(crContext(), 0, 0, self->aspect.width, self->aspect.height, -1, 1);
 
-	crDbgStr("crender started with %d x %d, api=%s\n", crAppContext.context->xres, crAppContext.context->yres, crAppContext.context->apiName);
+	crDbgStr("crender started with %d x %d, api=%s\n", crContext()->xres, crContext()->yres, crContext()->apiName);
 }
 
 void appFree(AppContext* self)
@@ -39,7 +39,7 @@ void appResize(AppContext* self, size_t xres, size_t yres)
 	self->aspect.height = (float)yres;
 
 	crContextChangeResolution(crContext(), xres, yres);
-	crRenderTargetSetViewport(0, 0, (float)xres, (float)yres, -1, 1);
+	crContextSetViewport(crContext(), 0, 0, (float)xres, (float)yres, -1, 1);
 }
 
 void appLoadMaterialBegin(AppContext* self, const char** directives)

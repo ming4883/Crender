@@ -182,3 +182,23 @@ CR_API void crContextApplyFfpState(CrContext* self)
 
 #endif
 }
+
+CR_API void crContextSetViewport(CrContext* self, float x, float y, float w, float h, float zmin, float zmax)
+{
+	glEnable(GL_SCISSOR_TEST);
+	glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
+	glScissor((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
+	glDepthRange(zmin, zmax);
+}
+
+CR_API void crContextClearColor(CrContext* self, float r, float g, float b, float a)
+{
+	glClearColor(r, g, b, a);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+CR_API void crContextClearDepth(CrContext* self, float z)
+{
+	glClearDepth(z);
+	glClear(GL_DEPTH_BUFFER_BIT);
+}

@@ -105,7 +105,7 @@ void crAppRender()
 	localSettings.linearity /= 10.0f;
 	remoteConfigUnlock(config);
 
-	crRenderTargetClearDepth(1);
+	crContextClearDepth(crContext(), 1);
 
 	drawBackground();
 	drawScene(&localSettings);

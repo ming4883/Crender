@@ -315,3 +315,31 @@ CR_API void crContextApplyGpuState(CrContext* self)
 CR_API void crContextApplyFfpState(CrContext* self)
 {
 }
+
+
+CR_API void crContextSetViewport(CrContext* self, float x, float y, float w, float h, float zmin, float zmax)
+{
+	IDirect3DDevice9* d3ddev = current->d3ddev;
+
+	D3DVIEWPORT9 vp;
+	vp.X = (DWORD)x;
+	vp.Y = (DWORD)y;
+	vp.Width  = (DWORD)w;
+	vp.Height = (DWORD)h;
+	vp.MinZ = zmin * 0.5f + 0.5f;
+	vp.MaxZ = zmax * 0.5f + 0.5f;;
+
+	IDirect3DDevice9_SetViewport(d3ddev, &vp);
+}
+
+CR_API void crContextClearColor(CrContext* self, float r, float g, float b, float a)
+{
+	IDirect3DDevice9* d3ddev = current->d3ddev;
+	IDirect3DDevice9_Clear(d3ddev, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_COLORVALUE(r, g, b, a), 1, 0);
+}
+
+CR_API void crContextClearDepth(CrContext* self, float z)
+{
+	IDirect3DDevice9* d3ddev = current->d3ddev;
+	IDirect3DDevice9_Clear(d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
+}

@@ -146,9 +146,9 @@ void drawShadowMap()
 	
 	CrRenderBuffer* bufs[] = {shadowMap, nullptr};
 	crRenderTargetPreRender(app->renderTarget, bufs, shadowMapZ);
-	crRenderTargetSetViewport(0, 0, (float)shadowMapSize, (float)shadowMapSize, -1, 1);
-	crRenderTargetClearColor(1, 1, 1, 1);
-	crRenderTargetClearDepth(1);
+	crContextSetViewport(crContext(), 0, 0, (float)shadowMapSize, (float)shadowMapSize, -1, 1);
+	crContextClearColor(crContext(), 1, 1, 1, 1);
+	crContextClearDepth(crContext(), 1);
 
 	// compute shadow map matrix
 	{
@@ -217,7 +217,7 @@ void drawShadowMap()
 	}
 
 	crRenderTargetPreRender(nullptr, nullptr, nullptr);
-	crRenderTargetSetViewport(0, 0, (float)crAppContext.context->xres, (float)crAppContext.context->yres, -1, 1);
+	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
 }
 
 void drawScene()
@@ -414,7 +414,7 @@ void crAppRender()
 {
 	drawShadowMap();
 
-	crRenderTargetClearDepth(1);
+	crContextClearDepth(crContext(), 1);
 	drawBackground();
 	drawScene();
 }

@@ -39,11 +39,6 @@ CR_API void crRenderTargetReleaseBuffer(CrRenderTarget* self, CrRenderBuffer* bu
 
 CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** colors, CrRenderBuffer* depth);
 
-CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax);
-
-CR_API void crRenderTargetClearColor(float r, float g, float b, float a);
-
-CR_API void crRenderTargetClearDepth(float z);
 
 #ifdef __cplusplus
 }

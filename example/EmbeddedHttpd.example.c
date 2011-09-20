@@ -80,7 +80,7 @@ void crAppHandleMouse(int x, int y, int action)
 
 void crAppRender()
 {
-	crRenderTargetClearColor(0, 1, 0, 1.0f);
+	crContextClearColor(crContext(), 0, 1, 0, 1.0f);
 }
 
 void crAppConfig()
@@ -117,7 +117,7 @@ void crAppRender()
 	r = bgR / 255; g = bgG / 255; b = bgB / 255;
 	remoteConfigUnlock(_config);
 
-	crRenderTargetClearColor(r, g, b, 1.0f);
+	crContextClearColor(crContext(), r, g, b, 1.0f);
 }
 
 void crAppConfig()
@@ -141,7 +141,7 @@ CrBool crAppInitialize()
 		{nullptr, nullptr, 0, 0}
 	};
 
-	crRenderTargetSetViewport(0, 0, (float)crAppContext.context->xres, (float)crAppContext.context->yres, -1, 1);
+	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
 
 	_config = remoteConfigAlloc();
 	remoteConfigInit(_config, 8080, CrTrue);

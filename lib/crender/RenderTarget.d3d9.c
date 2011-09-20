@@ -133,26 +133,3 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 		IDirect3DDevice9_SetDepthStencilSurface(crContextImpl()->d3ddev, nullptr);
 	}
 }
-
-CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
-{
-	D3DVIEWPORT9 vp;
-	vp.X = (DWORD)x;
-	vp.Y = (DWORD)y;
-	vp.Width  = (DWORD)w;
-	vp.Height = (DWORD)h;
-	vp.MinZ = zmin * 0.5f + 0.5f;
-	vp.MaxZ = zmax * 0.5f + 0.5f;;
-
-	IDirect3DDevice9_SetViewport(crContextImpl()->d3ddev, &vp);
-}
-
-CR_API void crRenderTargetClearColor(float r, float g, float b, float a)
-{
-	IDirect3DDevice9_Clear(crContextImpl()->d3ddev, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_COLORVALUE(r, g, b, a), 1, 0);
-}
-
-CR_API void crRenderTargetClearDepth(float z)
-{
-	IDirect3DDevice9_Clear(crContextImpl()->d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
-}

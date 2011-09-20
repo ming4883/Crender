@@ -22,8 +22,8 @@ void crAppRender()
 	CrGpuState* gpuState = &crContext()->gpuState;
 
 	// render to texture
-	crRenderTargetClearDepth(1);
-	crRenderTargetClearColor(0.25f, 0.75f, 1.0f, 1.0f);
+	crContextClearDepth(crContext(), 1);
+	crContextClearColor(crContext(), 0.25f, 0.75f, 1.0f, 1.0f);
 
 	// display the label
 	gpuState->blend = CrTrue;

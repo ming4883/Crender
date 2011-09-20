@@ -120,6 +120,12 @@ CR_API void crContextApplyGpuState(CrContext* self);
 
 CR_API void crContextApplyFfpState(CrContext* self);
 
+CR_API void crContextSetViewport(CrContext* self, float x, float y, float w, float h, float zmin, float zmax);
+
+CR_API void crContextClearColor(CrContext* self, float r, float g, float b, float a);
+
+CR_API void crContextClearDepth(CrContext* self, float z);
+
 #ifdef __cplusplus
 }
 #endif

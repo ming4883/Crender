@@ -62,8 +62,8 @@ void crAppRender()
 		
 	// clear
 	{
-		crRenderTargetClearColor(bgClr.x, bgClr.y, bgClr.z, bgClr.w);
-		crRenderTargetClearDepth(1);
+		crContextClearColor(crContext(), bgClr.x, bgClr.y, bgClr.z, bgClr.w);
+		crContextClearDepth(crContext(), 1);
 	}
 
 	// setup gpu state

@@ -150,23 +150,3 @@ CR_API void crRenderTargetPreRender(CrRenderTarget* self, CrRenderBuffer** color
 		}
 	}
 }
-
-CR_API void crRenderTargetSetViewport(float x, float y, float w, float h, float zmin, float zmax)
-{
-	glEnable(GL_SCISSOR_TEST);
-	glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
-	glScissor((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h);
-	glDepthRange(zmin, zmax);
-}
-
-CR_API void crRenderTargetClearColor(float r, float g, float b, float a)
-{
-	glClearColor(r, g, b, a);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
-
-CR_API void crRenderTargetClearDepth(float z)
-{
-	glClearDepth(z);
-	glClear(GL_DEPTH_BUFFER_BIT);
-}
