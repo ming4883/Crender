@@ -34,6 +34,8 @@ typedef struct CrContextImpl
 	CrContext i;
 
 	unsigned int gpuInputId;
+	GLuint defFBOName;
+	GLuint rttFBOName;
 
 #if defined(CR_WIN32)
 	GLuint hDC;
@@ -43,7 +45,6 @@ typedef struct CrContextImpl
 
 #if defined(CR_APPLE_IOS)
 	GLuint eaglContext;
-	GLuint defFBOName;
 	GLuint defColorBufName;
 	GLuint defDepthBufName;
 #endif

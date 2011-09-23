@@ -1,5 +1,6 @@
 #include "Context.gl.h"
 #include "Mat44.h"
+#include "Texture.gl.h"
 
 CR_API void crGpuStateInit(CrGpuState* self)
 {
@@ -201,4 +202,78 @@ CR_API void crContextClearDepth(CrContext* self, float z)
 {
 	glClearDepth(z);
 	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+struct CrTexture;
+typedef struct CrTexture;
+
+static GLenum crGL_ATTACHMENT_POINT[] =
+{	GL_COLOR_ATTACHMENT0,
+#if !defined(CR_GLES_2)
+	GL_COLOR_ATTACHMENT1,
+	GL_COLOR_ATTACHMENT2,
+	GL_COLOR_ATTACHMENT3,
+	GL_COLOR_ATTACHMENT4,
+	GL_COLOR_ATTACHMENT5,
+	GL_COLOR_ATTACHMENT6,
+	GL_COLOR_ATTACHMENT7,
+#endif
+};
+
+CR_API CrBool crContextPreRTT(CrContext* self, CrTexture** colors, CrTexture* depth)
+{
+	CrContextImpl* impl = (CrContextImpl*)self;
+
+	size_t bufCnt;
+	CrTexture** curr;
+
+	if(nullptr == self)
+		return CrFalse;
+
+	crCheckGLError();	// clear any unhandled gl errors
+
+	glBindFramebuffer(GL_FRAMEBUFFER, impl->rttFBOName);
+	
+	// attach color buffers
+	bufCnt = 0;
+	if(nullptr != colors) {
+		curr = (CrTexture**)colors;
+		while(*curr != nullptr) {
+			CrTexture* tex = (*curr);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, crGL_ATTACHMENT_POINT[bufCnt], ((CrTextureImpl*)tex)->glTarget, ((CrTextureImpl*)tex)->glName, 0);
+			++curr;
+			++bufCnt;
+		}
+	}
+
+	// attach depth buffers
+	if(depth != nullptr) {
+		CrTexture* tex = depth;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ((CrTextureImpl*)tex)->glTarget, ((CrTextureImpl*)tex)->glName, 0);
+	}
+
+#if !defined(CR_GLES_2)
+	// assign buffer bindings
+	glDrawBuffers(bufCnt, crGL_ATTACHMENT_POINT);
+#endif
+	{	// check for framebuffer's complete status
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if(GL_FRAMEBUFFER_COMPLETE != status) {
+			crDbgStr("imcomplete framebuffer status: %x\n", status);
+			crCheckGLError();
+			return CrFalse;
+		}
+	}
+
+	return CrTrue;
+}
+
+CR_API CrBool crContextPostRTT(CrContext* self)
+{
+	CrContextImpl* impl = (CrContextImpl*)self;
+	glBindFramebuffer(GL_FRAMEBUFFER, impl->defFBOName);
+
+	crCheckGLError();
+
+	return CrTrue;
 }

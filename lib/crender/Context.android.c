@@ -82,6 +82,15 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
 	self->xres = w;
 	self->yres = h;
+
+	// create FBOs
+	if(nullptr == glGenFramebuffers) {
+		crDbgStr("render target is not supported!\n");
+	}
+	else {
+		impl->defFBOName = 0;
+		glGenFramebuffers(1, &impl->rttFBOName);
+	}
 	
 	current = impl;
 

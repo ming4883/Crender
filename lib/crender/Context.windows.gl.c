@@ -167,20 +167,33 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 			0
 		};
 
+		GLuint vertexArray;
+
 		HGLRC newRC = wglCreateContextAttribsARB(hDC, 0, contextAttribs);
 		wglMakeCurrent(0, 0);
 		wglDeleteContext(hRC);
 		hRC = newRC;
 		wglMakeCurrent(hDC, hRC);
+
+		// 3.0 or above requires a vertex array
+		glGenVertexArrays(1, &vertexArray);
+		glBindVertexArray(vertexArray);
 	}
 
 	impl->hDC = (GLuint)hDC;
 	impl->hRC = (GLuint)hRC;
 	impl->hwnd = *hWnd;
 
-	current = impl;
+	// create FBOs
+	if(nullptr == glGenFramebuffers) {
+		crDbgStr("render target is not supported!\n");
+	}
+	else {
+		impl->defFBOName = 0;
+		glGenFramebuffers(1, &impl->rttFBOName);
+	}
 
-	glBindVertexArray(0);
+	current = impl;
 
 	return CrTrue;
 }

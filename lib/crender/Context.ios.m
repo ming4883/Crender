@@ -77,10 +77,10 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 
 	// color buffer storage
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defColorBufName);
-    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:*eaglLayer];
+	[context renderbufferStorage:GL_RENDERBUFFER fromDrawable:*eaglLayer];
 	int w, h;
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &w);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &h);
+	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &w);
+	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &h);
 	self->xres = w;
 	self->yres = h;
 
@@ -88,10 +88,18 @@ CR_API CrBool crContextInit(CrContext* self, void** window)
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defDepthBufName);
 	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT16, self->xres, self->yres);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        crDbgStr("Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
-    }
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		crDbgStr("Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+	}
+	
+	// rtt FBO
+	if(nullptr == glGenFramebuffers) {
+		crDbgStr("render target is not supported!\n");
+	}
+	else {
+		glGenFramebuffers(1, &impl->rttFBOName);
+	}
 
 	current = impl;
 
@@ -121,7 +129,7 @@ CR_API void crContextSwapBuffers(CrContext* self)
 	EAGLContext* context = (EAGLContext*)impl->eaglContext;
 
 	glBindRenderbuffer(GL_RENDERBUFFER, impl->defColorBufName);
-    [context presentRenderbuffer:GL_RENDERBUFFER];
+	[context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 CR_API CrBool crContextChangeResolution(CrContext* self, size_t xres, size_t yres)
