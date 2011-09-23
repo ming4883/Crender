@@ -1,6 +1,7 @@
 #include "Context.d3d9.h"
 #include "Mem.h"
 #include "Mat44.h"
+#include "Texture.d3d9.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -342,4 +343,50 @@ CR_API void crContextClearDepth(CrContext* self, float z)
 {
 	IDirect3DDevice9* d3ddev = current->d3ddev;
 	IDirect3DDevice9_Clear(d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
+}
+
+CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth)
+{
+	CrContextImpl* impl = (CrContextImpl*)self;
+
+	size_t bufCnt;
+	CrTexture** curr;
+	if(nullptr == self)
+		return CrFalse;
+
+	/*
+	// attach color buffers
+	bufCnt = 0;
+	if(nullptr != colors) {
+		curr = (CrTexture**)colors;
+		while(*curr != nullptr) {
+			CrTextureImpl* buf = (CrTextureImpl*)*curr;
+			IDirect3DDevice9_SetRenderTarget(impl->d3ddev, bufCnt, buf->d3dsurf);
+			++curr;
+			++bufCnt;
+		}
+	}
+
+	// attach depth buffers
+	if(depth != nullptr) {
+		CrTexture* tex = depth->texture;
+		CrRenderBufferImpl* buf = (CrRenderBufferImpl*)depth;
+		IDirect3DDevice9_SetDepthStencilSurface(impl->d3ddev, buf->d3dsurf);
+	}
+	else {
+		IDirect3DDevice9_SetDepthStencilSurface(impl->d3ddev, nullptr);
+	}
+	*/
+
+	return CrTrue;
+}
+
+CR_API CrBool crContextPostRTT(CrContext* self)
+{
+	CrContextImpl* impl = (CrContextImpl*)self;
+
+	IDirect3DDevice9_SetRenderTarget(impl->d3ddev, 0, impl->d3dcolorbuf);
+	IDirect3DDevice9_SetDepthStencilSurface(impl->d3ddev, impl->d3ddepthbuf);
+
+	return CrTrue;
 }

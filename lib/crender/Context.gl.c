@@ -204,9 +204,6 @@ CR_API void crContextClearDepth(CrContext* self, float z)
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-struct CrTexture;
-typedef struct CrTexture;
-
 static GLenum crGL_ATTACHMENT_POINT[] =
 {	GL_COLOR_ATTACHMENT0,
 #if !defined(CR_GLES_2)
@@ -220,7 +217,7 @@ static GLenum crGL_ATTACHMENT_POINT[] =
 #endif
 };
 
-CR_API CrBool crContextPreRTT(CrContext* self, CrTexture** colors, CrTexture* depth)
+CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
 

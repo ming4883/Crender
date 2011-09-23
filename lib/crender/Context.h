@@ -126,6 +126,12 @@ CR_API void crContextClearColor(CrContext* self, float r, float g, float b, floa
 
 CR_API void crContextClearDepth(CrContext* self, float z);
 
+struct CrTexture;
+
+CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth);
+
+CR_API CrBool crContextPostRTT(CrContext* self);
+
 #ifdef __cplusplus
 }
 #endif
