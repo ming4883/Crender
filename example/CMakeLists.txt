@@ -99,6 +99,28 @@ ENDIF()
 CREATE_EXAMPLE( example_cloth_simulation "${SRC}" "${RES}" )
 
 #-------------------------------------------------------------------------------
+# example_water
+SET( SRC 
+	Water.example.c
+	Cloth.c
+	Cloth.h
+	Sphere.c
+	Sphere.h
+	)
+	
+SET( RES
+	../media/Common.glsl
+	../media/ClothSimulation.glsl
+	../media/ShadowMap.glsl
+	)
+
+IF( APPLE )
+	LIST( APPEND RES Example.xib )
+ENDIF()
+
+CREATE_EXAMPLE( example_water "${SRC}" "${RES}" )
+
+#-------------------------------------------------------------------------------
 # example_embedded_httpd
 SET( SRC EmbeddedHttpd.example.c )
 
