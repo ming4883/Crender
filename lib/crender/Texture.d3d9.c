@@ -9,6 +9,10 @@ CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_FloatR32, 4, D3DFMT_R32F},
 	{CrGpuFormat_FloatR16G16B16A16, 8, D3DFMT_A16B16G16R16F},
 	{CrGpuFormat_FloatR32G32B32A32, 16, D3DFMT_A32B32G32R32F},
+	{CrGpuFormat_Depth16, 2, D3DFMT_D16},
+	{CrGpuFormat_Depth32, 4, D3DFMT_D32},
+	{CrGpuFormat_Depth24Stencil8, 4, D3DFMT_D24S8},
+	
 };
 
 CrTextureGpuFormatMapping* crTextureGpuFormatMappingGet(CrGpuFormat crFormat)
@@ -71,13 +75,18 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 		return CrFalse;
 	}
 
+	if(format & CrGpuFormat_Depth) {
+		crDbgStr("No depth texture support for non-rtt texture\n", format);
+		return CrFalse;
+	}
+
 	self->format = format;
 	self->width = width;
 	self->height = height;
 	self->mipCount = mipCount;
 	self->surfCount = surfCount;
 
-	// init cache memory
+	// calculate single surface size
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
@@ -101,6 +110,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	return CrTrue;
 
 }
+
 
 CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
@@ -129,11 +139,13 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	self->mipCount = mipCount;
 	self->surfCount = surfCount;
 
-	// set cache memory to null
+	// calculate single surface size
 	{
 		size_t tmpw, tmph;
 		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
 	}
+
+	/*
 
 	// create d3d texture
 	{
@@ -141,6 +153,39 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
 		if(FAILED(hr)) {
 			crDbgStr("d3d9 failed to create texture %8x", hr);
+			return CrFalse;
+		}
+	}
+
+	*/
+
+	// depth texture is not support in d3d9
+	if(format & CrGpuFormat_Depth) {
+		HRESULT hr = IDirect3DDevice9_CreateDepthStencilSurface(
+			crContextImpl()->d3ddev,
+			width, height,
+			impl->apiFormatMapping->d3dFormat,
+			D3DMULTISAMPLE_NONE, 0,
+			TRUE, 
+			&impl->d3dsurf,
+			nullptr);
+
+		if(FAILED(hr)) {
+			crDbgStr("d3d9 failed to create texture %8x", hr);
+			return CrFalse;
+		}
+	}
+	else {
+		HRESULT hr;
+		hr = IDirect3DDevice9_CreateTexture(crContextImpl()->d3ddev, width, height, self->mipCount, D3DUSAGE_RENDERTARGET, impl->apiFormatMapping->d3dFormat, D3DPOOL_DEFAULT, &impl->d3dtex, nullptr);
+		if(FAILED(hr)) {
+			crDbgStr("d3d9 failed to create texture %8x", hr);
+			return CrFalse;
+		}
+
+		hr = IDirect3DTexture9_GetSurfaceLevel(impl->d3dtex, 0, &impl->d3dsurf);
+		if(FAILED(hr)) {
+			crDbgStr("d3d9 failed to get texture surface %8x", hr);
 			return CrFalse;
 		}
 	}
@@ -236,6 +281,10 @@ CR_API void crTextureFree(CrTexture* self)
 
 	if(nullptr != impl->d3dtex) {
 		IDirect3DTexture9_Release(impl->d3dtex);
+	}
+
+	if(nullptr != impl->d3dsurf) {
+		IDirect3DSurface9_Release(impl->d3dsurf);
 	}
 	
 	crMem()->free(self, "CrTexture");

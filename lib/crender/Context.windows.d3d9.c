@@ -353,12 +353,11 @@ CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct
 	CrTexture** curr;
 	if(nullptr == self)
 		return CrFalse;
-
-	/*
+	
 	// attach color buffers
 	bufCnt = 0;
 	if(nullptr != colors) {
-		curr = (CrTexture**)colors;
+		curr = colors;
 		while(*curr != nullptr) {
 			CrTextureImpl* buf = (CrTextureImpl*)*curr;
 			IDirect3DDevice9_SetRenderTarget(impl->d3ddev, bufCnt, buf->d3dsurf);
@@ -369,14 +368,12 @@ CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct
 
 	// attach depth buffers
 	if(depth != nullptr) {
-		CrTexture* tex = depth->texture;
-		CrRenderBufferImpl* buf = (CrRenderBufferImpl*)depth;
+		CrTextureImpl* buf = (CrTextureImpl*)depth;
 		IDirect3DDevice9_SetDepthStencilSurface(impl->d3ddev, buf->d3dsurf);
 	}
 	else {
 		IDirect3DDevice9_SetDepthStencilSurface(impl->d3ddev, nullptr);
 	}
-	*/
 
 	return CrTrue;
 }

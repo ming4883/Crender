@@ -8,7 +8,6 @@
 #include "red_tile_texture.h"
 
 #include "../lib/crender/Texture.h"
-#include "../lib/crender/RenderTarget.h"
 
 AppContext* app = nullptr;
 RemoteConfig* config = nullptr;
@@ -28,8 +27,8 @@ Material* shadowMapMtl = nullptr;
 CrTexture* texture = nullptr;
 
 CrMat44 shadowMapMtx;
-CrRenderBuffer* shadowMap = nullptr;
-CrRenderBuffer* shadowMapZ = nullptr;
+CrTexture* shadowMap = nullptr;
+CrTexture* shadowMapZ = nullptr;
 size_t shadowMapSize = 1024;
 CrVec4 shadowMapParam = { 1.f / 1024, 1e-3f * 1.5f, 0, 0};
 
@@ -144,8 +143,8 @@ void drawShadowMap()
 {
 	CrGpuState* gpuState = &crContext()->gpuState;
 	
-	CrRenderBuffer* bufs[] = {shadowMap, nullptr};
-	crRenderTargetPreRender(app->renderTarget, bufs, shadowMapZ);
+	CrTexture* bufs[] = {shadowMap, nullptr};
+	crContextPreRTT(crContext(), bufs, shadowMapZ);
 	crContextSetViewport(crContext(), 0, 0, (float)shadowMapSize, (float)shadowMapSize, -1, 1);
 	crContextClearColor(crContext(), 1, 1, 1, 1);
 	crContextClearDepth(crContext(), 1);
@@ -216,7 +215,8 @@ void drawShadowMap()
 		}
 	}
 
-	crRenderTargetPreRender(nullptr, nullptr, nullptr);
+	//crRenderTargetPreRender(nullptr, nullptr, nullptr);
+	crContextPostRTT(crContext());
 	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
 }
 
@@ -255,7 +255,7 @@ void drawScene()
 			CrSamplerAddress_Clamp, 
 			CrSamplerAddress_Clamp
 		};
-		crGpuProgramUniformTexture(sceneMtl->program, CrHash("u_shadowMapTex"), shadowMap->texture, &sampler);
+		crGpuProgramUniformTexture(sceneMtl->program, CrHash("u_shadowMapTex"), shadowMap, &sampler);
 	}
 	{
 		CrMat44 shadowMapTexMtx = shadowMapMtx;
@@ -440,6 +440,8 @@ void crAppFinalize()
 	materialFree(sceneMtl);
 	materialFree(bgMtl);
 	crTextureFree(texture);
+	crTextureFree(shadowMap);
+	crTextureFree(shadowMapZ);
 	appFree(app);
 }
 
@@ -464,8 +466,11 @@ CrBool crAppInitialize()
 	}
 
 	// shadow map
-	shadowMap = crRenderTargetAcquireBuffer(app->renderTarget, shadowMapSize, shadowMapSize, CrGpuFormat_FloatR16);
-	shadowMapZ = crRenderTargetAcquireBuffer(app->renderTarget, shadowMapSize, shadowMapSize, CrGpuFormat_Depth16);
+	shadowMap = crTextureAlloc();
+	crTextureInitRtt(shadowMap, shadowMapSize, shadowMapSize, 0, 1, CrGpuFormat_FloatR16);
+
+	shadowMapZ = crTextureAlloc();
+	crTextureInitRtt(shadowMapZ,shadowMapSize, shadowMapSize, 0, 1, CrGpuFormat_Depth16);
 
 	// materials
 	{

@@ -14,9 +14,6 @@ AppContext* appAlloc()
 
 void appInit(AppContext* self)
 {
-	self->renderTarget = crRenderTargetAlloc();
-	crRenderTargetInit(self->renderTarget);
-
 	self->istream = &myInputStream;
 
 	self->aspect.width = (float)crContext()->xres;
@@ -29,7 +26,6 @@ void appInit(AppContext* self)
 
 void appFree(AppContext* self)
 {
-	crRenderTargetFree(self->renderTarget);
 	free(self);
 }
 

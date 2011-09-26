@@ -19,6 +19,7 @@ typedef struct CrTextureImpl
 {
 	CrTexture i;
 	IDirect3DTexture9* d3dtex;
+	IDirect3DSurface9* d3dsurf;
 	struct CrTextureGpuFormatMapping* apiFormatMapping;
 } CrTextureImpl;
 

@@ -6,7 +6,6 @@
 #include "../lib/crender/Vec4.h"
 #include "../lib/crender/Mat44.h"
 #include "../lib/crender/Shader.h"
-#include "../lib/crender/RenderTarget.h"
 
 #include "Framework.h"
 #include "Material.h"
@@ -38,8 +37,6 @@ typedef struct AppContext
 	} aspect;
 
 	ShaderContext shaderContext;
-
-	CrRenderTarget* renderTarget;
 
 	InputStream* istream;
 

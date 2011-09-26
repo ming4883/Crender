@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2010, Troy D. Hanson   http://uthash.sourceforge.net
+Copyright (c) 2008-2011, Troy D. Hanson   http://uthash.sourceforge.net
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTARRAY_H
 #define UTARRAY_H
 
-#define UTARRAY_VERSION 1.9.1
+#define UTARRAY_VERSION 1.9.4
 
 #ifdef __GNUC__
 #define _UNUSED_ __attribute__ ((__unused__)) 
@@ -136,7 +136,7 @@ typedef struct {
             _utarray_eltptr(a,j),                                             \
             ((a)->i - (j))*((a)->icd->sz));                                   \
   }                                                                           \
-  if (a->icd->copy) {                                                         \
+  if ((a)->icd->copy) {                                                         \
     size_t _ut_i;                                                             \
     for(_ut_i=0;_ut_i<(w)->i;_ut_i++) {                                       \
       (a)->icd->copy(_utarray_eltptr(a,j+_ut_i), _utarray_eltptr(w,_ut_i));   \
@@ -170,7 +170,7 @@ typedef struct {
 } while(0)
 
 #define utarray_concat(dst,src) do {                                          \
-  utarray_inserta(dst,src,utarray_len(dst));                                  \
+  utarray_inserta((dst),(src),utarray_len(dst));                                  \
 } while(0)
 
 #define utarray_erase(a,pos,len) do {                                         \
@@ -202,6 +202,8 @@ typedef struct {
 #define utarray_sort(a,cmp) do {                                              \
   qsort((a)->d, (a)->i, (a)->icd->sz, cmp);                                   \
 } while(0)
+
+#define utarray_find(a,v,cmp) bsearch((v),(a)->d,(a)->i,(a)->icd->sz,cmp)
 
 #define utarray_front(a) (((a)->i) ? (_utarray_eltptr(a,0)) : NULL)
 #define utarray_next(a,e) (((e)==NULL) ? utarray_front(a) : ((((a)->i) > (utarray_eltidx(a,e)+1)) ? _utarray_eltptr(a,utarray_eltidx(a,e)+1) : NULL))

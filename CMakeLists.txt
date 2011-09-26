@@ -24,7 +24,7 @@ SET( CRENDER_COMMON
 		lib/crender/Platform.c
 		lib/crender/Platform.h
 		lib/crender/pstdint.h
-		lib/crender/RenderTarget.h
+#		lib/crender/RenderTarget.h
 		lib/crender/Shader.h
 		lib/crender/StrHash.c
 		lib/crender/StrHash.h
@@ -52,8 +52,8 @@ IF( WIN32 )
 #		lib/crender/GpuState.gl.c
 #		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
-		lib/crender/RenderTarget.gl.c
-		lib/crender/RenderTarget.gl.h
+#		lib/crender/RenderTarget.gl.c
+#		lib/crender/RenderTarget.gl.h
 		lib/crender/Shader.gl.c
 		lib/crender/Shader.gl.h
 		lib/crender/Texture.gl.c
@@ -84,8 +84,8 @@ IF( WIN32 )
 #		lib/crender/GpuState.d3d9.c
 #		lib/crender/GpuState.d3d9.h
 		lib/crender/Mat44.d3d9.c
-		lib/crender/RenderTarget.d3d9.c
-		lib/crender/RenderTarget.d3d9.h
+#		lib/crender/RenderTarget.d3d9.c
+#		lib/crender/RenderTarget.d3d9.h
 		lib/crender/Shader.d3d9.c
 		lib/crender/Shader.d3d9.h
 		lib/crender/Texture.d3d9.c
@@ -111,8 +111,8 @@ ELSEIF( APPLE )
 #		lib/crender/GpuState.gl.c
 #		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
-		lib/crender/RenderTarget.gl.c
-		lib/crender/RenderTarget.gl.h
+#		lib/crender/RenderTarget.gl.c
+#		lib/crender/RenderTarget.gl.h
 		lib/crender/Shader.gl.c
 		lib/crender/Shader.gl.h
 		lib/crender/Texture.gl.c
@@ -165,17 +165,17 @@ ADD_LIBRARY( crender
 	)
 
 # unit testes
-IF( NOT APPLE )
-	ADD_EXECUTABLE( test_crender
-		test/TestXPRender.c
-		lib/cutest/CuTest.c
-		lib/cutest/CuTest.h
-		lib/cutest/README.txt
-		)
+# IF( NOT APPLE )
+	# ADD_EXECUTABLE( test_crender
+		# test/TestXPRender.c
+		# lib/cutest/CuTest.c
+		# lib/cutest/CuTest.h
+		# lib/cutest/README.txt
+		# )
 
-	TARGET_LINK_LIBRARIES( test_crender crender ${PLATFORM_LIBS} )
+	# TARGET_LINK_LIBRARIES( test_crender crender ${PLATFORM_LIBS} )
 
-ENDIF()
+# ENDIF()
 
 # examples
 ADD_SUBDIRECTORY( example )

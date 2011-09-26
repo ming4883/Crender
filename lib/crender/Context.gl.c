@@ -245,8 +245,11 @@ CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct
 
 	// attach depth buffers
 	if(depth != nullptr) {
-		CrTexture* tex = depth;
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ((CrTextureImpl*)tex)->glTarget, ((CrTextureImpl*)tex)->glName, 0);
+		CrTextureImpl* tex = (CrTextureImpl*)depth;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex->glTarget, tex->glName, 0);
+	}
+	else {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
 	}
 
 #if !defined(CR_GLES_2)
