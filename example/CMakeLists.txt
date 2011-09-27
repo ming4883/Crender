@@ -102,16 +102,13 @@ CREATE_EXAMPLE( example_cloth_simulation "${SRC}" "${RES}" )
 # example_water
 SET( SRC 
 	Water.example.c
-	Cloth.c
-	Cloth.h
 	Sphere.c
 	Sphere.h
 	)
 	
 SET( RES
 	../media/Common.glsl
-	../media/ClothSimulation.glsl
-	../media/ShadowMap.glsl
+	../media/Water.glsl
 	)
 
 IF( APPLE )
