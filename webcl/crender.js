@@ -231,6 +231,39 @@ function crCreateTexture2DFromUrl(url, flipY) {
 	return tex;
 }
 
+function crCreateTexture2DFromDOM(id, flipY) {
+	var tex = gl.createTexture();
+	tex.ready = false;
+	tex.image = document.getElementById(id);
+	if (!tex.image) {
+		if(crLog) crLog("image '" + id + "' not found!");
+		return tex;
+	};
+	
+	tex.image.style.visibility="hidden";
+	
+	if(crLog) crLog("loading texture2d from DOM '" + id + "'...");
+	
+	try {
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+	catch(err) {
+		if(crLog) crLog("failed to load texture2d from DOM '" + id + "'");
+		if(crLog) crLog(err);
+		return tex;
+	}
+	
+	if(crLog) crLog("loaded texture2d from DOM '" + id + "'");
+	tex.ready = true;
+	
+	return tex;
+}
+
 function crCreateFBOTexture2D(width, height, options) {
 
 	options = options || {};
