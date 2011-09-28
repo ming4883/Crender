@@ -95,8 +95,8 @@ void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
 	
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
-	//drop = 0.5 - cos(drop * PI) * 0.5;
-	drop = 0.5 - drop * 0.5;
+	drop = 0.5 + cos(drop * PI) * 0.5;
+	//drop = 0.5 - drop * 0.5;
 	
 	curr.x += drop * u_strength;
 	
@@ -115,12 +115,17 @@ void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
 	vec3 norm = normalize(vec3(curr.z, sqrt(1.0 - dot(curr.zw, curr.zw)), curr.w));
 	
-	vec4 tex = texture2D(u_tex, v_texcrd + (norm.xz / 32.0));
 	float ndoth = max(0.0, dot(norm, vec3(0.0, 1.0, 0.0)));
-	//ndoth = 1.0 - pow(1.0 - ndoth, 2.0);
-	ndoth = pow(ndoth, 4.0);
+	vec2 offset = norm.xz * ndoth / 16.0;
+	vec4 tex = texture2D(u_tex, v_texcrd - offset);
 	
-	gl_FragColor = tex + vec4(1.0,1.0,1.0,1.0) * (1.0-ndoth) * 2.0;//mix(vec4(1.0,1.0,1.0,1.0), tex, ndoth);
+	//ndoth = 1.0 - pow(1.0 - ndoth, 2.0);
+	ndoth = pow(ndoth, 8.0);
+	
+	//gl_FragColor = tex + vec4(1.0,1.0,1.0,1.0) * (1.0-ndoth) * 2.0;
+	//gl_FragColor = mix(vec4(1.0,1.0,1.0,1.0) * 1.0, tex, ndoth);
+	gl_FragColor = mix(tex * 1.5, tex * 1.0, ndoth);
+	
 }
 </script>
 
@@ -143,7 +148,8 @@ function init() {
 	water = new Water(256);
 	water.inited = false;
 	
-	//tex = crCreateTexture2DFromUrl("media/me-prewedding01.jpg", true);
+	//tex = crCreateTexture2DFromUrl("media/me-wedding01.jpg", true);
+	//tex = crCreateTexture2DFromUrl("media/me-wedding02.jpg", true);
 	tex = crCreateTexture2DFromUrl("media/trees.jpg", true);
 	
 	crLog("init complete");
@@ -158,12 +164,12 @@ function render() {
 	
 	passed += 1.0;
 	
-	if(passed > 300.0) {
+	if(passed > 120.0) {
 		passed = 0.0;
 		var scalar = water.delta[0];
 		var x = Math.random();
 		var y = Math.random();
-		water.addDrop(x, y, 8 * scalar, 1 / 64.0);
+		water.addDrop(x, y, 12 * scalar, 1 / 64.0);
 	}
 	
 	water.step();
@@ -181,7 +187,8 @@ function addDropAt(e, strength) {
 	
 	if(water) {
 		var scalar = water.delta[0] * (water.segments / gl.canvasWidth);
-		water.addDrop(mpos.x * scalar, 1.0 - mpos.y * scalar, 8 * scalar, strength); 
+		var scalary = water.delta[0] * (water.segments / gl.canvasHeight);
+		water.addDrop(mpos.x * scalar, 1.0 - mpos.y * scalary, 12 * scalar, strength); 
 	}
 	//e.preventDefault();
 }
@@ -218,7 +225,7 @@ function main() {
 </script>
 
 <body onload="main();" style="background-color:#030303;color:#ffffff;">
-<canvas id="the-canvas" style="border: none;" width="512" height="512"></canvas><br/>
+<canvas id="the-canvas" style="border: none;" width="800" height="480"></canvas><br/>
 Log<br/>
 <textarea id="logger" rows="5" cols="80"></textarea>
 </body>
