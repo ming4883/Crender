@@ -17,6 +17,17 @@ function crInit(canvas) {
 	}
 }
 
+function crGetMousePos(e) {
+	var mouseX = e.pageX;
+	var mouseY = e.pageY;
+	for (var obj = gl.canvas; obj; obj = obj.offsetParent) {
+		mouseX -= obj.offsetLeft;
+		mouseY -= obj.offsetTop;
+	}
+	
+	return {x:mouseX, y:mouseY};
+}
+
 function crClearColorBuffer(r, g, b, a) {
 	gl.clearColor(r, g, b, a);
 	gl.clear(gl.COLOR_BUFFER_BIT);
