@@ -12,3 +12,4 @@ msvc/*
 */android/.project
 */android/default.properties
 *.PIXExp
+me-*

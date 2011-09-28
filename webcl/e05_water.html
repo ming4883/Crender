@@ -95,7 +95,9 @@ void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
 	
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
-	drop = 0.5 - cos(drop * PI) * 0.5;
+	//drop = 0.5 - cos(drop * PI) * 0.5;
+	drop = 0.5 - drop * 0.5;
+	
 	curr.x += drop * u_strength;
 	
 	// output
@@ -107,17 +109,25 @@ void main(void) {
 precision highp float;
 varying vec2 v_texcrd;
 uniform sampler2D u_buffer;
+uniform sampler2D u_tex;
 
 void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
 	vec3 norm = normalize(vec3(curr.z, sqrt(1.0 - dot(curr.zw, curr.zw)), curr.w));
-	gl_FragColor = vec4(norm * 0.5 + 0.5, 1);
+	
+	vec4 tex = texture2D(u_tex, v_texcrd + (norm.xz / 32.0));
+	float ndoth = max(0.0, dot(norm, vec3(0.0, 1.0, 0.0)));
+	//ndoth = 1.0 - pow(1.0 - ndoth, 2.0);
+	ndoth = pow(ndoth, 4.0);
+	
+	gl_FragColor = tex + vec4(1.0,1.0,1.0,1.0) * (1.0-ndoth) * 2.0;//mix(vec4(1.0,1.0,1.0,1.0), tex, ndoth);
 }
 </script>
 
 <script type="text/javascript">
 
 var water;
+var tex;
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -126,10 +136,15 @@ function log(x) {
 	}
 }
 
+var passed = 0;
+
 function init() {
 	
-	water = new Water(1, 1, 511);
+	water = new Water(256);
 	water.inited = false;
+	
+	//tex = crCreateTexture2DFromUrl("media/me-prewedding01.jpg", true);
+	tex = crCreateTexture2DFromUrl("media/trees.jpg", true);
 	
 	crLog("init complete");
 }
@@ -141,10 +156,19 @@ function render() {
 		water.inited = true;
 	}
 	
-	water.step();
+	passed += 1.0;
+	
+	if(passed > 300.0) {
+		passed = 0.0;
+		var scalar = water.delta[0];
+		var x = Math.random();
+		var y = Math.random();
+		water.addDrop(x, y, 8 * scalar, 1 / 64.0);
+	}
+	
 	water.step();
 	water.updateNormals();
-	water.draw();
+	water.draw(tex);
 }
 
 function tick() {
@@ -152,12 +176,12 @@ function tick() {
 	render();
 }
 
-function addDropAt(e) {
+function addDropAt(e, strength) {
 	var mpos = crGetMousePos(e);
 	
 	if(water) {
-		var scalar = water.delta[0];
-		water.addDrop(mpos.x * scalar, 1.0 - mpos.y * scalar, 8 * scalar, 1 / 64.0); 
+		var scalar = water.delta[0] * (water.segments / gl.canvasWidth);
+		water.addDrop(mpos.x * scalar, 1.0 - mpos.y * scalar, 8 * scalar, strength); 
 	}
 	//e.preventDefault();
 }
@@ -167,19 +191,18 @@ var dragging = false;
 function handleMouseDown(e) {
 	
 	dragging = true;
-	addDropAt(e);
-	addDropAt(e);
+	addDropAt(e, 1.0 / 64);
 }
 
 function handleMouseMove(e) {
-	if(dragging)
-		addDropAt(e);
+	if(dragging) {
+		addDropAt(e, 1.0 / 128);
+	}
 }
 
 function handleMouseUp(e) {
 	dragging = false;
 }
-
 
 function main() {
 	crLog = log;
