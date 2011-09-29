@@ -46,7 +46,7 @@ function init() {
 	prog.u_mvpMatrix = gl.getUniformLocation(prog, "u_mvpMatrix");
 	prog.u_tex = gl.getUniformLocation(prog, "u_tex");
 	
-	tex = crCreateTexture2DFromUrl("media/nehe.gif", true);
+	tex = crCreateTexture2DFromUrl("media/nehe.gif", {flipY:true});
 	
 	crLoadMesh("media/box.mesh.json", function(ret) {
 		mesh = ret;

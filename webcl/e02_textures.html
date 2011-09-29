@@ -61,7 +61,7 @@ function init() {
 	prog.i_texcrd = gl.getAttribLocation(prog, "i_texcrd");
 	
 	vb = crCreateVertexBuffer(new Float32Array(vertices), gl.STATIC_DRAW);
-	tex = crCreateTexture2DFromDOM("nehe", true);
+	tex = crCreateTexture2DFromUrl("media/nehe.gif", {flipY:true});
 	
 	crLog("init complete");
 }
@@ -150,6 +150,5 @@ function main() {
 <canvas id="the-canvas" style="border: none;" width="640" height="360"></canvas><br/>
 Log<br/>
 <textarea id="logger" rows="5" cols="80"></textarea><br/>
-<img id="nehe" src="media/nehe.gif">
 </body>
 </html>
