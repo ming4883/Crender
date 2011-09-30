@@ -110,6 +110,7 @@ precision highp float;
 varying vec2 v_texcrd;
 uniform sampler2D u_buffer;
 uniform sampler2D u_tex;
+uniform sampler2D u_refls;
 
 void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
@@ -118,13 +119,15 @@ void main(void) {
 	float ndoth = max(0.0, dot(norm, vec3(0.0, 1.0, 0.0)));
 	vec2 offset = norm.xz * ndoth / 32.0;
 	vec4 tex = texture2D(u_tex, v_texcrd - offset);
+	vec4 refls = texture2D(u_refls, v_texcrd - offset);
 	
-	//ndoth = 1.0 - pow(1.0 - ndoth, 2.0);
-	ndoth = pow(ndoth, 8.0);
+	ndoth = 1.0 - pow(ndoth, 2.0);
+	ndoth = ndoth * 0.75 + 0.25;
 	
 	//gl_FragColor = tex + vec4(1.0,1.0,1.0,1.0) * (1.0-ndoth) * 2.0;
 	//gl_FragColor = mix(vec4(1.0,1.0,1.0,1.0) * 1.0, tex, ndoth);
-	gl_FragColor = mix(tex * 1.5, tex * 1.0, ndoth);
+	//gl_FragColor = mix(tex * 1.5, tex * 1.0, ndoth);
+	gl_FragColor = mix(refls, tex, ndoth);
 	
 }
 </script>
@@ -133,6 +136,7 @@ void main(void) {
 
 var water;
 var tex;
+var refls;
 
 function log(x) {
 	var logger = document.getElementById("logger");
@@ -148,12 +152,16 @@ function init() {
 	water = new Water(256);
 	water.inited = false;
 	
-	//tex = crCreateTexture2DFromUrl("media/me-wedding01.jpg", true);
-	//tex = crCreateTexture2DFromUrl("media/me-wedding02.jpg", true);
+	//tex = crCreateTexture2DFromUrl("media/me-wedding01.jpg",
+	//tex = crCreateTexture2DFromUrl("media/me-wedding02.jpg",
+	//tex = crCreateTexture2DFromUrl("media/me-prewedding01.jpg",
+	//tex = crCreateTexture2DFromUrl("media/me-prewedding02.jpg",
 	tex = crCreateTexture2DFromUrl("media/trees.jpg", 
 		{flipY:true, 
 		 mag_filter:gl.LINEAR, min_filter:gl.LINEAR,
 		 wrap_s:gl.CLAMP_TO_EDGE, wrap_t:gl.CLAMP_TO_EDGE});
+	
+	refls = crCreateTexture2DFromUrl("media/webgl.jpg", {flipY:true, mag_filter:gl.LINEAR, min_filter:gl.LINEAR});
 	
 	crLog("init complete");
 }
@@ -167,7 +175,7 @@ function render() {
 	
 	passed += 1.0;
 	
-	if(passed > 120.0) {
+	if(passed > 60.0) {
 		passed = 0.0;
 		var scalar = water.delta[0];
 		var x = Math.random();
@@ -177,7 +185,7 @@ function render() {
 	
 	water.step();
 	water.updateNormals();
-	water.draw(tex);
+	water.draw(tex, refls);
 }
 
 function tick() {

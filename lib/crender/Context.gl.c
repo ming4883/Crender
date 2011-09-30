@@ -101,7 +101,7 @@ CR_API void crContextApplyGpuState(CrContext* self)
 	if(self->gpuState.blend) {
 		glEnable(GL_BLEND);
 
-		if(nullptr == glBlendFuncSeparate) {
+		if(crContextFixedPipelineOnly()) {
 			glBlendFunc(
 				CrGpuState_blendFactorMapping[self->gpuState.blendFactorSrcRGB - CrGpuState_BlendFactor_One],
 				CrGpuState_blendFactorMapping[self->gpuState.blendFactorDestRGB - CrGpuState_BlendFactor_One]);
