@@ -6,6 +6,7 @@
 #include "Pvr.h"
 #include "red_tile_texture.h"
 
+#include "../lib/crender/Mem.h"
 #include "../lib/crender/Texture.h"
 
 AppContext* app = nullptr;
@@ -47,6 +48,82 @@ typedef struct Mouse
 } Mouse;
 
 Mouse mouse = {0};
+
+typedef enum WaterBuffer
+{
+	WaterBuffer_Position0,
+	WaterBuffer_Position1,
+	WaterBuffer_Count,
+} WaterBuffer;
+
+typedef enum WaterMaterial
+{
+	WaterMaterial_Init,
+	WaterMaterial_Step,
+	WaterMaterial_Normal,
+	WaterMaterial_AddDrop,
+	WaterMaterial_Count,
+
+} WaterMaterial;
+
+/*
+sceneMtl = appLoadMaterial(
+			"Water.Scene.Vertex",
+			"Water.Scene.Fragment",
+			nullptr, nullptr, nullptr);
+*/
+
+typedef struct Water
+{
+	size_t size;
+	CrTexture* buffers[WaterBuffer_Count];
+	Material* materials[WaterMaterial_Count];
+	
+} Water;
+
+Water* waterNew(size_t size)
+{
+	size_t i;
+	Water* self = crMem()->alloc(sizeof(Water), "water");
+	memset(self, 0, sizeof(Water));
+
+	self->size = size;
+	for(i=0; i<WaterBuffer_Count; ++i) {
+		self->buffers[i] = crTextureAlloc();
+		crTextureInitRtt(self->buffers[i], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
+	}
+
+	self->materials[WaterMaterial_Init] = appLoadMaterial(
+		"Water.Process.Vertex",
+		"Water.Init.Fragment",
+		nullptr, nullptr, nullptr);
+
+	self->materials[WaterMaterial_Step] = appLoadMaterial(
+		"Water.Process.Vertex",
+		"Water.Step.Fragment",
+		nullptr, nullptr, nullptr);
+
+	self->materials[WaterMaterial_Normal] = appLoadMaterial(
+		"Water.Process.Vertex",
+		"Water.Normal.Fragment",
+		nullptr, nullptr, nullptr);
+
+	self->materials[WaterMaterial_AddDrop] = appLoadMaterial(
+		"Water.Process.Vertex",
+		"Water.AddDrop.Fragment",
+		nullptr, nullptr, nullptr);
+
+	return self;
+}
+
+void waterFree(Water* self)
+{
+	size_t i;
+	for(i=0; i<WaterBuffer_Count; ++i) {
+		crTextureFree(self->buffers[i]);
+	}
+	crMem()->free(self, "water");
+}
 
 void drawBackground()
 {
