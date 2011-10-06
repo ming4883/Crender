@@ -76,10 +76,15 @@ sceneMtl = appLoadMaterial(
 typedef struct Water
 {
 	size_t size;
+	size_t currentBuffer;
+	CrBool inited;
+	Mesh* screenQuad;
 	CrTexture* buffers[WaterBuffer_Count];
 	Material* materials[WaterMaterial_Count];
 	
 } Water;
+
+Water* water;
 
 Water* waterNew(size_t size)
 {
@@ -92,6 +97,11 @@ Water* waterNew(size_t size)
 		self->buffers[i] = crTextureAlloc();
 		crTextureInitRtt(self->buffers[i], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
 	}
+
+	self->screenQuad = meshAlloc();
+	meshInitWithScreenQuad(self->screenQuad);
+
+	appLoadMaterialBegin(app, nullptr);
 
 	self->materials[WaterMaterial_Init] = appLoadMaterial(
 		"Water.Process.Vertex",
@@ -113,8 +123,13 @@ Water* waterNew(size_t size)
 		"Water.AddDrop.Fragment",
 		nullptr, nullptr, nullptr);
 
+	appLoadMaterialEnd(app);
+
+	self->inited = CrFalse;
+
 	return self;
 }
+
 
 void waterFree(Water* self)
 {
@@ -122,7 +137,63 @@ void waterFree(Water* self)
 	for(i=0; i<WaterBuffer_Count; ++i) {
 		crTextureFree(self->buffers[i]);
 	}
+	for(i=0; i<WaterMaterial_Count; ++i) {
+		materialFree(self->materials[i]);
+	}
+	meshFree(self->screenQuad);
 	crMem()->free(self, "water");
+}
+
+void waterPreProcess(Water* self, CrTexture* target)
+{
+	CrTexture* bufs[] = {target, nullptr};
+
+	crContextPreRTT(crContext(), bufs, nullptr);
+	crContextSetViewport(crContext(), 0, 0, (float)target->width, (float)target->height, -1, 1);
+
+	crContext()->gpuState.depthTest = CrFalse;
+	crContext()->gpuState.depthWrite = CrFalse;
+	crContextApplyGpuState(crContext());
+}
+
+void waterPostProcess(Water* self)
+{
+	crContextPostRTT(crContext());
+	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
+}
+
+void waterInit(Water* self)
+{
+	size_t i=0;
+
+	for(i=0; i<2; ++i) {
+		CrGpuProgram* prog = self->materials[WaterMaterial_Init]->program;
+
+		waterPreProcess(self, self->buffers[WaterBuffer_Position0+i]);
+
+		crGpuProgramPreRender(prog);
+		meshPreRender(self->screenQuad, prog);
+		meshRenderTriangles(self->screenQuad);
+	}
+
+	waterPostProcess(self);
+
+	self->inited = CrTrue;
+}
+
+void waterStep(Water* self)
+{
+	size_t curr = 0;
+
+	CrGpuProgram* prog = self->materials[WaterMaterial_Step]->program;
+
+	waterPreProcess(self, self->buffers[WaterBuffer_Position0+curr]);
+
+	crGpuProgramPreRender(prog);
+	meshPreRender(self->screenQuad, prog);
+	meshRenderTriangles(self->screenQuad);
+
+	waterPostProcess(self);
 }
 
 void drawBackground()
@@ -332,6 +403,7 @@ void crAppConfig()
 void crAppFinalize()
 {
 	remoteConfigFree(config);
+	waterFree(water);
 	meshFree(ballMesh);
 	meshFree(floorMesh);
 	meshFree(waterMesh);
@@ -416,6 +488,7 @@ CrBool crAppInitialize()
 		meshInitWithScreenQuad(bgMesh);
 	}
 
+	water = waterNew(256);
 
 	return CrTrue;
 }

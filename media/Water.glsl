@@ -8,7 +8,7 @@ void main(void) {
 }
 
 -- Init.Fragment
-precision highp float;
+//precision highp float;
 varying vec2 v_texcrd;
 
 void main(void) {
@@ -19,7 +19,7 @@ void main(void) {
 }
 
 -- Step.Fragment
-precision highp float;
+//precision highp float;
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
 uniform sampler2D u_buffer;
@@ -49,7 +49,7 @@ void main(void) {
 }
 
 -- Normal.Fragment
-precision highp float;
+//precision highp float;
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
 uniform sampler2D u_buffer;
@@ -66,7 +66,7 @@ void main(void) {
 }
 
 -- AddDrop.Fragment
-precision highp float;
+//precision highp float;
 const float PI = 3.141592653589793;
 
 varying vec2 v_texcrd;
