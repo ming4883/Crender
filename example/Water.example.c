@@ -183,13 +183,20 @@ void waterInit(Water* self)
 
 void waterStep(Water* self)
 {
-	size_t curr = 0;
+	size_t curr = WaterBuffer_Position0;
+	size_t last = WaterBuffer_Position1;
 
 	CrGpuProgram* prog = self->materials[WaterMaterial_Step]->program;
 
-	waterPreProcess(self, self->buffers[WaterBuffer_Position0+curr]);
+	waterPreProcess(self, self->buffers[curr]);
 
 	crGpuProgramPreRender(prog);
+	{ float val[] = {1.0f / self->size, 1.0f / self->size};
+	crGpuProgramUniform2fv(prog, CrHash("u_delta"), 1, val); }
+	{ CrSampler samp = {CrSamplerFilter_MagMin_Nearest_Mip_None, CrSamplerAddress_Clamp, CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &samp);
+	}
+
 	meshPreRender(self->screenQuad, prog);
 	meshRenderTriangles(self->screenQuad);
 
