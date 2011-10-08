@@ -81,6 +81,7 @@ typedef struct Water
 	Mesh* screenQuad;
 	CrTexture* buffers[WaterBuffer_Count];
 	Material* materials[WaterMaterial_Count];
+	CrSampler psampler;
 	
 } Water;
 
@@ -123,6 +124,11 @@ Water* waterNew(size_t size)
 		"Water.AddDrop.Fragment",
 		nullptr, nullptr, nullptr);
 
+	self->psampler.filter = CrSamplerFilter_MagMin_Nearest_Mip_None;
+	self->psampler.addressU = CrSamplerAddress_Clamp;
+	self->psampler.addressV = CrSamplerAddress_Clamp;
+	self->psampler.addressW = CrSamplerAddress_Clamp;
+
 	appLoadMaterialEnd(app);
 
 	self->inited = CrFalse;
@@ -160,6 +166,16 @@ void waterPostProcess(Water* self)
 {
 	crContextPostRTT(crContext());
 	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
+
+	crContext()->gpuState.depthTest = CrTrue;
+	crContext()->gpuState.depthWrite = CrTrue;
+}
+
+void waterSwapBuffers(Water* self)
+{
+	CrTexture* tmp = self->buffers[WaterBuffer_Position0];
+	self->buffers[WaterBuffer_Position0] = self->buffers[WaterBuffer_Position1];
+	self->buffers[WaterBuffer_Position1] = tmp;
 }
 
 void waterInit(Water* self)
@@ -193,14 +209,65 @@ void waterStep(Water* self)
 	crGpuProgramPreRender(prog);
 	{ float val[] = {1.0f / self->size, 1.0f / self->size};
 	crGpuProgramUniform2fv(prog, CrHash("u_delta"), 1, val); }
-	{ CrSampler samp = {CrSamplerFilter_MagMin_Nearest_Mip_None, CrSamplerAddress_Clamp, CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
-	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &samp);
-	}
+	
+	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &self->psampler);
 
 	meshPreRender(self->screenQuad, prog);
 	meshRenderTriangles(self->screenQuad);
 
 	waterPostProcess(self);
+
+	waterSwapBuffers(self);
+}
+
+void waterNormal(Water* self)
+{
+	size_t curr = WaterBuffer_Position0;
+	size_t last = WaterBuffer_Position1;
+
+	CrGpuProgram* prog = self->materials[WaterMaterial_Normal]->program;
+
+	waterPreProcess(self, self->buffers[curr]);
+
+	crGpuProgramPreRender(prog);
+	{ float val[] = {1.0f / self->size, 1.0f / self->size};
+	crGpuProgramUniform2fv(prog, CrHash("u_delta"), 1, val); }
+
+	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &self->psampler);
+
+	meshPreRender(self->screenQuad, prog);
+	meshRenderTriangles(self->screenQuad);
+
+	waterPostProcess(self);
+
+	waterSwapBuffers(self);
+}
+
+void waterAddDrop(Water* self, float x, float y, float r, float s)
+{
+	size_t curr = WaterBuffer_Position0;
+	size_t last = WaterBuffer_Position1;
+
+	CrGpuProgram* prog = self->materials[WaterMaterial_AddDrop]->program;
+
+	waterPreProcess(self, self->buffers[curr]);
+
+	crGpuProgramPreRender(prog);
+	{ float val[] = {x, y};
+	crGpuProgramUniform2fv(prog, CrHash("u_center"), 1, val); }
+
+	crGpuProgramUniform1fv(prog, CrHash("u_radius"), 1, &r);
+
+	crGpuProgramUniform1fv(prog, CrHash("u_strength"), 1, &s);
+
+	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &self->psampler);
+
+	meshPreRender(self->screenQuad, prog);
+	meshRenderTriangles(self->screenQuad);
+
+	waterPostProcess(self);
+
+	waterSwapBuffers(self);
 }
 
 void drawBackground()
@@ -305,11 +372,11 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx)
 	crGpuProgramPreRender(sceneMtl->program);
 	{	
 		CrSampler sampler = {
-			CrSamplerFilter_MagMinMip_Linear, 
+			CrSamplerFilter_MagMin_Linear_Mip_None, 
 			CrSamplerAddress_Wrap, 
 			CrSamplerAddress_Wrap
 		};
-		crGpuProgramUniformTexture(sceneMtl->program, CrHash("u_tex"), texture, &sampler);
+		crGpuProgramUniformTexture(sceneMtl->program, CrHash("u_tex"), water->buffers[WaterBuffer_Position0], &sampler);
 	}
 	{
 		CrMat44 refractionMapTexMtx = refractionMapMtx;
@@ -397,6 +464,21 @@ void crAppRender()
 	crContextClearDepth(crContext(), 1);
 	drawBackground();
 	drawScene(viewMtx, projMtx, viewProjMtx);
+
+	if(CrFalse == water->inited) {
+		size_t i;
+		waterInit(water);
+		for(i=0; i<16; ++i) {
+			float r = 12.0f / water->size;
+			float x = (rand() % 0xffff) / ((float)0xffff);
+			float y = (rand() % 0xffff) / ((float)0xffff);
+			float s = 1 / 64.0f;
+			waterAddDrop(water, x, y, r, s);
+		}
+	}
+	waterStep(water);
+	waterNormal(water);
+
 	drawWater(viewMtx, projMtx, viewProjMtx);
 }
 
