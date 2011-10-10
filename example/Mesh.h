@@ -4,6 +4,7 @@
 #include "Stream.h"
 #include "../lib/crender/Platform.h"
 #include "../lib/crender/Vec3.h"
+#include "../lib/crender/Vec2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,7 +52,7 @@ void meshInit(Mesh* self, size_t vertexCount, size_t indexCount);
 
 void meshInitWithUnitSphere(Mesh* self, size_t segmentCount);
 
-void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offset, size_t segmentCount);
+void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offset, const CrVec2* uvScale, size_t segmentCount);
 
 void meshInitWithScreenQuad(Mesh* self);
 

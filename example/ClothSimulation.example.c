@@ -520,8 +520,9 @@ CrBool crAppInitialize()
 	// floor
 	{
 		CrVec3 offset = crVec3(-2.5f, -2.5f, 0);
+		CrVec2 uvs = crVec2(5.0f, 5.0f);
 		floorMesh = meshAlloc();
-		meshInitWithQuad(floorMesh, 5, 5, &offset, 1);
+		meshInitWithQuad(floorMesh, 5, 5, &offset, &uvs, 1);
 	}
 
 	// bg

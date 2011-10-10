@@ -12,7 +12,7 @@ void main(void) {
 varying vec2 v_texcrd;
 
 void main(void) {
-	gl_FragColor.x = 0.5;//v_texcrd.y;
+	gl_FragColor.x = v_texcrd.y;
 	gl_FragColor.y = 0.0;
 	gl_FragColor.z = 0.0;
 	gl_FragColor.w = 1.0;
@@ -143,4 +143,47 @@ void main() {
 	color.xyz += u_matSpecular.xyz * ndh;
 	
 	gl_FragColor = color;
+}
+
+-- SceneWater.Fragment
+varying vec3 v_normal;
+varying vec3 v_pos;
+varying vec2 v_texcoord;
+varying vec4 v_refractionMap;
+
+uniform vec4 u_matDiffuse;
+uniform vec4 u_matSpecular;
+uniform float u_matShininess;
+uniform vec4 u_refractionMapParam;
+
+uniform sampler2D u_tex;
+
+void main() {
+/*
+	vec3 n = normalize(v_normal.xyz);
+	vec3 l = normalize(vec3(0,10,10) - v_pos.xyz);
+	vec3 h = normalize(l + vec3(0, 0, 1));
+	
+	if(false == gl_FrontFacing)
+		n *= -1;
+		
+	vec3 sm = v_refractionMap.xyz / v_refractionMap.www;
+	
+	float ndl = max(0, dot(n, l)) * 0.8 + 0.2;
+	float ndh = max(0, dot(n, h));
+	ndh = pow(ndh, u_matShininess);
+	
+	vec4 color = u_matDiffuse * texture2D(u_tex, v_texcoord);
+	color.xyz *= ndl;
+	color.xyz += u_matSpecular.xyz * ndh;
+	
+	gl_FragColor = color;
+*/
+	vec4 curr = texture2D(u_tex, v_texcoord);
+	vec3 norm = normalize(vec3(curr.z, sqrt(1.0 - dot(curr.zw, curr.zw)), curr.w));
+	
+	float d = dot(norm, vec3(0, 1, 0));
+	d = pow(max(d, 0.0), 16.0);
+	
+	gl_FragColor = vec4(d, d, d, 1);
 }
