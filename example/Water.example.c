@@ -20,6 +20,8 @@ Material* sceneMtl = nullptr;
 Material* waterMtl = nullptr;
 Material* bgMtl = nullptr;
 CrTexture* texture = nullptr;
+CrTexture* refractTex = nullptr;
+CrTexture* rttDepth = nullptr;
 
 CrMat44 refractionMapMtx;
 size_t refractionMapSize = 1024;
@@ -35,21 +37,22 @@ typedef struct Settings
 
 Settings settings = {10, 5, 3, 4};
 
-typedef struct Mouse
+typedef struct Input
 {
 	CrBool isDown;
 	int x;
 	int y;
-	CrVec3 clothOffsets[2];
+	CrBool addDrop;
 	
-} Mouse;
+} Input;
 
-Mouse mouse = {0};
+Input input = {0};
 
 typedef enum WaterBuffer
 {
 	WaterBuffer_Position0,
 	WaterBuffer_Position1,
+	WaterBuffer_Normal,
 	WaterBuffer_Count,
 } WaterBuffer;
 
@@ -62,13 +65,6 @@ typedef enum WaterMaterial
 	WaterMaterial_Count,
 
 } WaterMaterial;
-
-/*
-sceneMtl = appLoadMaterial(
-			"Water.Scene.Vertex",
-			"Water.Scene.Fragment",
-			nullptr, nullptr, nullptr);
-*/
 
 typedef struct Water
 {
@@ -91,10 +87,14 @@ Water* waterNew(size_t size)
 	memset(self, 0, sizeof(Water));
 
 	self->size = size;
-	for(i=0; i<WaterBuffer_Count; ++i) {
-		self->buffers[i] = crTextureAlloc();
-		crTextureInitRtt(self->buffers[i], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
+	for(i=0; i<2; ++i) {
+		size_t id = WaterBuffer_Position0 + i;
+		self->buffers[id] = crTextureAlloc();
+		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
 	}
+
+	self->buffers[WaterBuffer_Normal] = crTextureAlloc();
+	crTextureInitRtt(self->buffers[WaterBuffer_Normal], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 
 	self->screenQuad = meshAlloc();
 	meshInitWithScreenQuad(self->screenQuad);
@@ -229,24 +229,21 @@ void waterStep(Water* self)
 void waterNormal(Water* self)
 {
 	size_t curr = WaterBuffer_Position0 + waterCurrBuffer(self);
-	size_t last = WaterBuffer_Position0 + waterLastBuffer(self);
-
+	
 	CrGpuProgram* prog = self->materials[WaterMaterial_Normal]->program;
 
-	waterPreProcess(self, self->buffers[curr]);
+	waterPreProcess(self, self->buffers[WaterBuffer_Normal]);
 
 	crGpuProgramPreRender(prog);
 	{ float val[] = {1.0f / self->size, 1.0f / self->size};
 	crGpuProgramUniform2fv(prog, CrHash("u_delta"), 1, val); }
 
-	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[last], &self->psampler);
+	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[curr], &self->psampler);
 
 	meshPreRender(self->screenQuad, prog);
 	meshRenderTriangles(self->screenQuad);
 
 	waterPostProcess(self);
-
-	waterSwapBuffers(self);
 }
 
 void waterAddDrop(Water* self, float x, float y, float r, float s)
@@ -353,23 +350,15 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx)
 	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(waterMtl->program);
-	{	
-		CrSampler sampler = {
-			CrSamplerFilter_MagMin_Nearest_Mip_None, 
-			CrSamplerAddress_Wrap, 
-			CrSamplerAddress_Wrap
-		};
-		size_t curr = WaterBuffer_Position0 + waterCurrBuffer(water);
-		crGpuProgramUniformTexture(prog, CrHash("u_tex"), water->buffers[curr], &sampler);
-		//crGpuProgramUniformTexture(prog, CrHash("u_tex"), texture, &sampler);
-	}
-	{
-		CrMat44 refractionMapTexMtx = refractionMapMtx;
-		crMat44AdjustToAPIProjectiveTexture(&refractionMapTexMtx);
-		crMat44Transpose(&refractionMapTexMtx, &refractionMapTexMtx);
-		crGpuProgramUniformMtx4fv(prog, CrHash("u_refractionMapTexMtx"), 1, CrFalse, refractionMapTexMtx.v);
-		crGpuProgramUniform4fv(prog, CrHash("u_refractionMapParam"), 1, refractionMapParam.v);
-	}
+
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	crGpuProgramUniformTexture(prog, CrHash("u_water"), water->buffers[WaterBuffer_Normal], &sampler);}
+	
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);}
+
+	{ float val[] = {32.0f / refractTex->width, 32.0f / refractTex->height, 0, 0};
+	crGpuProgramUniform4fv(prog, CrHash("u_refractionMapParam"), 1, val);}
 
 	// draw water plane
 	{
@@ -407,32 +396,24 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 void crAppHandleMouse(int x, int y, int action)
 {
 	if(CrApp_MouseDown == action) {
-		mouse.x = x;
-		mouse.y = y;
-		mouse.isDown = CrTrue;
+		input.x = x;
+		input.y = y;
+		input.isDown = CrTrue;
 	}
 	else if(CrApp_MouseUp == action) {
-		mouse.isDown = CrFalse;
-
-		{
-			float r = 12.0f / water->size;
-			float x = 0.5f;
-			float y = 0.5f;
-			float s = 1 / 64.0f;
-			waterAddDrop(water, x, y, r, s);
-		}
+		input.isDown = CrFalse;
+		input.addDrop = CrTrue;
 	}
-	else if((CrApp_MouseMove == action) && (CrTrue == mouse.isDown)) {
-		int dx = x - mouse.x;
-		int dy = y - mouse.y;
-		
-		float mouseSensitivity = 0.0025f;
+	else if((CrApp_MouseMove == action) && (CrTrue == input.isDown)) {
+		//int dx = x - input.x;
+		//int dy = y - input.y;
+		//float mouseSensitivity = 0.0025f;
 	}
 }
 
 void crAppRender()
 {
-	CrVec3 eyeAt = crVec3(-2.5f, 1.5f, 4);
+	CrVec3 eyeAt = crVec3(0, 1.5f, 3);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -444,15 +425,39 @@ void crAppRender()
 	crMat44AdjustToAPIDepthRange(&projMtx);
 	crMat44Mult(&viewProjMtx, &projMtx, &viewMtx);
 
+	// update water
+	if(CrFalse == water->inited) {
+		waterInit(water);
+	}
+	//if(CrTrue == input.addDrop) {
+	{
+		float r = 12.0f / water->size;
+		float x = (abs(rand()) % 0xffff) / (float)0xffff;
+		float y = (abs(rand()) % 0xffff) / (float)0xffff;
+		float s = 1 / 64.0f;
+		waterAddDrop(water, x, y, r, s);
+		input.addDrop = CrFalse;
+	}
+
+	waterStep(water);
+	waterNormal(water);
+
+	// render to refractTex
+	{ CrTexture* bufs[] = {refractTex, nullptr};
+	crContextPreRTT(crContext(), bufs, rttDepth);}
+	crContextSetViewport(crContext(), 0, 0, (float)refractTex->width, (float)refractTex->height, -1, 1);
+
 	crContextClearDepth(crContext(), 1);
 	drawBackground();
 	drawScene(viewMtx, projMtx, viewProjMtx);
 
-	if(CrFalse == water->inited) {
-		waterInit(water);
-	}
-	waterStep(water);
-	waterNormal(water);
+	crContextPostRTT(crContext());
+	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
+
+	// render to screen
+	crContextClearDepth(crContext(), 1);
+	drawBackground();
+	drawScene(viewMtx, projMtx, viewProjMtx);
 
 	drawWater(viewMtx, projMtx, viewProjMtx);
 }
@@ -475,6 +480,8 @@ void crAppFinalize()
 	materialFree(sceneMtl);
 	materialFree(bgMtl);
 	crTextureFree(texture);
+	crTextureFree(refractTex);
+	crTextureFree(rttDepth);
 	appFree(app);
 }
 
@@ -510,7 +517,7 @@ CrBool crAppInitialize()
 			nullptr, nullptr, nullptr);
 
 		waterMtl = appLoadMaterial(
-			"Water.Scene.Vertex",
+			"Water.SceneWater.Vertex",
 			"Water.SceneWater.Fragment",
 			nullptr, nullptr, nullptr);
 		
@@ -525,6 +532,12 @@ CrBool crAppInitialize()
 	// textures
 	{
 		texture = Pvr_createTexture(red_tile_texture);
+
+		refractTex = crTextureAlloc();
+		crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_UnormR8G8B8A8);
+		
+		rttDepth = crTextureAlloc();
+		crTextureInitRtt(rttDepth, 512, 512, 0, 1, CrGpuFormat_Depth16);
 	}
 
 	// floor
@@ -549,7 +562,7 @@ CrBool crAppInitialize()
 		meshInitWithScreenQuad(bgMesh);
 	}
 
-	water = waterNew(256);
+	water = waterNew(512);
 
 	return CrTrue;
 }

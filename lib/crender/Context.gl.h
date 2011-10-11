@@ -33,6 +33,9 @@ typedef struct CrContextImpl
 {
 	CrContext i;
 
+	CrGpuState appliedGpuState;
+	CrFfpState appliedFfpState;
+
 	unsigned int gpuInputId;
 	GLuint defFBOName;
 	GLuint rttFBOName;

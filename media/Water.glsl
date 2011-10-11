@@ -12,7 +12,7 @@ void main(void) {
 varying vec2 v_texcrd;
 
 void main(void) {
-	gl_FragColor.x = v_texcrd.y;
+	gl_FragColor.x = 0.5;//v_texcrd.y;
 	gl_FragColor.y = 0.0;
 	gl_FragColor.z = 0.0;
 	gl_FragColor.w = 1.0;
@@ -60,7 +60,8 @@ void main(void) {
 	vec3 dx = vec3(u_delta.x, texture2D(u_buffer, v_texcrd + vec2(u_delta.x, 0.0)).x - curr.x, 0.0);
 	vec3 dy = vec3(0.0, texture2D(u_buffer, v_texcrd + vec2(0.0, u_delta.y)).x - curr.x, u_delta.y);
 	
-	curr.zw = normalize(cross(dy, dx)).xz;
+	curr.xyz = normalize(cross(dy, dx)).xyz * 0.5 + vec3(0.5, 0.5, 0.5);
+	curr.w = 1.0;
 	// output
 	gl_FragColor = curr;
 }
@@ -145,6 +146,28 @@ void main() {
 	gl_FragColor = color;
 }
 
+-- SceneWater.Vertex
+attribute vec4 i_vertex;
+attribute vec3 i_normal;
+attribute vec2 i_texcoord0;
+
+varying vec3 v_normal;
+varying vec3 v_pos;
+varying vec2 v_texcoord;
+varying vec4 v_refractionMap;
+
+uniform mat4 u_worldMtx;
+uniform mat4 u_worldViewMtx;
+uniform mat4 u_worldViewProjMtx;
+
+void main() {
+	gl_Position = u_worldViewProjMtx * i_vertex;
+	v_normal = (u_worldMtx * vec4(i_normal, 0)).xyz;
+	v_pos = (u_worldMtx * i_vertex).xyz;
+	v_texcoord = i_texcoord0;
+	v_refractionMap = (u_worldViewProjMtx * i_vertex);
+}
+
 -- SceneWater.Fragment
 varying vec3 v_normal;
 varying vec3 v_pos;
@@ -156,34 +179,19 @@ uniform vec4 u_matSpecular;
 uniform float u_matShininess;
 uniform vec4 u_refractionMapParam;
 
-uniform sampler2D u_tex;
+uniform sampler2D u_water;
+uniform sampler2D u_refract;
 
 void main() {
-/*
-	vec3 n = normalize(v_normal.xyz);
-	vec3 l = normalize(vec3(0,10,10) - v_pos.xyz);
-	vec3 h = normalize(l + vec3(0, 0, 1));
 	
-	if(false == gl_FrontFacing)
-		n *= -1;
-		
-	vec3 sm = v_refractionMap.xyz / v_refractionMap.www;
-	
-	float ndl = max(0, dot(n, l)) * 0.8 + 0.2;
-	float ndh = max(0, dot(n, h));
-	ndh = pow(ndh, u_matShininess);
-	
-	vec4 color = u_matDiffuse * texture2D(u_tex, v_texcoord);
-	color.xyz *= ndl;
-	color.xyz += u_matSpecular.xyz * ndh;
-	
-	gl_FragColor = color;
-*/
-	vec4 curr = texture2D(u_tex, v_texcoord);
-	vec3 norm = normalize(vec3(curr.z, sqrt(1.0 - dot(curr.zw, curr.zw)), curr.w));
+	vec4 water = texture2D(u_water, v_texcoord);
+	vec3 norm = normalize(water.xyz * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
+	refracoord += norm.xz * u_refractionMapParam.xy;
+	vec4 refra = texture2D(u_refract, refracoord);
 	
 	float d = dot(norm, vec3(0, 1, 0));
-	d = pow(max(d, 0.0), 16.0);
-	
-	gl_FragColor = vec4(d, d, d, 1);
+	d = 1.0 - pow(max(d, 0.0), 8.0);
+
+	gl_FragColor = (refra + vec4(d, d, d, 1));
 }

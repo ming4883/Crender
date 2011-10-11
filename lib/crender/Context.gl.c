@@ -13,7 +13,6 @@ CR_API void crGpuStateInit(CrGpuState* self)
 	self->blendFactorSrcA = CrGpuState_BlendFactor_One;
 	self->blendFactorDestA = CrGpuState_BlendFactor_Zero;
 	self->polygonMode = CrGpuState_PolygonMode_Fill;
-
 }
 
 CR_API void crFfpStateInit(CrFfpState* self)
@@ -36,7 +35,6 @@ CR_API void crFfpStateInit(CrFfpState* self)
 	memset(self->texConstant, 0, sizeof(self->texConstant));
 	crMat44SetIdentity((CrMat44*)self->transformModel);
 	crMat44SetIdentity((CrMat44*)self->transformProj);
-
 }
 
 static GLenum CrGpuState_blendFactorMapping[] = {
@@ -81,6 +79,9 @@ static GLenum CrFfpState_TexArgMapping[] = {
 
 CR_API void crContextApplyGpuState(CrContext* self)
 {
+	if(memcmp(&((CrContextImpl*)self)->appliedGpuState, &self->gpuState, sizeof(CrGpuState)) == 0)
+		return;
+
 	crCheckGLError();	// clear any unhandled gl errors
 
 	if(self->gpuState.depthTest)
@@ -122,12 +123,16 @@ CR_API void crContextApplyGpuState(CrContext* self)
 	glPolygonMode(GL_FRONT_AND_BACK, CrGpuState_polygonModeMapping[self->gpuState.polygonMode - CrGpuState_PolygonMode_Line]);
 #endif
 
+	memcpy(&((CrContextImpl*)self)->appliedGpuState, &self->gpuState, sizeof(CrGpuState));
 }
 
 CR_API void crContextApplyFfpState(CrContext* self)
 {
 	CrMat44 m;
 	size_t i;
+
+	if(memcmp(&((CrContextImpl*)self)->appliedFfpState, &self->ffpState, sizeof(CrFfpState)) == 0)
+		return;
 	
 	crCheckGLError();	// clear any unhandled gl errors
 	
@@ -182,6 +187,8 @@ CR_API void crContextApplyFfpState(CrContext* self)
 	glLoadMatrixf((float*)&m);
 
 #endif
+
+	memcpy(&((CrContextImpl*)self)->appliedFfpState, &self->ffpState, sizeof(CrFfpState));
 }
 
 CR_API void crContextSetViewport(CrContext* self, float x, float y, float w, float h, float zmin, float zmax)
@@ -200,8 +207,17 @@ CR_API void crContextClearColor(CrContext* self, float r, float g, float b, floa
 
 CR_API void crContextClearDepth(CrContext* self, float z)
 {
+	CrContextImpl* impl = (CrContextImpl*)self;
+
+	if(CrFalse == impl->appliedGpuState.depthWrite) {
+		glDepthMask(GL_TRUE);
+	}
 	glClearDepth(z);
 	glClear(GL_DEPTH_BUFFER_BIT);
+
+	if(CrFalse == impl->appliedGpuState.depthWrite) {
+		glDepthMask(GL_FALSE);
+	}
 }
 
 static GLenum crGL_ATTACHMENT_POINT[] =
