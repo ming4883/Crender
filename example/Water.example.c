@@ -309,6 +309,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	app->shaderContext.matSpecular = crVec4(0.0f, 0.0f, 0.0f, 1);
 	app->shaderContext.matShininess = 64;
 
+	/*
 	// draw floor
 	{
 		{ CrVec3 v = {0, -2.5f, 0};
@@ -325,6 +326,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 		meshPreRender(floorMesh, prog);
 		meshRenderTriangles(floorMesh);
 	}
+	*/
 
 	// draw wall
 	{
@@ -368,7 +370,8 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 
 	// draw water plane
 	{
-		app->shaderContext.matDiffuse = crVec4(0.8f, 1.0f, 0.8f, 1);
+		app->shaderContext.matDiffuse = crVec4(0.875f, 1.0f, 0.875f, 1);
+		//app->shaderContext.matDiffuse = crVec4(1.0f, 1.0f, 1.0f, 1);
 		app->shaderContext.matSpecular = crVec4(1, 1, 1, 1);
 		app->shaderContext.matShininess = 64;
 		{
@@ -485,7 +488,7 @@ void crAppHandleMouse(int x, int y, int action)
 void crAppRender()
 {
 	//CrVec3 eyeAt = crVec3(0, 1.5f, 2);
-	CrVec3 eyeAt = crVec3(0, 2, 3.75f);
+	CrVec3 eyeAt = crVec3(0, 1, 3.75f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;

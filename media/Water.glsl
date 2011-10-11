@@ -194,7 +194,7 @@ void main() {
 	d = pow(d, 4.0);
 	
 	// add some lighting
-	vec3 l = normalize(vec3(-2.0, 2.0, 0.0) - v_pos);
+	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	float ndh = max(0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);
