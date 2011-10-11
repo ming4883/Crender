@@ -312,8 +312,8 @@ void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offse
 			size_t i = r * stride + c;
 			pos[i] = crVec3(x, y, offset->v[2]);
 			nor[i] = crVec3(0, 0, 1);
-			uv0[i].x = uvScale->x * (float)r / segmentCount;
-			uv0[i].y = uvScale->y * (float)c / segmentCount;
+			uv0[i].x = uvScale->x * (float)c / segmentCount;
+			uv0[i].y = uvScale->y * (float)r / segmentCount;
 		}
 	}
 

@@ -85,7 +85,7 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE ignoreMe0, LPSTR ignoreMe1, INT ig
 
 				crContextSwapBuffers(crAppContext.context);
 
-				Sleep(1000 / 60);
+				Sleep((1000 / 60)-1);
 			}
 		}
 
