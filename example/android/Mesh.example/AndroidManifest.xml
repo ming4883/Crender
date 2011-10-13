@@ -11,14 +11,12 @@
 
   <application android:label="@string/app_name" android:icon="@drawable/icon">
     <activity android:name=".CrenderMeshExample"
-              android:label="@string/app_name"
-              android:screenOrientation="landscape">
+              android:label="@string/app_name">
     </activity>
     <!-- Our activity is the built-in NativeActivity framework class.
              This will take care of integrating with our NDK code. -->
     <activity android:name="android.app.NativeActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape">
+            android:label="@string/app_name">
       <!-- Tell NativeActivity the name of or .so -->
       <meta-data android:name="android.app.lib_name"
               android:value="crender-mesh-example" />
