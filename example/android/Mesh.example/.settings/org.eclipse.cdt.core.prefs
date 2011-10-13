@@ -1,9 +1,6 @@
-#Thu Oct 13 18:34:45 CST 2011
+#Thu Oct 13 19:24:38 CST 2011
 eclipse.preferences.version=1
 environment/project/0.930017=
-environment/project/0.930017/NDK_MODULE_PATH/delimiter=;
-environment/project/0.930017/NDK_MODULE_PATH/operation=append
-environment/project/0.930017/NDK_MODULE_PATH/value=/cygdrive/d/Working/sandbox/Crender
 environment/project/0.930017/PATH/delimiter=;
 environment/project/0.930017/PATH/operation=replace
 environment/project/0.930017/PATH/value=D\:\\NVIDIA Corporation\\NVIDIA GPU Computing Toolkit\\CUDA\\v4.0\\bin\\;C\:\\Program Files\\NVIDIA Corporation\\PhysX\\Common;C\:\\Windows\\system32;C\:\\Windows;C\:\\Windows\\System32\\Wbem;C\:\\Program Files\\Common Files\\Autodesk Shared\\;C\:\\Program Files\\Autodesk\\backburner\\;C\:\\Windows\\system32\\Wbem;C\:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C\:\\Program Files\\AMD\\MCat\\;C\:\\Program Files\\TortoiseSVN\\bin;C\:\\Program Files\\NVIDIA Corporation\\win_x86_es2emu\\\\bin\\release;C\:\\Program Files\\AMD\\CodeAnalyst\\bin;C\:\\Program Files\\AMD\\GPU ShaderAnalyzer 1.56\\;D\:\\NVIDIA Corporation\\NVIDIA GPU Computing SDK 4.0\\C\\common\\bin;C\:\\Program Files\\QuickTime\\QTSystem\\;D\:\\Working\\sandbox\\mcore\\Bin;C\:\\Python25;C\:\\Program Files\\CMake 2.8\\bin;D\:\\NVPACK\\android-sdk-windows\\platform-tools;D\:\\NVPACK\\android-sdk-windows\\tools;D\:\\NVPACK\\jdk1.6.0_24\\bin;D\:\\NVPACK\\cygwin\\bin;D\:\\NVPACK\\apache-ant-1.8.2\\bin;${CYGWIN_HOME}/bin
