@@ -3,7 +3,7 @@
 #include "Mesh.h"
 
 AppContext* app = nullptr;
-RemoteConfig* config = nullptr;
+//RemoteConfig* config = nullptr;
 CrVec4 bgClr = {1, 0.25f, 0.25f, 1};
 Mesh* mesh = nullptr;
 Material* mtl = nullptr;
@@ -27,7 +27,7 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 
 void crAppHandleMouse(int x, int y, int action)
 {
-	crDbgStr("handle mouse x=%d, y=%d, a=%d\n", x, y, action); 
+	//crDbgStr("handle mouse x=%d, y=%d, a=%d\n", x, y, action); 
 }
 
 void crAppRender()
@@ -43,9 +43,9 @@ void crAppRender()
 
 	Settings lsettings;
 
-	remoteConfigLock(config);
+	//remoteConfigLock(config);
 	lsettings = settings;
-	remoteConfigUnlock(config);
+	//remoteConfigUnlock(config);
 	
 	crMat44CameraLookAt(&viewMtx, &eyeAt, &lookAt, &eyeUp);
 	crMat44Prespective(&projMtx, 45.0f, app->aspect.width / app->aspect.height, 0.1f, 30.0f);
@@ -102,7 +102,7 @@ void crAppFinalize()
 {
 	meshFree(mesh);
 	materialFree(mtl);
-	remoteConfigFree(config);
+	//remoteConfigFree(config);
 	appFree(app);
 }
 
@@ -110,8 +110,8 @@ CrBool crAppInitialize()
 {
 	app = appAlloc();
 	appInit(app);
-	appResize(app, 320, 240);
-
+	
+	/*
 	// remote config
 	{
 		RemoteVarDesc descs[] = {
@@ -123,6 +123,7 @@ CrBool crAppInitialize()
 		remoteConfigInit(config, 8080, CrTrue);
 		remoteConfigAddVars(config, descs);
 	}
+	*/
 	
 	// load mesh
 	{
@@ -147,7 +148,7 @@ CrBool crAppInitialize()
 	
 	bgClr = crVec4(0.25f, 1, 0.25f, 1);
 	
-	crDbgStr("XpRender Mesh example started");
+	crDbgStr("Mesh example started");
 
 	return CrTrue;
 }

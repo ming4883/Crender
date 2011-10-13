@@ -31,8 +31,8 @@ CR_API CrContext* crContextAlloc()
 	
 	crGpuStateInit(&self->i.gpuState);
 	crFfpStateInit(&self->i.ffpState);
-	memcpy(&self->appliedGpuState, &self->i.gpuState, sizeof(CrGpuState));
-	memcpy(&self->appliedFfpState, &self->i.ffpState, sizeof(CrFfpState));
+	memset(&self->appliedGpuState, 0, sizeof(CrGpuState));
+	memset(&self->appliedFfpState, 0, sizeof(CrFfpState));
 
 	return &self->i;
 }
