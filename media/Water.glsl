@@ -173,7 +173,7 @@ uniform sampler2D u_refract;
 void main() {
 	
 	vec4 water = texture2D(u_water, v_texcoord);
-	vec3 norm = normalize( vec3(water.z, 0.01, water.w) );
+	vec3 norm = normalize( vec3(water.z, 0.001, water.w) );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
 	refracoord += norm.xz * u_refractionMapParam.xy;
@@ -186,7 +186,7 @@ void main() {
 	d = pow(d, 4.0);
 	
 	// add some lighting
-	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
+	vec3 l = normalize(vec3(-5.0, 1.0, -5.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	float ndh = max(0.0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);

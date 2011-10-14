@@ -13,7 +13,7 @@ precision highp float;
 varying vec2 v_texcrd;
 
 void main(void) {
-	gl_FragColor.x = 0.5;//v_texcrd.y;
+	gl_FragColor.x = 0.0;
 	gl_FragColor.y = 0.0;
 	gl_FragColor.z = 0.0;
 	gl_FragColor.w = 1.0;
@@ -30,41 +30,26 @@ void main(void) {
 	vec2 dx = vec2(u_delta.x, 0.0);
 	vec2 dy = vec2(0.0, u_delta.y);
 	vec4 curr = texture2D(u_buffer, v_texcrd);
-	float average =
-		( texture2D(u_buffer, v_texcrd - dx).x
-		+ texture2D(u_buffer, v_texcrd - dy).x
-		+ texture2D(u_buffer, v_texcrd + dx).x
-		+ texture2D(u_buffer, v_texcrd + dy).x
-		) * 0.25;
+	vec4 s;
+	s.x = texture2D(u_buffer, v_texcrd - dx - dy).x;
+	s.y = texture2D(u_buffer, v_texcrd - dx + dy).x;
+	s.z = texture2D(u_buffer, v_texcrd + dx - dy).x;
+	s.w = texture2D(u_buffer, v_texcrd + dx + dy).x;
+	
+	float average = dot(s, vec4(0.25, 0.25, 0.25, 0.25));
 	
 	// change the velocity to move toward the average
 	curr.y += (average - curr.x) * 2.0;
 	
 	// apply some dumping to the velocity
-	curr.y *= 0.995;
+	curr.y *= 0.985;
 	
 	// move the displacement along the velocity
 	curr.x += curr.y;
 	
-	// output
-	gl_FragColor = curr;
-}
-
--- Normal.Fragment
-precision highp float;
-
-varying vec2 v_texcrd;
-uniform vec2 u_delta;
-uniform sampler2D u_buffer;
-
-void main(void) {
-	vec4 curr = texture2D(u_buffer, v_texcrd);
+	curr.z = dot(s, vec4(0.25, 0.25,-0.25,-0.25)); // sobelX
+	curr.w = dot(s, vec4(0.25,-0.25,+0.25,-0.25)); // sobelY
 	
-	vec3 dx = vec3(u_delta.x, texture2D(u_buffer, v_texcrd + vec2(u_delta.x, 0.0)).x - curr.x, 0.0);
-	vec3 dy = vec3(0.0, texture2D(u_buffer, v_texcrd + vec2(0.0, u_delta.y)).x - curr.x, u_delta.y);
-	
-	curr.xyz = normalize(cross(dy, dx)).xyz * 0.5 + vec3(0.5, 0.5, 0.5);
-	curr.w = 1.0;
 	// output
 	gl_FragColor = curr;
 }
@@ -85,7 +70,6 @@ void main(void) {
 	
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
 	drop = 0.5 - cos(drop * PI) * 0.5;
-	//drop = 0.5 - drop * 0.5;
 	
 	curr.x += drop * u_strength;
 	
@@ -189,10 +173,10 @@ uniform sampler2D u_refract;
 void main() {
 	
 	vec4 water = texture2D(u_water, v_texcoord);
-	vec3 norm = normalize(water.xyz * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec3 norm = normalize( vec3(water.z, 0.001, water.w) );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
-	refracoord += norm.xz * u_refractionMapParam.xy;
+	//refracoord += norm.xz * u_refractionMapParam.xy;
 	
 	vec4 refra = texture2D(u_refract, refracoord);
 	refra.xyz *= u_matDiffuse.xyz;
@@ -209,5 +193,5 @@ void main() {
 	
 	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 
-	gl_FragColor = mix(refra, refle, d) + u_matSpecular * ndh;
+	gl_FragColor = refra;//mix(refra, refle, d) + u_matSpecular * ndh;
 }

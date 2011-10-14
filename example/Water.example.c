@@ -298,10 +298,10 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	app->shaderContext.matSpecular = crVec4(0.0f, 0.0f, 0.0f, 1);
 	app->shaderContext.matShininess = 64;
 
-	/*
+	
 	// draw floor
 	{
-		{ CrVec3 v = {0, -2.5f, 0};
+		{ CrVec3 v = {0, -2.0f, 0};
 		CrMat44 m;
 		crMat44MakeRotation(&m, CrVec3_c100(), -90);
 		crMat44SetTranslation(&m, &v);
@@ -315,11 +315,10 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 		meshPreRender(floorMesh, prog);
 		meshRenderTriangles(floorMesh);
 	}
-	*/
 
 	// draw wall
 	{
-		{ CrVec3 v = {0, 0, -2.5f};
+		{ CrVec3 v = {0, 0.5f, -2.5f};
 		CrMat44 m;
 		crMat44SetIdentity(&m);
 		crMat44SetTranslation(&m, &v);
@@ -333,6 +332,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 		meshPreRender(floorMesh, prog);
 		meshRenderTriangles(floorMesh);
 	}
+/**/
 }
 
 void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 camPos)
@@ -351,6 +351,9 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	
 	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);}
+
+	//{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
+	//crGpuProgramUniformTexture(prog, CrHash("u_water"), texture, &sampler); }
 
 	{ float val[] = {16.0f / refractTex->width, 16.0f / refractTex->height, 0, 0};
 	crGpuProgramUniform4fv(prog, CrHash("u_refractionMapParam"), 1, val);}
@@ -477,7 +480,7 @@ void crAppHandleMouse(int x, int y, int action)
 void crAppRender()
 {
 	//CrVec3 eyeAt = crVec3(0, 1.5f, 2);
-	CrVec3 eyeAt = crVec3(0, 1, 3.75f);
+	CrVec3 eyeAt = crVec3(0, 5, 2.5f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -565,7 +568,7 @@ CrBool crAppInitialize()
 	*/
 
 	// water
-	water = waterNew(128);
+	water = waterNew(256);
 
 	// materials
 	{
