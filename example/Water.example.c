@@ -47,7 +47,6 @@ typedef enum WaterBuffer
 {
 	WaterBuffer_Position0,
 	WaterBuffer_Position1,
-	WaterBuffer_Normal,
 	WaterBuffer_Count,
 } WaterBuffer;
 
@@ -55,7 +54,6 @@ typedef enum WaterMaterial
 {
 	WaterMaterial_Init,
 	WaterMaterial_Step,
-	WaterMaterial_Normal,
 	WaterMaterial_AddDrop,
 	WaterMaterial_Count,
 
@@ -87,15 +85,10 @@ Water* waterNew(size_t size)
 	for(i=0; i<2; ++i) {
 		size_t id = WaterBuffer_Position0 + i;
 		self->buffers[id] = crTextureAlloc();
-		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
-		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
+		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
+		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
 		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 	}
-
-	crDbgStr("create water normal buffers\n");
-
-	self->buffers[WaterBuffer_Normal] = crTextureAlloc();
-	crTextureInitRtt(self->buffers[WaterBuffer_Normal], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 
 	crDbgStr("load water materials quad\n");
 
@@ -109,11 +102,6 @@ Water* waterNew(size_t size)
 	self->materials[WaterMaterial_Step] = appLoadMaterial(
 		"Water.Process.Vertex",
 		"Water.Step.Fragment",
-		nullptr, nullptr, nullptr);
-
-	self->materials[WaterMaterial_Normal] = appLoadMaterial(
-		"Water.Process.Vertex",
-		"Water.Normal.Fragment",
 		nullptr, nullptr, nullptr);
 
 	self->materials[WaterMaterial_AddDrop] = appLoadMaterial(
@@ -239,29 +227,6 @@ void waterStep(Water* self)
 	waterSwapBuffers(self);
 }
 
-void waterNormal(Water* self)
-{
-	size_t curr = WaterBuffer_Position0 + waterCurrBuffer(self);
-	
-	CrGpuProgram* prog = self->materials[WaterMaterial_Normal]->program;
-
-	if(nullptr ==self->screenQuad)
-		return;
-
-	waterPreProcess(self, self->buffers[WaterBuffer_Normal]);
-
-	crGpuProgramPreRender(prog);
-	{ float val[] = {1.0f / self->size, 1.0f / self->size};
-	crGpuProgramUniform2fv(prog, CrHash("u_delta"), 1, val); }
-
-	crGpuProgramUniformTexture(prog, CrHash("u_buffer"), self->buffers[curr], &self->psampler);
-
-	meshPreRender(self->screenQuad, prog);
-	meshRenderTriangles(self->screenQuad);
-
-	waterPostProcess(self);
-}
-
 void waterAddDrop(Water* self, float x, float y, float r, float s)
 {
 	size_t curr = WaterBuffer_Position0 + waterCurrBuffer(self);
@@ -382,7 +347,7 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	crGpuProgramPreRender(waterMtl->program);
 
 	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
-	crGpuProgramUniformTexture(prog, CrHash("u_water"), water->buffers[WaterBuffer_Normal], &sampler);}
+	crGpuProgramUniformTexture(prog, CrHash("u_water"), water->buffers[WaterBuffer_Position0 + water->curr], &sampler);}
 	
 	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);}
@@ -533,7 +498,6 @@ void crAppRender()
 	}
 
 	waterStep(water);
-	waterNormal(water);
 
 	// render to refractTex
 	{ CrTexture* bufs[] = {refractTex, nullptr};
