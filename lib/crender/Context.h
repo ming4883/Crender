@@ -128,6 +128,8 @@ CR_API void crContextClearDepth(CrContext* self, float z);
 
 struct CrTexture;
 
+CR_API CrBool crContextDepthTextureSupport();
+
 CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth);
 
 CR_API CrBool crContextPostRTT(CrContext* self);

@@ -345,6 +345,11 @@ CR_API void crContextClearDepth(CrContext* self, float z)
 	IDirect3DDevice9_Clear(d3ddev, 0, nullptr, D3DCLEAR_ZBUFFER, 0, z, 0);
 }
 
+CR_API CrBool crContextDepthTextureSupport()
+{
+	return CrFalse;
+}
+
 CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;

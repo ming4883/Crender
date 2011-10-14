@@ -12,6 +12,9 @@ CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR4G4B4A4, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4},
 	{CrGpuFormat_CompPVRTC2, 2, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG, 0, 0},	// glCompressedTexImage2D does not need format & type
 	{CrGpuFormat_CompPVRTC4, 1, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG, 0, 0},
+	{CrGpuFormat_FloatR16G16B16A16, 8, GL_RGBA, GL_RGBA, GL_HALF_FLOAT_OES},
+	{CrGpuFormat_FloatR32G32B32A32, 16, GL_RGBA, GL_RGBA, GL_FLOAT},
+	{CrGpuFormat_Depth16, 2, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT},
 };
 #else
 CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
@@ -148,21 +151,29 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	self->mipCount = mipCount;
 	self->surfCount = surfCount;
 
-	{
-		size_t tmpw, tmph;
-		self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);
+	{ size_t tmpw, tmph;
+	self->surfSizeInByte = crTextureGetMipLevelOffset(self, self->mipCount+1, &tmpw, &tmph);}
+
+	if((self->format & CrGpuFormat_Depth) && !crContextDepthTextureSupport()) {
+		glGenRenderbuffers(1, &impl->glName);
+		glBindRenderbuffer(GL_RENDERBUFFER, impl->glName);
+		
+		self->flags = CrTexture_Inited | CrTexture_RenderTarget;
+
+		return crTextureCommit(self, nullptr);
 	}
+	else {
+		glGenTextures(1, &impl->glName);
 
-	glGenTextures(1, &impl->glName);
+		if(self->surfCount == 1) {
+			impl->glTarget = GL_TEXTURE_2D;
+			glBindTexture(impl->glTarget, impl->glName);
+		}
 
-	if(self->surfCount == 1) {
-		impl->glTarget = GL_TEXTURE_2D;
-		glBindTexture(impl->glTarget, impl->glName);
+		self->flags = CrTexture_Inited | CrTexture_RenderTarget;
+
+		return crTextureCommit(self, nullptr);
 	}
-
-	self->flags = CrTexture_Inited | CrTexture_RenderTarget;
-
-	return crTextureCommit(self, nullptr);
 }
 
 
@@ -194,6 +205,11 @@ CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 	crCheckGLError();	// clear any unhandled gl errors
 
 	mapping = impl->apiFormatMapping;
+
+	if((self->format & CrGpuFormat_Depth) && !crContextDepthTextureSupport()) {
+		glRenderbufferStorage(GL_RENDERBUFFER, mapping->internalFormat, self->width, self->height);
+		return CrTrue;
+	}
 
 	if(self->surfCount == 1) {
 
@@ -241,8 +257,12 @@ CR_API void crTextureFree(CrTexture* self)
 	if(nullptr == self)
 		return;
 
-	if(0 != impl->glName)
-		glDeleteTextures(1, &impl->glName);
+	if(0 != impl->glName) {
+		if((self->format & CrGpuFormat_Depth) && !crContextDepthTextureSupport())
+			glDeleteRenderbuffers(1, &impl->glName);
+		else
+			glDeleteTextures(1, &impl->glName);
+	}
 
 	crMem()->free(self, "CrTexture");
 }

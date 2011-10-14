@@ -10,7 +10,7 @@
 #include "../lib/crender/Texture.h"
 
 AppContext* app = nullptr;
-RemoteConfig* config = nullptr;
+//RemoteConfig* config = nullptr;
 
 Mesh* floorMesh = nullptr;
 Mesh* waterMesh = nullptr;
@@ -81,18 +81,23 @@ Water* waterNew(size_t size)
 	Water* self = crMem()->alloc(sizeof(Water), "water");
 	memset(self, 0, sizeof(Water));
 
+	crDbgStr("create water position buffers\n");
+
 	self->size = size;
 	for(i=0; i<2; ++i) {
 		size_t id = WaterBuffer_Position0 + i;
 		self->buffers[id] = crTextureAlloc();
 		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
+		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
+		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 	}
+
+	crDbgStr("create water normal buffers\n");
 
 	self->buffers[WaterBuffer_Normal] = crTextureAlloc();
 	crTextureInitRtt(self->buffers[WaterBuffer_Normal], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 
-	self->screenQuad = meshAlloc();
-	meshInitWithScreenQuad(self->screenQuad);
+	crDbgStr("load water materials quad\n");
 
 	appLoadMaterialBegin(app, nullptr);
 
@@ -122,6 +127,13 @@ Water* waterNew(size_t size)
 	self->psampler.addressW = CrSamplerAddress_Clamp;
 
 	appLoadMaterialEnd(app);
+
+	crDbgStr("create water screen quad\n");
+
+	self->screenQuad = meshAlloc();
+	meshInitWithScreenQuad(self->screenQuad);
+
+	crDbgStr("water new complete\n");
 
 	self->inited = CrFalse;
 
@@ -182,6 +194,9 @@ void waterInit(Water* self)
 {
 	size_t i=0;
 
+	if(nullptr ==self->screenQuad)
+		return;
+
 	for(i=0; i<2; ++i) {
 		CrGpuProgram* prog = self->materials[WaterMaterial_Init]->program;
 
@@ -205,6 +220,9 @@ void waterStep(Water* self)
 
 	CrGpuProgram* prog = self->materials[WaterMaterial_Step]->program;
 
+	if(nullptr ==self->screenQuad)
+		return;
+
 	waterPreProcess(self, self->buffers[curr]);
 
 	crGpuProgramPreRender(prog);
@@ -227,6 +245,9 @@ void waterNormal(Water* self)
 	
 	CrGpuProgram* prog = self->materials[WaterMaterial_Normal]->program;
 
+	if(nullptr ==self->screenQuad)
+		return;
+
 	waterPreProcess(self, self->buffers[WaterBuffer_Normal]);
 
 	crGpuProgramPreRender(prog);
@@ -247,6 +268,9 @@ void waterAddDrop(Water* self, float x, float y, float r, float s)
 	size_t last = WaterBuffer_Position0 + waterLastBuffer(self);
 
 	CrGpuProgram* prog = self->materials[WaterMaterial_AddDrop]->program;
+
+	if(nullptr ==self->screenQuad)
+		return;
 
 	waterPreProcess(self, self->buffers[curr]);
 
@@ -462,9 +486,9 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 	static float t = 0;
 	Settings lsettings;
 
-	remoteConfigLock(config);
+	//remoteConfigLock(config);
 	lsettings = settings;
-	remoteConfigUnlock(config);
+	//remoteConfigUnlock(config);
 }
 
 void crAppHandleMouse(int x, int y, int action)
@@ -540,7 +564,7 @@ void crAppConfig()
 
 void crAppFinalize()
 {
-	remoteConfigFree(config);
+	//remoteConfigFree(config);
 	waterFree(water);
 	meshFree(floorMesh);
 	meshFree(waterMesh);
@@ -560,6 +584,7 @@ CrBool crAppInitialize()
 	appInit(app);
 	
 	// remote config
+	/*
 	{
 		RemoteVarDesc descs[] = {
 			{"gravity", &settings.gravity, 1, 100},
@@ -573,6 +598,10 @@ CrBool crAppInitialize()
 		remoteConfigInit(config, 8080, CrTrue);
 		remoteConfigAddVars(config, descs);
 	}
+	*/
+
+	// water
+	water = waterNew(128);
 
 	// materials
 	{
@@ -602,9 +631,11 @@ CrBool crAppInitialize()
 	{
 		texture = Pvr_createTexture(red_tile_texture);
 
+		crDbgStr("create scene color buffers\n");
 		refractTex = crTextureAlloc();
 		crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 		
+		crDbgStr("create scene depth buffers\n");
 		rttDepth = crTextureAlloc();
 		crTextureInitRtt(rttDepth, 512, 512, 0, 1, CrGpuFormat_Depth16);
 	}
@@ -631,7 +662,7 @@ CrBool crAppInitialize()
 		meshInitWithScreenQuad(bgMesh);
 	}
 
-	water = waterNew(256);
+	crDbgStr("Water example started\n");
 
 	return CrTrue;
 }

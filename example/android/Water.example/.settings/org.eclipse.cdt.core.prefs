@@ -1,5 +1,8 @@
-#Thu Oct 13 19:30:44 CST 2011
+#Fri Oct 14 11:40:55 CST 2011
 eclipse.preferences.version=1
 environment/project/0.930017=
+environment/project/0.930017/CYGWIN/delimiter=;
+environment/project/0.930017/CYGWIN/operation=append
+environment/project/0.930017/CYGWIN/value=nodosfilewarning
 environment/project/0.930017/append=true
 environment/project/0.930017/appendContributed=true

@@ -8,7 +8,8 @@ void main(void) {
 }
 
 -- Init.Fragment
-//precision highp float;
+precision highp float;
+
 varying vec2 v_texcrd;
 
 void main(void) {
@@ -19,7 +20,8 @@ void main(void) {
 }
 
 -- Step.Fragment
-//precision highp float;
+precision highp float;
+
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
 uniform sampler2D u_buffer;
@@ -49,7 +51,8 @@ void main(void) {
 }
 
 -- Normal.Fragment
-//precision highp float;
+precision highp float;
+
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
 uniform sampler2D u_buffer;
@@ -67,7 +70,8 @@ void main(void) {
 }
 
 -- AddDrop.Fragment
-//precision highp float;
+precision highp float;
+
 const float PI = 3.141592653589793;
 
 varying vec2 v_texcrd;
@@ -110,6 +114,8 @@ void main() {
 }
 
 -- Scene.Fragment
+precision highp float;
+
 varying vec3 v_normal;
 varying vec3 v_pos;
 varying vec2 v_texcoord;
@@ -127,10 +133,10 @@ void main() {
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	
 	if(false == gl_FrontFacing)
-		n *= -1;
+		n *= -1.0;
 
-	float ndl = max(0, dot(n, l));
-	float ndh = max(0, dot(n, h));
+	float ndl = max(0.0, dot(n, l));
+	float ndh = max(0.0, dot(n, h));
 	ndh = pow(ndh, u_matShininess);
 	
 	vec4 tex = texture2D(u_tex, v_texcoord);
@@ -164,6 +170,8 @@ void main() {
 }
 
 -- SceneWater.Fragment
+precision highp float;
+
 varying vec3 v_normal;
 varying vec3 v_pos;
 varying vec2 v_texcoord;
@@ -196,10 +204,10 @@ void main() {
 	// add some lighting
 	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
-	float ndh = max(0, dot(norm, h));
+	float ndh = max(0.0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);
 	
-	vec4 refle = vec4(1, 1, 1, 1.0);
+	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 
 	gl_FragColor = mix(refra, refle, d) + u_matSpecular * ndh;
 }

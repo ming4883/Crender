@@ -87,6 +87,9 @@ void meshFree(Mesh* self)
 	size_t i;
 	MeshImpl* impl = (MeshImpl*)self;
 
+	if(nullptr == impl)
+		return;
+
 	if(self->flags & MeshFlag_Inited) {
 
 		crBufferFree(impl->indexBuffer);
@@ -203,10 +206,16 @@ void meshInitWithUnitSphere(Mesh* self, size_t segmentCount)
 	meshInit(self, (height-2)* width+2, (height-2)*(width-1)*2 * 3);
 	self->vertexPerPatch = 3;
 
+	/*
 	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
 	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
 	nor = crBufferMap(impl->normalBuffer, CrBufferMapAccess_Write);
 	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
+	*/
+	idx = (unsigned short*)self->index.buffer;
+	pos = (CrVec3*)self->vertex.buffer;
+	nor = (CrVec3*)self->normal.buffer;
+	uv0 = (CrVec2*)self->texcoord[0].buffer;
 
 	for(t=0, j=1; j<height-1; ++j)
 	{
@@ -253,10 +262,13 @@ void meshInitWithUnitSphere(Mesh* self, size_t segmentCount)
 
 	}
 
+	/*
 	crBufferUnmap(impl->indexBuffer);
 	crBufferUnmap(impl->vertexBuffer);
 	crBufferUnmap(impl->normalBuffer);
 	crBufferUnmap(impl->tcBuffer[0]);
+	*/
+	meshCommit(self);
 
 #undef PI
 }
@@ -276,10 +288,16 @@ void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offse
 	meshInit(self, stride * stride, (stride-1) * (stride-1) * 6);
 	self->vertexPerPatch = 3;
 
+	/*
 	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
 	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
 	nor = crBufferMap(impl->normalBuffer, CrBufferMapAccess_Write);
 	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
+	*/
+	idx = (unsigned short*)self->index.buffer;
+	pos = (CrVec3*)self->vertex.buffer;
+	nor = (CrVec3*)self->normal.buffer;
+	uv0 = (CrVec2*)self->texcoord[0].buffer;
 
 	for(r=0; r<(stride-1); ++r)
 	{
@@ -317,10 +335,13 @@ void meshInitWithQuad(Mesh* self, float width, float height, const CrVec3* offse
 		}
 	}
 
+	meshCommit(self);
+	/*
 	crBufferUnmap(impl->indexBuffer);
 	crBufferUnmap(impl->vertexBuffer);
 	crBufferUnmap(impl->normalBuffer);
 	crBufferUnmap(impl->tcBuffer[0]);
+	*/
 }
 
 void meshInitWithScreenQuad(Mesh* self)
@@ -334,9 +355,9 @@ void meshInitWithScreenQuad(Mesh* self)
 	meshInit(self, 4, 6);
 	self->vertexPerPatch = 3;
 
-	idx = crBufferMap(impl->indexBuffer, CrBufferMapAccess_Write);
-	pos = crBufferMap(impl->vertexBuffer, CrBufferMapAccess_Write);
-	uv0 = crBufferMap(impl->tcBuffer[0], CrBufferMapAccess_Write);
+	idx = (unsigned short*)self->index.buffer;
+	pos = (CrVec3*)self->vertex.buffer;
+	uv0 = (CrVec2*)self->texcoord[0].buffer;
 
 	(*idx++) = 0; (*idx++) = 1; (*idx++) = 2;
 	(*idx++) = 3; (*idx++) = 2; (*idx++) = 1;
@@ -346,7 +367,5 @@ void meshInitWithScreenQuad(Mesh* self)
 	pos[2] = crVec3( 1, 1, 0); uv0[2] = crVec2(1, 1);
 	pos[3] = crVec3( 1,-1, 0); uv0[3] = crVec2(1, 0);
 
-	crBufferUnmap(impl->indexBuffer);
-	crBufferUnmap(impl->vertexBuffer);
-	crBufferUnmap(impl->tcBuffer[0]);
+	meshCommit(self);
 }

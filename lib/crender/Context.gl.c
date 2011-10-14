@@ -233,6 +233,15 @@ static GLenum crGL_ATTACHMENT_POINT[] =
 #endif
 };
 
+CR_API CrBool crContextDepthTextureSupport() {
+#ifdef CR_GLES_2
+	return CrFalse;
+#else
+	//return (CrBool)glewGetExtension("GL_ARB_depth_texture");
+	return CrTrue;
+#endif
+}
+
 CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct CrTexture* depth)
 {
 	CrContextImpl* impl = (CrContextImpl*)self;
@@ -262,7 +271,10 @@ CR_API CrBool crContextPreRTT(CrContext* self, struct CrTexture** colors, struct
 	// attach depth buffers
 	if(depth != nullptr) {
 		CrTextureImpl* tex = (CrTextureImpl*)depth;
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex->glTarget, tex->glName, 0);
+		if(crContextDepthTextureSupport())
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex->glTarget, tex->glName, 0);
+		else
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, tex->glName);
 	}
 	else {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
