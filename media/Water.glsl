@@ -183,10 +183,10 @@ void main() {
 	
 	float d = dot(norm, normalize(u_camPos - v_pos));
 	d = max(d, 0.0);
-	d = pow(d, 4.0);
+	d = pow(d, 8.0);
 	
 	// add some lighting
-	vec3 l = normalize(vec3(-5.0, 1.0, -5.0) - v_pos);
+	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	float ndh = max(0.0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);

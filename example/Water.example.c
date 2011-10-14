@@ -23,6 +23,8 @@ CrTexture* texture = nullptr;
 CrTexture* refractTex = nullptr;
 CrTexture* rttDepth = nullptr;
 
+float waterSize = 4.0f;
+
 typedef struct Settings
 {
 	float gravity;
@@ -316,6 +318,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 		meshRenderTriangles(floorMesh);
 	}
 
+	/*
 	// draw wall
 	{
 		{ CrVec3 v = {0, 0.5f, -2.5f};
@@ -444,8 +447,8 @@ void addDrop(CrMat44 viewProjMtx)
 	x =  (orgWs.x + dirWs.x * t);
 	y = -(orgWs.z + dirWs.z * t);
 	
-	x = (x / 2.5f) * 0.5f + 0.5f;
-	y = (y / 2.5f) * 0.5f + 0.5f;
+	x = (x / waterSize) * 0.5f + 0.5f;
+	y = (y / waterSize) * 0.5f + 0.5f;
 	waterAddDrop(water, x, y, r, s);
 }
 
@@ -480,7 +483,7 @@ void crAppHandleMouse(int x, int y, int action)
 void crAppRender()
 {
 	//CrVec3 eyeAt = crVec3(0, 1.5f, 2);
-	CrVec3 eyeAt = crVec3(0, 5, 2.5f);
+	CrVec3 eyeAt = crVec3(0, 5, 4.5f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -617,10 +620,10 @@ CrBool crAppInitialize()
 
 	// water
 	{
-		CrVec3 offset = crVec3(-2.5f, -2.5f, 0);
+		CrVec3 offset = crVec3(-waterSize, -waterSize, 0);
 		CrVec2 uvs = crVec2(1.0f, 1.0f);
 		waterMesh = meshAlloc();
-		meshInitWithQuad(waterMesh, 5, 5, &offset, &uvs, 1);
+		meshInitWithQuad(waterMesh, waterSize*2, waterSize*2, &offset, &uvs, 1);
 	}
 
 	// bg
