@@ -8,7 +8,7 @@ void main(void) {
 }
 
 -- Init.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec2 v_texcrd;
 
@@ -20,7 +20,7 @@ void main(void) {
 }
 
 -- Step.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
@@ -55,7 +55,7 @@ void main(void) {
 }
 
 -- AddDrop.Fragment
-precision highp float;
+precision mediump float;
 
 const float PI = 3.141592653589793;
 
@@ -98,7 +98,7 @@ void main() {
 }
 
 -- Scene.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec3 v_normal;
 varying vec3 v_pos;
@@ -154,7 +154,7 @@ void main() {
 }
 
 -- SceneWater.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec3 v_normal;
 varying vec3 v_pos;
@@ -176,14 +176,14 @@ void main() {
 	vec3 norm = normalize( vec3(water.z, 0.001, water.w) );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
-	//refracoord += norm.xz * u_refractionMapParam.xy;
+	refracoord += norm.xz * u_refractionMapParam.xy;
 	
 	vec4 refra = texture2D(u_refract, refracoord);
 	refra.xyz *= u_matDiffuse.xyz;
 	
 	float d = dot(norm, normalize(u_camPos - v_pos));
 	d = max(d, 0.0);
-	d = pow(d, 4.0);
+	d = pow(d, 8.0);
 	
 	// add some lighting
 	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
@@ -193,5 +193,5 @@ void main() {
 	
 	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 
-	gl_FragColor = refra;//mix(refra, refle, d) + u_matSpecular * ndh;
+	gl_FragColor = mix(refra, refle, d) + u_matSpecular * ndh;
 }

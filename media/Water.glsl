@@ -8,7 +8,7 @@ void main(void) {
 }
 
 -- Init.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec2 v_texcrd;
 
@@ -20,7 +20,7 @@ void main(void) {
 }
 
 -- Step.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
@@ -55,7 +55,7 @@ void main(void) {
 }
 
 -- AddDrop.Fragment
-precision highp float;
+precision mediump float;
 
 const float PI = 3.141592653589793;
 
@@ -98,7 +98,7 @@ void main() {
 }
 
 -- Scene.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec3 v_normal;
 varying vec3 v_pos;
@@ -154,7 +154,7 @@ void main() {
 }
 
 -- SceneWater.Fragment
-precision highp float;
+precision mediump float;
 
 varying vec3 v_normal;
 varying vec3 v_pos;

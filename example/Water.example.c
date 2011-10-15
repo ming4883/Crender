@@ -23,17 +23,12 @@ CrTexture* texture = nullptr;
 CrTexture* refractTex = nullptr;
 CrTexture* rttDepth = nullptr;
 
-float waterSize = 4.0f;
-
 typedef struct Settings
 {
-	float gravity;
-	float airResistance;
-	float impact;
 	float shadowSlopScale;
 } Settings;
 
-Settings settings = {10, 5, 3, 4};
+Settings settings = {4};
 
 typedef struct Input
 {
@@ -74,6 +69,9 @@ typedef struct Water
 } Water;
 
 Water* water;
+const CrVec3 waterN = {0.0f, 1.0f, 0.0f};
+const CrVec3 waterP = {0.0f, 0.0f, 0.0f};
+const float waterSize = 3.0f;
 
 Water* waterNew(size_t size)
 {
@@ -87,9 +85,8 @@ Water* waterNew(size_t size)
 	for(i=0; i<2; ++i) {
 		size_t id = WaterBuffer_Position0 + i;
 		self->buffers[id] = crTextureAlloc();
-		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR32G32B32A32);
-		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
-		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
+		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
+		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 	}
 
 	crDbgStr("load water materials quad\n");
@@ -129,7 +126,6 @@ Water* waterNew(size_t size)
 
 	return self;
 }
-
 
 void waterFree(Water* self)
 {
@@ -285,7 +281,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	CrGpuProgram* prog = sceneMtl->program;
 	CrGpuState* gpuState = &crContext()->gpuState;
 
-	gpuState->cull = CrTrue;
+	gpuState->cull = CrFalse;
 	gpuState->depthTest = CrTrue;
 	crContextApplyGpuState(crContext());
 
@@ -300,42 +296,20 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	app->shaderContext.matSpecular = crVec4(0.0f, 0.0f, 0.0f, 1);
 	app->shaderContext.matShininess = 64;
 
-	
-	// draw floor
-	{
-		{ CrVec3 v = {0, -2.0f, 0};
-		CrMat44 m;
-		crMat44MakeRotation(&m, CrVec3_c100(), -90);
-		crMat44SetTranslation(&m, &v);
-		
-		app->shaderContext.worldMtx = m;
-		crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
-		crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m); }
-
-		appShaderContextPreRender(app, sceneMtl);
-
-		meshPreRender(floorMesh, prog);
-		meshRenderTriangles(floorMesh);
-	}
-
-	/*
 	// draw wall
-	{
-		{ CrVec3 v = {0, 0.5f, -2.5f};
-		CrMat44 m;
-		crMat44SetIdentity(&m);
-		crMat44SetTranslation(&m, &v);
-		
-		app->shaderContext.worldMtx = m;
-		crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
-		crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m); }
+	{ CrVec3 v = {0, 1.0f, -2.5f};
+	CrMat44 m;
+	crMat44SetIdentity(&m);
+	crMat44SetTranslation(&m, &v);
+	
+	app->shaderContext.worldMtx = m;
+	crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
+	crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m); }
 
-		appShaderContextPreRender(app, sceneMtl);
+	appShaderContextPreRender(app, sceneMtl);
 
-		meshPreRender(floorMesh, prog);
-		meshRenderTriangles(floorMesh);
-	}
-/**/
+	meshPreRender(floorMesh, prog);
+	meshRenderTriangles(floorMesh);
 }
 
 void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 camPos)
@@ -364,24 +338,20 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	crGpuProgramUniform3fv(prog, CrHash("u_camPos"), 1, camPos.v);
 
 	// draw water plane
-	{
-		app->shaderContext.matDiffuse = crVec4(0.875f, 1.0f, 0.875f, 1);
-		//app->shaderContext.matDiffuse = crVec4(1.0f, 1.0f, 1.0f, 1);
-		app->shaderContext.matSpecular = crVec4(1, 1, 1, 1);
-		app->shaderContext.matShininess = 64;
-		{
-			CrMat44 m;
-			crMat44MakeRotation(&m, CrVec3_c100(), -90);
-			
-			app->shaderContext.worldMtx = m;
-			crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
-			crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m);
-		}
-		appShaderContextPreRender(app, waterMtl);
-
-		meshPreRender(waterMesh, prog);
-		meshRenderTriangles(waterMesh);
+	app->shaderContext.matDiffuse = crVec4(0.75f, 1.0f, 0.75f, 1);
+	app->shaderContext.matSpecular = crVec4(1, 1, 1, 1);
+	app->shaderContext.matShininess = 64;
+	{ CrMat44 m;
+	crMat44MakeRotation(&m, CrVec3_c100(), -90);
+	
+	app->shaderContext.worldMtx = m;
+	crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
+	crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m);
 	}
+	appShaderContextPreRender(app, waterMtl);
+
+	meshPreRender(waterMesh, prog);
+	meshRenderTriangles(waterMesh);
 }
 
 void crMat44Unproject(CrVec3* _out, const CrVec3* screenPos, const CrMat44* m)
@@ -483,7 +453,7 @@ void crAppHandleMouse(int x, int y, int action)
 void crAppRender()
 {
 	//CrVec3 eyeAt = crVec3(0, 1.5f, 2);
-	CrVec3 eyeAt = crVec3(0, 5, 4.5f);
+	CrVec3 eyeAt = crVec3(0, 2.0f, 4.0f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -507,12 +477,18 @@ void crAppRender()
 
 	// render to refractTex
 	{ CrTexture* bufs[] = {refractTex, nullptr};
-	crContextPreRTT(crContext(), bufs, rttDepth);}
+	crContextPreRTT(crContext(), bufs, rttDepth);
+	}
 	crContextSetViewport(crContext(), 0, 0, (float)refractTex->width, (float)refractTex->height, -1, 1);
 
 	crContextClearDepth(crContext(), 1);
 	drawBackground();
-	drawScene(viewMtx, projMtx, viewProjMtx, eyeAt);
+	{ CrMat44 r, v, vp;
+	crMat44PlanarReflect(&r, &waterN, &waterP);
+	crMat44Mult(&v, &viewMtx, &r);
+	crMat44Mult(&vp, &projMtx, &v);
+	drawScene(v, projMtx, vp, eyeAt);
+	}
 
 	crContextPostRTT(crContext());
 	crContextSetViewport(crContext(), 0, 0, (float)crContext()->xres, (float)crContext()->yres, -1, 1);
@@ -555,18 +531,14 @@ CrBool crAppInitialize()
 	
 	// remote config
 	/*
-	{
-		RemoteVarDesc descs[] = {
-			{"gravity", &settings.gravity, 1, 100},
-			{"airResistance", &settings.airResistance, 1, 20},
-			{"impact", &settings.impact, 1, 10},
-			{"shadowSlopScale", &settings.shadowSlopScale, 0, 8},
-			{nullptr, nullptr, 0, 0}
-		};
-		
-		config = remoteConfigAlloc();
-		remoteConfigInit(config, 8080, CrTrue);
-		remoteConfigAddVars(config, descs);
+	{ RemoteVarDesc descs[] = {
+		{"shadowSlopScale", &settings.shadowSlopScale, 0, 8},
+		{nullptr, nullptr, 0, 0}
+	};
+	
+	config = remoteConfigAlloc();
+	remoteConfigInit(config, 8080, CrTrue);
+	remoteConfigAddVars(config, descs);
 	}
 	*/
 
@@ -574,62 +546,56 @@ CrBool crAppInitialize()
 	water = waterNew(256);
 
 	// materials
-	{
-		const char* directives[]  = {nullptr};
+	{ const char* directives[]  = {nullptr};
 		
-		appLoadMaterialBegin(app, directives);
+	appLoadMaterialBegin(app, directives);
 
-		sceneMtl = appLoadMaterial(
-			"Water.Scene.Vertex",
-			"Water.Scene.Fragment",
-			nullptr, nullptr, nullptr);
+	sceneMtl = appLoadMaterial(
+		"Water.Scene.Vertex",
+		"Water.Scene.Fragment",
+		nullptr, nullptr, nullptr);
 
-		waterMtl = appLoadMaterial(
-			"Water.SceneWater.Vertex",
-			"Water.SceneWater.Fragment",
-			nullptr, nullptr, nullptr);
-		
-		bgMtl = appLoadMaterial(
-			"Common.Bg.Vertex.20",
-			"Common.Bg.Fragment.20",
-			nullptr, nullptr, nullptr);
-		
-		appLoadMaterialEnd(app);
+	waterMtl = appLoadMaterial(
+		"Water.SceneWater.Vertex",
+		"Water.SceneWater.Fragment",
+		nullptr, nullptr, nullptr);
+	
+	bgMtl = appLoadMaterial(
+		"Common.Bg.Vertex.20",
+		"Common.Bg.Fragment.20",
+		nullptr, nullptr, nullptr);
+	
+	appLoadMaterialEnd(app);
 	}
 
 	// textures
-	{
-		texture = Pvr_createTexture(red_tile_texture);
+	texture = Pvr_createTexture(red_tile_texture);
 
-		crDbgStr("create scene color buffers\n");
-		refractTex = crTextureAlloc();
-		crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_UnormR8G8B8A8);
-		
-		crDbgStr("create scene depth buffers\n");
-		rttDepth = crTextureAlloc();
-		crTextureInitRtt(rttDepth, 512, 512, 0, 1, CrGpuFormat_Depth16);
-	}
-
+	crDbgStr("create scene color buffers\n");
+	refractTex = crTextureAlloc();
+	crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_UnormR8G8B8A8);
+	
+	crDbgStr("create scene depth buffers\n");
+	rttDepth = crTextureAlloc();
+	crTextureInitRtt(rttDepth, 512, 512, 0, 1, CrGpuFormat_Depth16);
+	
 	// floor
-	{
-		CrVec3 offset = crVec3(-2.5f, -2.5f, 0);
-		CrVec2 uvs = crVec2(1.0f, 1.0f);
-		floorMesh = meshAlloc();
-		meshInitWithQuad(floorMesh, 5, 5, &offset, &uvs, 1);
+	{ CrVec3 offset = crVec3(-1.0f, -1.0f, 0);
+	CrVec2 uvs = crVec2(1.0f, 1.0f);
+	floorMesh = meshAlloc();
+	meshInitWithQuad(floorMesh, 2, 2, &offset, &uvs, 1);
 	}
 
 	// water
-	{
-		CrVec3 offset = crVec3(-waterSize, -waterSize, 0);
-		CrVec2 uvs = crVec2(1.0f, 1.0f);
-		waterMesh = meshAlloc();
-		meshInitWithQuad(waterMesh, waterSize*2, waterSize*2, &offset, &uvs, 1);
+	{ CrVec3 offset = crVec3(-waterSize, -waterSize, 0);
+	CrVec2 uvs = crVec2(1.0f, 1.0f);
+	waterMesh = meshAlloc();
+	meshInitWithQuad(waterMesh, waterSize*2, waterSize*2, &offset, &uvs, 1);
 	}
 
 	// bg
-	{
-		bgMesh = meshAlloc();
-		meshInitWithScreenQuad(bgMesh);
+	{ bgMesh = meshAlloc();
+	meshInitWithScreenQuad(bgMesh);
 	}
 
 	crDbgStr("Water example started\n");

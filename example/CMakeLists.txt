@@ -118,6 +118,23 @@ ENDIF()
 CREATE_EXAMPLE( example_water "${SRC}" "${RES}" )
 
 #-------------------------------------------------------------------------------
+# example_reflection
+SET( SRC 
+	Reflection.example.c
+	)
+	
+SET( RES
+	../media/Common.glsl
+	../media/Reflection.glsl
+	)
+
+IF( APPLE )
+	LIST( APPEND RES Example.xib )
+ENDIF()
+
+CREATE_EXAMPLE( example_reflection "${SRC}" "${RES}" )
+
+#-------------------------------------------------------------------------------
 # example_embedded_httpd
 SET( SRC EmbeddedHttpd.example.c )
 
