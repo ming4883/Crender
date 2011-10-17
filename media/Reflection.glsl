@@ -74,17 +74,28 @@ uniform float u_matShininess;
 uniform vec4 u_refractionMapParam;
 uniform vec3 u_camPos;
 
+uniform sampler2D u_flow;
 uniform sampler2D u_water;
 uniform sampler2D u_refract;
 
 void main() {
 	
-	vec2 watercoord = v_texcoord * u_refractionMapParam.zz + vec2(0.0, u_refractionMapParam.w);
-	vec4 water = texture2D(u_water, watercoord);
+	vec2 flow = texture2D(u_flow, v_texcoord).xy * 2.0 - 1.0;
+	//vec2 flow = (v_texcoord * 2.0 - 1.0);
+	float halfcycle = u_refractionMapParam.y;
+	float phase0 = u_refractionMapParam.z;
+	float phase1 = u_refractionMapParam.w;
+	float texscale = 4.0;
+	
+	vec4 normal0 = texture2D(u_water, (v_texcoord * texscale) + flow * phase0);
+	vec4 normal1 = texture2D(u_water, (v_texcoord * texscale * 2.0) + flow * phase1);
+	float flowLerp = (abs(halfcycle - phase0) / halfcycle);
+	
+	vec4 water = mix(normal0, normal1, flowLerp);
 	vec3 norm = normalize( water.xzy * 2.0 - 1.0 );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
-	refracoord += norm.xz * u_refractionMapParam.xy;
+	refracoord += norm.xz * u_refractionMapParam.xx;
 	
 	vec4 refra = texture2D(u_refract, refracoord);
 	refra.xyz *= u_matDiffuse.xyz;
@@ -94,7 +105,7 @@ void main() {
 	d = pow(d, 8.0);
 	
 	// add some lighting
-	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
+	vec3 l = normalize(vec3(-5.0, 5.0, -5.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	float ndh = max(0.0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);

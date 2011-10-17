@@ -3,7 +3,8 @@
 #include "Material.h"
 #include "Pvr.h"
 #include "red_tile_texture.h"
-#include "water_normal_map.h"
+#include "water_normal_map1.h"
+#include "water_flow_map.h"
 
 #include "../lib/crender/Mem.h"
 #include "../lib/crender/Texture.h"
@@ -20,6 +21,7 @@ Material* waterMtl = nullptr;
 Material* bgMtl = nullptr;
 CrTexture* texture = nullptr;
 CrTexture* waterNormalMap = nullptr;
+CrTexture* waterFlowMap = nullptr;
 CrTexture* refractTex = nullptr;
 CrTexture* rttDepth = nullptr;
 
@@ -33,7 +35,7 @@ float elapsedTime = 0;
 Settings settings = {4};
 const CrVec3 waterN = {0.0f, 1.0f, 0.0f};
 const CrVec3 waterP = {0.0f, 0.0f, 0.0f};
-const float waterSize = 3.0f;
+const float waterSize = 8.0f;
 
 typedef struct Input
 {
@@ -119,6 +121,10 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	crGpuProgramUniformTexture(prog, CrHash("u_water"), waterNormalMap, &sampler);
 	}
 	
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
+	crGpuProgramUniformTexture(prog, CrHash("u_flow"), waterFlowMap, &sampler);
+	}
+	
 	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);
 	}
@@ -127,7 +133,11 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	//crGpuProgramUniformTexture(prog, CrHash("u_tex"), texture, &sampler);
 	//}
 
-	{ float val[] = {16.0f / refractTex->width, 16.0f / refractTex->height, 2.0, -elapsedTime / 4};
+	{ float cycle = 2.0f; float halfCycle = cycle * 0.5f;
+	float t = elapsedTime / 32.0f;
+	float p0 = fmodf(t, cycle);
+	float p1 = fmodf(t + halfCycle, cycle);
+	float val[] = {16.0f / refractTex->width, halfCycle, p0, p1};
 	crGpuProgramUniform4fv(prog, CrHash("u_refractionMapParam"), 1, val);
 	}
 
@@ -237,6 +247,7 @@ void crAppFinalize()
 	materialFree(bgMtl);
 	crTextureFree(texture);
 	crTextureFree(waterNormalMap);
+	crTextureFree(waterFlowMap);
 	crTextureFree(refractTex);
 	crTextureFree(rttDepth);
 	appFree(app);
@@ -284,7 +295,8 @@ CrBool crAppInitialize()
 
 	// textures
 	texture = Pvr_createTexture(red_tile_texture);
-	waterNormalMap = Pvr_createTexture(water_normal_map);
+	waterNormalMap = Pvr_createTexture(water_normal_map1);
+	waterFlowMap = Pvr_createTexture(water_flow_map);
 
 	crDbgStr("create scene color buffers\n");
 	refractTex = crTextureAlloc();
