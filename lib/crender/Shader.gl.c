@@ -166,7 +166,7 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 				case GL_SAMPLER_2D_SHADOW:
 #endif
 					{	// bind sampler to the specific texture unit
-						glUniform1i(i, texunit++);
+						glUniform1i(uniform->loc, texunit++);
 					}
 					break;
 				default:

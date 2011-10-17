@@ -4,8 +4,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := crender-water-example
 
-LOCAL_SRC_FILES += ../../../Water.example.c
-#LOCAL_SRC_FILES += ../../../Reflection.example.c
+#LOCAL_SRC_FILES += ../../../Water.example.c
+LOCAL_SRC_FILES += ../../../Reflection.example.c
 LOCAL_SRC_FILES += ../../../Common.c
 LOCAL_SRC_FILES += ../../../Framework.android.c
 LOCAL_SRC_FILES += ../../../Material.c

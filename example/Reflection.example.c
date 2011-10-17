@@ -3,7 +3,7 @@
 #include "Material.h"
 #include "Pvr.h"
 #include "red_tile_texture.h"
-#include "water_normal_map1.h"
+#include "water_normal_map.h"
 #include "water_flow_map.h"
 
 #include "../lib/crender/Mem.h"
@@ -31,11 +31,12 @@ typedef struct Settings
 } Settings;
 
 float elapsedTime = 0;
+float deltaTime = 0;
 
 Settings settings = {4};
 const CrVec3 waterN = {0.0f, 1.0f, 0.0f};
 const CrVec3 waterP = {0.0f, 0.0f, 0.0f};
-const float waterSize = 8.0f;
+const float waterSize = 5.0f;
 
 typedef struct Input
 {
@@ -83,14 +84,12 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	}
 
 	crGpuProgramUniform3fv(prog, CrHash("u_camPos"), 1, camPos.v);
-	app->shaderContext.matDiffuse = crVec4(1.0f, 1.0f, 1.0f, 1);
-	app->shaderContext.matSpecular = crVec4(0.0f, 0.0f, 0.0f, 1);
-	app->shaderContext.matShininess = 64;
 
 	// draw wall
-	{ CrVec3 v = {0, 1.0f, -1.0f};
+	{ CrVec3 v = {0, 1.25f, -1.0f};
 	CrMat44 m;
 	crMat44SetIdentity(&m);
+	crMat44MakeRotation(&m, CrVec3_c010(), elapsedTime * 5.0f);
 	crMat44SetTranslation(&m, &v);
 	
 	app->shaderContext.worldMtx = m;
@@ -104,10 +103,12 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	meshRenderTriangles(floorMesh);
 }
 
+#define CYCLE 0.15f
+#define HALF_CYCLE CYCLE * 0.5f
+
 void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 camPos)
 {
 	CrGpuState* gpuState = &crContext()->gpuState;
-	//Material* mtl = sceneMtl;
 	Material* mtl = waterMtl;
 	CrGpuProgram* prog = mtl->program;
 	
@@ -117,39 +118,39 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 
 	crGpuProgramPreRender(mtl->program);
 
-	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
-	crGpuProgramUniformTexture(prog, CrHash("u_water"), waterNormalMap, &sampler);
-	}
-	
-	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
-	crGpuProgramUniformTexture(prog, CrHash("u_flow"), waterFlowMap, &sampler);
-	}
-	
 	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);
 	}
 
-	//{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
-	//crGpuProgramUniformTexture(prog, CrHash("u_tex"), texture, &sampler);
-	//}
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
+	crGpuProgramUniformTexture(prog, CrHash("u_water"), waterNormalMap, &sampler);
+	}
+	
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	crGpuProgramUniformTexture(prog, CrHash("u_flow"), waterFlowMap, &sampler);
+	}
 
-	{ float cycle = 2.0f; float halfCycle = cycle * 0.5f;
-	float t = elapsedTime / 32.0f;
-	float p0 = fmodf(t, cycle);
-	float p1 = fmodf(t + halfCycle, cycle);
-	float val[] = {16.0f / refractTex->width, halfCycle, p0, p1};
+	{ float t = deltaTime * 0.05f;
+	static float p0 = 0;
+	static float p1 = HALF_CYCLE;
+	float val[] = {16.0f / refractTex->width, HALF_CYCLE, 0, 0};
+	p0 += t; if(p0 >= CYCLE) p0 = 0;
+	p1 += t; if(p1 >= CYCLE) p1 = 0;
+	val[2] = p0;
+	val[3] = p1;
+
 	crGpuProgramUniform4fv(prog, CrHash("u_refractionMapParam"), 1, val);
 	}
 
 	crGpuProgramUniform3fv(prog, CrHash("u_camPos"), 1, camPos.v);
 
 	// draw water plane
-	app->shaderContext.matDiffuse = crVec4(0.75f, 1.0f, 0.75f, 1);
-	app->shaderContext.matSpecular = crVec4(1, 1, 1, 1);
+	app->shaderContext.matDiffuse = crVec4(1.0f, 1.0f, 1.0f, 1);
+	app->shaderContext.matSpecular = crVec4(1.0f, 1.0f, 1.0f, 1);
 	app->shaderContext.matShininess = 64;
 	{ CrMat44 m;
 	crMat44MakeRotation(&m, CrVec3_c100(), -90);
-	
+
 	app->shaderContext.worldMtx = m;
 	crMat44Mult(&app->shaderContext.worldViewMtx, &viewMtx, &m);
 	crMat44Mult(&app->shaderContext.worldViewProjMtx, &viewProjMtx, &m);
@@ -164,7 +165,8 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 {
 	Settings lsettings;
 
-	elapsedTime += elapsedMilliseconds / 1000.0f;
+	deltaTime = elapsedMilliseconds / 1000.0f;
+	elapsedTime += deltaTime;
 
 	//remoteConfigLock(config);
 	lsettings = settings;
@@ -191,7 +193,7 @@ void crAppHandleMouse(int x, int y, int action)
 
 void crAppRender()
 {
-	CrVec3 eyeAt = crVec3(0, 2.0f, 4.0f);
+	CrVec3 eyeAt = crVec3(0, 2.0f, 6.0f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -295,7 +297,7 @@ CrBool crAppInitialize()
 
 	// textures
 	texture = Pvr_createTexture(red_tile_texture);
-	waterNormalMap = Pvr_createTexture(water_normal_map1);
+	waterNormalMap = Pvr_createTexture(water_normal_map);
 	waterFlowMap = Pvr_createTexture(water_flow_map);
 
 	crDbgStr("create scene color buffers\n");

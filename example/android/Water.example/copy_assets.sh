@@ -1,4 +1,4 @@
-#echo pwd = $(pwd)
+echo pwd is: $(pwd)
 echo removing old assets...
 if [ -d assets ]; then
     rm -r assets
@@ -9,6 +9,6 @@ if [ ! -d assets ]; then
 fi
 
 echo copying assets...
-cp ../../../media/Water.gles assets
-#cp ../../../media/Reflection.gles assets
+#cp ../../../media/Water.gles assets
+cp ../../../media/Reflection.gles assets
 cp ../../../media/Common.gles assets
