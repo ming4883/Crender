@@ -20,6 +20,7 @@ void crAppFinalize();								// application finalization
 void* crOpen(const char* filename);
 void crClose(void* handle);
 size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle);
+void crSleep(unsigned int milliseconds);
 
 typedef struct CrAppContext
 {

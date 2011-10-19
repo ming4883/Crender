@@ -92,7 +92,7 @@ void main() {
 	
 	vec4 water = mix(normal0, normal1, flowLerp);
 	water.xyz = water.xyz * 2.0 - 1.0;
-	vec3 norm = normalize( vec3(water.x, 0.5, water.y) );
+	vec3 norm = normalize( vec3(water.x, 0.25, water.y) );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
 	refracoord += norm.xz * u_refractionMapParam.xx;

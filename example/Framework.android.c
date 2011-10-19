@@ -40,6 +40,10 @@ size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
 	return (size_t)AAsset_read((AAsset*)handle, buff, elsize * nelem);
 }
 
+void crSleep(unsigned int milliseconds)
+{
+}
+
 /**
  * Our saved state data.
  */

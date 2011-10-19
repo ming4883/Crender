@@ -85,7 +85,7 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE ignoreMe0, LPSTR ignoreMe1, INT ig
 
 				crContextSwapBuffers(crAppContext.context);
 
-				Sleep((1000 / 60)-1);
+				//Sleep((1000 / 60)-1);
 			}
 		}
 
@@ -169,4 +169,9 @@ void crClose(void* handle)
 size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
 {
 	return fread(buff, elsize, nelem, (FILE*)handle);
+}
+
+void crSleep(unsigned int milliseconds)
+{
+	Sleep(milliseconds);
 }

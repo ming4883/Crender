@@ -85,8 +85,8 @@ Water* waterNew(size_t size)
 	for(i=0; i<2; ++i) {
 		size_t id = WaterBuffer_Position0 + i;
 		self->buffers[id] = crTextureAlloc();
-		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
-		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
+		crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_FloatR16G16B16A16);
+		//crTextureInitRtt(self->buffers[id], size, size, 0, 1, CrGpuFormat_UnormR8G8B8A8);
 	}
 
 	crDbgStr("load water materials quad\n");
@@ -430,6 +430,8 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 	//remoteConfigLock(config);
 	lsettings = settings;
 	//remoteConfigUnlock(config);
+
+	crSleep(1000/ 60);
 }
 
 void crAppHandleMouse(int x, int y, int action)

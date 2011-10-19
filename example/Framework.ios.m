@@ -346,6 +346,10 @@ size_t crRead(void* buff, size_t elsize, size_t nelem, void* handle)
 	return range.length;
 }
 
+void crSleep(unsigned int milliseconds)
+{
+}
+
 int main(int argc, char *argv[]) {
 
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];

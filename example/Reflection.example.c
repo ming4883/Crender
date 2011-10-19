@@ -89,7 +89,7 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 	{ CrVec3 v = {0, 1.25f, -1.0f};
 	CrMat44 m;
 	crMat44SetIdentity(&m);
-	crMat44MakeRotation(&m, CrVec3_c010(), elapsedTime * 5.0f);
+	crMat44MakeRotation(&m, CrVec3_c010(), elapsedTime * 10.0f);
 	crMat44SetTranslation(&m, &v);
 	
 	app->shaderContext.worldMtx = m;

@@ -16,7 +16,7 @@ void main(void) {
 	gl_FragColor.x = 0.0;
 	gl_FragColor.y = 0.0;
 	gl_FragColor.z = 0.0;
-	gl_FragColor.w = 1.0;
+	gl_FragColor.w = 0.0;
 }
 
 -- Step.Fragment
@@ -38,6 +38,8 @@ void main(void) {
 	
 	float average = dot(s, vec4(0.25, 0.25, 0.25, 0.25));
 	
+	//curr = curr * 2.0 - 1.0;
+	
 	// change the velocity to move toward the average
 	curr.y += (average - curr.x) * 2.0;
 	
@@ -51,6 +53,7 @@ void main(void) {
 	curr.w = dot(s, vec4(0.25,-0.25,+0.25,-0.25)); // sobelY
 	
 	// output
+	//curr = curr * 0.5 + 0.5;
 	gl_FragColor = curr;
 }
 
@@ -67,6 +70,7 @@ uniform sampler2D u_buffer;
 
 void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
+	//curr = curr * 2.0 - 1.0;
 	
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
 	drop = 0.5 - cos(drop * PI) * 0.5;
@@ -74,6 +78,7 @@ void main(void) {
 	curr.x += drop * u_strength;
 	
 	// output
+	//curr = curr * 0.5 + 0.5;
 	gl_FragColor = curr;
 }
 
@@ -173,6 +178,7 @@ uniform sampler2D u_refract;
 void main() {
 	
 	vec4 water = texture2D(u_water, v_texcoord);
+	//water = water * 2.0 - 1.0;
 	vec3 norm = normalize( vec3(water.z, 0.001, water.w) );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
