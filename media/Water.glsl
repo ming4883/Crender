@@ -44,7 +44,8 @@ void main(void) {
 	curr.y += (average - curr.x) * 2.0;
 	
 	// apply some dumping to the velocity
-	curr.y *= 0.985;
+	//curr.y *= 0.985;
+	curr.y -= curr.y / 16.0;
 	
 	// move the displacement along the velocity
 	curr.x += curr.y;

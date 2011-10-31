@@ -323,10 +323,10 @@ void drawWater(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 
 	crGpuProgramPreRender(waterMtl->program);
 
-	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Nearest_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_water"), water->buffers[WaterBuffer_Position0 + water->curr], &sampler);}
 	
-	{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
+	{ CrSampler sampler = {CrSamplerFilter_MagMin_Nearest_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 	crGpuProgramUniformTexture(prog, CrHash("u_refract"), refractTex, &sampler);}
 
 	//{ CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
@@ -575,7 +575,7 @@ CrBool crAppInitialize()
 
 	crDbgStr("create scene color buffers\n");
 	refractTex = crTextureAlloc();
-	crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_UnormR8G8B8A8);
+	crTextureInitRtt(refractTex, 512, 512, 0, 1, CrGpuFormat_FloatR16G16B16A16);
 	
 	crDbgStr("create scene depth buffers\n");
 	rttDepth = crTextureAlloc();
