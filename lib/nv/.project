@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>crender-mesh-example</name>
+	<name>nv</name>
 	<comment></comment>
 	<projects>
-		<project>com_nvidia_devtech_crender-mesh-example</project>
-		<project>libs</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -25,15 +23,15 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value>${NDKROOT}/ndk-build NDK_MODULE_PATH=../../..</value>
+					<value></value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
-					<value>bash</value>
+					<value></value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value></value>
+					<value>${workspace_loc:/libs/jni}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -70,22 +68,7 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>com.android.ide.eclipse.adt.PreCompilerBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>com.android.ide.eclipse.adt.ApkBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -96,7 +79,6 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>

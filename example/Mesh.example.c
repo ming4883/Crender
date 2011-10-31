@@ -126,6 +126,8 @@ CrBool crAppInitialize()
 	*/
 	
 	// load mesh
+	crDbgStr("loading monkey.obj...");
+	
 	{
 		mesh = meshAlloc();
 		if(!meshInitWithObjFile(mesh, "monkey.obj", app->istream))
@@ -133,6 +135,8 @@ CrBool crAppInitialize()
 	}
 	
 	// load materials
+	crDbgStr("loading materials...");
+	
 	{
 		appLoadMaterialBegin(app, nullptr);
 
