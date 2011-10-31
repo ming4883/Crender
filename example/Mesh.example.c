@@ -7,6 +7,7 @@ AppContext* app = nullptr;
 CrVec4 bgClr = {1, 0.25f, 0.25f, 1};
 Mesh* mesh = nullptr;
 Material* mtl = nullptr;
+int resumeCnt = 0;
 
 typedef struct Settings
 {
@@ -152,7 +153,7 @@ CrBool crAppInitialize()
 	
 	bgClr = crVec4(0.25f, 1, 0.25f, 1);
 	
-	crDbgStr("Mesh example started");
+	crDbgStr("Mesh example started, resumeCnt=%d", resumeCnt++);
 
 	return CrTrue;
 }

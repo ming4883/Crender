@@ -86,7 +86,6 @@ int32_t NVEventAppMain(int32_t argc, char** argv)
 				break;
 			case NV_EVENT_RESUME:
 			{
-				//LOGI("Resume event");
 				if(!crInited) {
 					crAppContext.context = crContextAlloc();
 					crAppConfig();
@@ -106,6 +105,10 @@ int32_t NVEventAppMain(int32_t argc, char** argv)
 			}
 			case NV_EVENT_PAUSE:
 			{
+				crAppFinalize();
+				crContextFree(crAppContext.context);
+				crInited = false;
+	
 				uiVisible = false;
 				continue;
 			}
@@ -136,9 +139,6 @@ int32_t NVEventAppMain(int32_t argc, char** argv)
 			crContextSwapBuffers(crAppContext.context);
 		}
 	}
-	
-	crAppFinalize();
-	crContextFree(crAppContext.context);
 
 	return 0;
 }
