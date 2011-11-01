@@ -7,6 +7,6 @@ msvc/*
 */android/*/assets
 */android/*/bin
 */android/*/gen
-*/android/*/src
 *.PIXExp
 me-*
+lib/nv/bin

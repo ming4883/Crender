@@ -7,6 +7,8 @@ CrTextureGpuFormatMapping CrTextureGpuFormatMappings[] = {
 	{CrGpuFormat_UnormR8, 1, D3DFMT_L8},
 	{CrGpuFormat_FloatR16, 2, D3DFMT_R16F},
 	{CrGpuFormat_FloatR32, 4, D3DFMT_R32F},
+	{CrGpuFormat_FloatR16G16, 4, D3DFMT_G16R16F},
+	{CrGpuFormat_FloatR32G32, 8, D3DFMT_G32R32F},
 	{CrGpuFormat_FloatR16G16B16A16, 8, D3DFMT_A16B16G16R16F},
 	{CrGpuFormat_FloatR32G32B32A32, 16, D3DFMT_A32B32G32R32F},
 	{CrGpuFormat_Depth16, 2, D3DFMT_D16},

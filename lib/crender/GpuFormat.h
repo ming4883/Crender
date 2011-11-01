@@ -12,6 +12,7 @@ typedef enum CrGpuFormat
 	CrGpuFormat_UnormR4G4B4A4,
 	CrGpuFormat_FloatR16,
 	CrGpuFormat_FloatR32,
+	CrGpuFormat_FloatR16G16,
 	CrGpuFormat_FloatR32G32,
 	CrGpuFormat_FloatR32G32B32,
 	CrGpuFormat_FloatR16G16B16A16,

@@ -38,24 +38,43 @@ void main(void) {
 	
 	float average = dot(s, vec4(0.25, 0.25, 0.25, 0.25));
 	
-	//curr = curr * 2.0 - 1.0;
-	
 	// change the velocity to move toward the average
 	curr.y += (average - curr.x) * 2.0;
 	
 	// apply some dumping to the velocity
-	//curr.y *= 0.985;
-	curr.y -= curr.y / 16.0;
+	curr.y *= 0.985;
 	
 	// move the displacement along the velocity
 	curr.x += curr.y;
 	
-	curr.z = dot(s, vec4(0.25, 0.25,-0.25,-0.25)); // sobelX
-	curr.w = dot(s, vec4(0.25,-0.25,+0.25,-0.25)); // sobelY
+	// output
+	gl_FragColor = curr;
+}
+
+-- Normal.Fragment
+precision mediump float;
+
+varying vec2 v_texcrd;
+uniform vec2 u_delta;
+uniform sampler2D u_buffer;
+
+void main(void) {
+	vec2 dx = vec2(u_delta.x, 0.0);
+	vec2 dy = vec2(0.0, u_delta.y);
+	vec4 s;
+	s.x = texture2D(u_buffer, v_texcrd - dx - dy).x;
+	s.y = texture2D(u_buffer, v_texcrd - dx + dy).x;
+	s.z = texture2D(u_buffer, v_texcrd + dx - dy).x;
+	s.w = texture2D(u_buffer, v_texcrd + dx + dy).x;
+	
+	vec2 n;
+	n.x = dot(s, vec4(0.25, 0.25,-0.25,-0.25)); // sobelX
+	n.y = dot(s, vec4(0.25,-0.25,+0.25,-0.25)); // sobelY
+	
+	vec3 norm = normalize( vec3(n.x, 0.001, n.y) );
 	
 	// output
-	//curr = curr * 0.5 + 0.5;
-	gl_FragColor = curr;
+	gl_FragColor = vec4(norm * 0.5 + 0.5, 0);
 }
 
 -- AddDrop.Fragment
@@ -71,7 +90,6 @@ uniform sampler2D u_buffer;
 
 void main(void) {
 	vec4 curr = texture2D(u_buffer, v_texcrd);
-	//curr = curr * 2.0 - 1.0;
 	
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
 	drop = 0.5 - cos(drop * PI) * 0.5;
@@ -79,7 +97,6 @@ void main(void) {
 	curr.x += drop * u_strength;
 	
 	// output
-	//curr = curr * 0.5 + 0.5;
 	gl_FragColor = curr;
 }
 
@@ -179,8 +196,9 @@ uniform sampler2D u_refract;
 void main() {
 	
 	vec4 water = texture2D(u_water, v_texcoord);
-	//water = water * 2.0 - 1.0;
-	vec3 norm = normalize( vec3(water.z, 0.001, water.w) );
+	water = water * 2.0 - 1.0;
+	vec3 norm = normalize( water.xyz );
+	//vec3 norm = ( water.xyz );
 	
 	vec2 refracoord = (v_refractionMap.xy / v_refractionMap.ww) * 0.5 + 0.5;
 	refracoord += norm.xz * u_refractionMapParam.xy;
@@ -192,13 +210,15 @@ void main() {
 	d = max(d, 0.0);
 	d = pow(d, 8.0);
 	
+	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
+	/*
 	// add some lighting
 	vec3 l = normalize(vec3(-5.0, 5.0, 0.0) - v_pos);
 	vec3 h = normalize(l + normalize(u_camPos - v_pos));
 	float ndh = max(0.0, dot(norm, h));
 	ndh = pow(ndh, u_matShininess);
-	
-	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 
 	gl_FragColor = mix(refra, refle, d) + u_matSpecular * ndh;
+	*/
+	gl_FragColor = mix(refra, refle, d);
 }

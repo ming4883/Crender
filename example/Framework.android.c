@@ -121,10 +121,22 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
 	struct Engine* engine = (struct Engine*)app->userData;
 	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
 		int x, y;
+		int action = -1;
+		
 		engine->animating = 1;
 		x = AMotionEvent_getX(event, 0);
 		y = AMotionEvent_getY(event, 0);
-		crAppHandleMouse(x, y, CrApp_MouseDown);
+		
+		switch(AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK) {
+			case AMOTION_EVENT_ACTION_DOWN:
+				action = CrApp_MouseDown; break;
+			case AMOTION_EVENT_ACTION_UP:
+				action = CrApp_MouseUp; break;
+			case AMOTION_EVENT_ACTION_MOVE:
+				action = CrApp_MouseMove; break;
+		}
+		
+		crAppHandleMouse(x, y, action);
 		return 1;
 	}
 	return 0;
