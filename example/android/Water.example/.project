@@ -24,7 +24,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value>${NDKROOT}/ndk-build NDK_MODULE_PATH=../../..</value>
+					<value>build.sh</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
