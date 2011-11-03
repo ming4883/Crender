@@ -102,8 +102,6 @@ CREATE_EXAMPLE( example_cloth_simulation "${SRC}" "${RES}" )
 # example_water
 SET( SRC 
 	Water.example.c
-	Sphere.c
-	Sphere.h
 	)
 	
 SET( RES

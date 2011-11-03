@@ -13,10 +13,7 @@ precision mediump float;
 varying vec2 v_texcrd;
 
 void main(void) {
-	gl_FragColor.x = 0.0;
-	gl_FragColor.y = 0.0;
-	gl_FragColor.z = 0.0;
-	gl_FragColor.w = 0.0;
+	gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 -- Step.Fragment
@@ -24,31 +21,29 @@ precision mediump float;
 
 varying vec2 v_texcrd;
 uniform vec2 u_delta;
-uniform sampler2D u_buffer;
+uniform sampler2D u_curr;
+uniform sampler2D u_last;
 
 void main(void) {
 	vec2 dx = vec2(u_delta.x, 0.0);
 	vec2 dy = vec2(0.0, u_delta.y);
-	vec4 curr = texture2D(u_buffer, v_texcrd);
+	vec4 curr = texture2D(u_curr, v_texcrd);
+	vec4 last = texture2D(u_last, v_texcrd);
 	vec4 s;
-	s.x = texture2D(u_buffer, v_texcrd - dx - dy).x;
-	s.y = texture2D(u_buffer, v_texcrd - dx + dy).x;
-	s.z = texture2D(u_buffer, v_texcrd + dx - dy).x;
-	s.w = texture2D(u_buffer, v_texcrd + dx + dy).x;
+	s.x = texture2D(u_curr, v_texcrd - dx - dy).x;
+	s.y = texture2D(u_curr, v_texcrd - dx + dy).x;
+	s.z = texture2D(u_curr, v_texcrd + dx - dy).x;
+	s.w = texture2D(u_curr, v_texcrd + dx + dy).x;
 	
 	float average = dot(s, vec4(0.25, 0.25, 0.25, 0.25));
 	
-	// change the velocity to move toward the average
-	curr.y += (average - curr.x) * 2.0;
+	// http://www.lonesock.net/article/verlet.html
+	// xi+1 = xi + (xi - xi-1) + a * dt * dt
 	
-	// apply some dumping to the velocity
-	curr.y *= 0.985;
+	float a = (average - curr.x);
+	float next = curr.x + (curr.x - last.x) * 0.985 + a;
 	
-	// move the displacement along the velocity
-	curr.x += curr.y;
-	
-	// output
-	gl_FragColor = curr;
+	gl_FragColor = vec4(next, 0, 0, 0);
 }
 
 -- Normal.Fragment
@@ -94,10 +89,10 @@ void main(void) {
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
 	drop = 0.5 - cos(drop * PI) * 0.5;
 	
-	curr.x += drop * u_strength;
+	float next = curr.x + drop * u_strength;
 	
 	// output
-	gl_FragColor = curr;
+	gl_FragColor = vec4(next, 0, 0, 0);
 }
 
 -- Scene.Vertex
