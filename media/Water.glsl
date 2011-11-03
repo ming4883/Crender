@@ -16,6 +16,16 @@ void main(void) {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 }
 
+-- Copy.Fragment
+precision mediump float;
+
+varying vec2 v_texcrd;
+uniform sampler2D u_buffer;
+
+void main(void) {
+	gl_FragColor = texture2D(u_buffer, v_texcrd);
+}
+
 -- Step.Fragment
 precision mediump float;
 
@@ -40,8 +50,10 @@ void main(void) {
 	// http://www.lonesock.net/article/verlet.html
 	// xi+1 = xi + (xi - xi-1) + a * dt * dt
 	
-	float a = (average - curr.x);
-	float next = curr.x + (curr.x - last.x) * 0.985 + a;
+	float v = curr.x - last.x;
+	float a = average - curr.x;
+	v -= v / 64.0; // dumping
+	float next = curr.x + v + a;
 	
 	gl_FragColor = vec4(next, 0, 0, 0);
 }
@@ -66,7 +78,7 @@ void main(void) {
 	n.x = dot(s, vec4(0.25, 0.25,-0.25,-0.25)); // sobelX
 	n.y = dot(s, vec4(0.25,-0.25,+0.25,-0.25)); // sobelY
 	
-	vec3 norm = normalize( vec3(n.x, 0.001, n.y) );
+	vec3 norm = normalize( vec3(n.x, 1.0 / 512.0, n.y) );
 	
 	// output
 	gl_FragColor = vec4(norm * 0.5 + 0.5, 0);
@@ -203,7 +215,7 @@ void main() {
 	
 	float d = dot(norm, normalize(u_camPos - v_pos));
 	d = max(d, 0.0);
-	d = pow(d, 8.0);
+	d = pow(d, 4.0);
 	
 	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 	/*
