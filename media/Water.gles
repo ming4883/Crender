@@ -101,7 +101,7 @@ void main(void) {
 	float drop = max(0.0, 1.0 - length(u_center - v_texcrd) / u_radius);
 	drop = 0.5 - cos(drop * PI) * 0.5;
 	
-	float next = curr.x + drop * u_strength;
+	float next = curr.x - drop * u_strength;
 	
 	// output
 	gl_FragColor = vec4(next, 0, 0, 0);
@@ -215,7 +215,7 @@ void main() {
 	
 	float d = dot(norm, normalize(u_camPos - v_pos));
 	d = max(d, 0.0);
-	d = pow(d, 4.0);
+	d = pow(d, 8.0);
 	
 	vec4 refle = vec4(1.0, 1.0, 1.0, 1.0);
 	/*
