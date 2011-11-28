@@ -132,6 +132,25 @@ ENDIF()
 
 CREATE_EXAMPLE( example_reflection "${SRC}" "${RES}" )
 
+
+#-------------------------------------------------------------------------------
+# example_texture_animation
+SET( SRC 
+	TextureAnimation.example.c
+	)
+	
+SET( RES
+	../media/Common.glsl
+	../media/TextureAnimation.glsl
+	)
+
+IF( APPLE )
+	LIST( APPEND RES Example.xib )
+ENDIF()
+
+CREATE_EXAMPLE( example_texture_animation "${SRC}" "${RES}" )
+
+
 #-------------------------------------------------------------------------------
 # example_embedded_httpd
 SET( SRC EmbeddedHttpd.example.c )

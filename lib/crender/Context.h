@@ -77,6 +77,7 @@ typedef struct CrFfpState
 {
 	float transformModel[16];
 	float transformProj[16];
+	float transformTex[16];
 	
 	float texConstant[4];
 	struct CrFfpTexStage texStage[CR_MAX_FFP_TEX_STAGE];

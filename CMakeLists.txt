@@ -14,7 +14,6 @@ SET( CRENDER_COMMON
 		lib/crender/Context.h
 		lib/crender/Buffer.h
 		lib/crender/GpuFormat.h
-#		lib/crender/GpuState.h
 		lib/crender/Mat44.c
 		lib/crender/Mat44.h
 		lib/crender/Mem.c
@@ -24,7 +23,6 @@ SET( CRENDER_COMMON
 		lib/crender/Platform.c
 		lib/crender/Platform.h
 		lib/crender/pstdint.h
-#		lib/crender/RenderTarget.h
 		lib/crender/Shader.h
 		lib/crender/StrHash.c
 		lib/crender/StrHash.h
@@ -49,11 +47,7 @@ IF( WIN32 )
 		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
-#		lib/crender/GpuState.gl.c
-#		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
-#		lib/crender/RenderTarget.gl.c
-#		lib/crender/RenderTarget.gl.h
 		lib/crender/Shader.gl.c
 		lib/crender/Shader.gl.h
 		lib/crender/Texture.gl.c
@@ -81,11 +75,7 @@ IF( WIN32 )
 		lib/crender/Context.d3d9.h
 		lib/crender/Buffer.d3d9.c
 		lib/crender/Buffer.d3d9.h
-#		lib/crender/GpuState.d3d9.c
-#		lib/crender/GpuState.d3d9.h
 		lib/crender/Mat44.d3d9.c
-#		lib/crender/RenderTarget.d3d9.c
-#		lib/crender/RenderTarget.d3d9.h
 		lib/crender/Shader.d3d9.c
 		lib/crender/Shader.d3d9.h
 		lib/crender/Texture.d3d9.c
@@ -108,11 +98,7 @@ ELSEIF( APPLE )
 		lib/crender/Context.gl.h
 		lib/crender/Buffer.gl.c
 		lib/crender/Buffer.gl.h
-#		lib/crender/GpuState.gl.c
-#		lib/crender/GpuState.gl.h
 		lib/crender/Mat44.gl.c
-#		lib/crender/RenderTarget.gl.c
-#		lib/crender/RenderTarget.gl.h
 		lib/crender/Shader.gl.c
 		lib/crender/Shader.gl.h
 		lib/crender/Texture.gl.c
@@ -123,8 +109,8 @@ ELSEIF( APPLE )
 	
 	SOURCE_GROUP( "glsw" FILES ${GLSW} )
 	SOURCE_GROUP( "httpd" FILES ${HTTPD} )
-	SOURCE_GROUP( "crender" FILES ${CRENDER} )	
-		
+	SOURCE_GROUP( "crender" FILES ${CRENDER} )
+	
 	ADD_DEFINITIONS( -DCR_APPLE_IOS )
 	ADD_DEFINITIONS( -DTARGET_OS_IPHONE )
 	

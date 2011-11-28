@@ -97,7 +97,7 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
 
 	if(nullptr == impl->apiFormatMapping) {
-		crDbgStr("Non supported texture format: %s\n", format);
+		crDbgStr("Non supported texture format: %08x\n", format);
 		return CrFalse;
 	}
 
@@ -145,7 +145,7 @@ CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, siz
 	impl->apiFormatMapping = crTextureGpuFormatMappingGet(format);
 
 	if(nullptr == impl->apiFormatMapping) {
-		crDbgStr("Non supported texture format: %s\n", format);
+		crDbgStr("Non supported texture format: %08x\n", format);
 		return CrFalse;
 	}
 

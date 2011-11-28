@@ -35,6 +35,7 @@ CR_API void crFfpStateInit(CrFfpState* self)
 	memset(self->texConstant, 0, sizeof(self->texConstant));
 	crMat44SetIdentity((CrMat44*)self->transformModel);
 	crMat44SetIdentity((CrMat44*)self->transformProj);
+	crMat44SetIdentity((CrMat44*)self->transformTex);
 }
 
 static GLenum CrGpuState_blendFactorMapping[] = {
@@ -141,7 +142,6 @@ CR_API void crContextApplyFfpState(CrContext* self)
 
 #ifndef CR_ANDROID
 	for(i=0; i<1; ++i) {
-
 		struct CrFfpTexStage* stage = &self->ffpState.texStage[i];
 
 		GLenum opRGB = CrFfpState_TexOpMapping[stage->opRGB - CrFfpState_TexOp_Arg0];
@@ -172,7 +172,13 @@ CR_API void crContextApplyFfpState(CrContext* self)
 		glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
 		glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
 		glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
+
+		glMatrixMode(GL_TEXTURE);
+		crMat44Transpose(&m, (CrMat44*)self->ffpState.transformTex);
+		glLoadMatrixf((float*)&m);
 	}
+
+	glActiveTexture(GL_TEXTURE0);
 
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, self->ffpState.texConstant);
 
