@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Pvr.h"
-#include "red_tile_texture.h"
+#include "tree_texture.h"
 
 #include "../lib/crender/Mem.h"
 #include "../lib/crender/Texture.h"
@@ -65,20 +65,22 @@ void drawScene(CrMat44 viewMtx, CrMat44 projMtx, CrMat44 viewProjMtx, CrVec3 cam
 
 	gpuState->cull = CrFalse;
 	gpuState->depthTest = CrTrue;
+	gpuState->blend = CrTrue;
+	gpuState->blendFactorSrcRGB = CrGpuState_BlendFactor_SrcAlpha;
+	gpuState->blendFactorDestRGB = CrGpuState_BlendFactor_OneMinusSrcAlpha;
+	gpuState->blendFactorSrcA = CrGpuState_BlendFactor_SrcAlpha;
+	gpuState->blendFactorDestA = CrGpuState_BlendFactor_OneMinusSrcAlpha;
 	crContextApplyGpuState(crContext());
 
 	crGpuProgramPreRender(prog);
 	{	
-		CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Wrap, CrSamplerAddress_Wrap};
+		CrSampler sampler = {CrSamplerFilter_MagMin_Linear_Mip_None,  CrSamplerAddress_Clamp, CrSamplerAddress_Clamp};
 		crGpuProgramUniformTexture(prog, CrHash("u_tex"), texture, &sampler);
 	}
 
 	{	CrMat44 m; crMat44Transpose(&m, &textureMtx);
 		crGpuProgramUniformMtx4fv(prog, CrHash("u_textureMtx"), 1, CrFalse, m.v);
 	}
-	app->shaderContext.matDiffuse = crVec4(1.0f, 1.0f, 1.0f, 1);
-	app->shaderContext.matSpecular = crVec4(0.0f, 0.0f, 0.0f, 1);
-	app->shaderContext.matShininess = 64;
 
 	// draw wall
 	{ CrVec3 v = {0, 1.0f, -2.5f};
@@ -106,7 +108,7 @@ void crAppUpdate(unsigned int elapsedMilliseconds)
 	//remoteConfigUnlock(config);
 
 	crMat44SetIdentity(&textureMtx);
-	textureMtx.m01 = 1/16.0f * cosf(t);
+	textureMtx.m01 = 1/8.0f * cosf(t);
 
 	t += elapsedMilliseconds / 1000.0f;
 }
@@ -132,7 +134,7 @@ void crAppHandleMouse(int x, int y, int action)
 void crAppRender()
 {
 	//CrVec3 eyeAt = crVec3(0, 1.5f, 2);
-	CrVec3 eyeAt = crVec3(0, 1.0f, 3.5f);
+	CrVec3 eyeAt = crVec3(0, 0.0f, 7.0f);
 	CrVec3 lookAt = crVec3(0, 0, 0);
 	CrVec3 eyeUp = *CrVec3_c010();
 	CrMat44 viewMtx;
@@ -205,7 +207,7 @@ CrBool crAppInitialize()
 	}
 
 	// textures
-	texture = Pvr_createTexture(red_tile_texture);
+	texture = Pvr_createTexture(tree_texture);
 
 	// floor
 	{ CrVec3 offset = crVec3(-1.0f, -1.0f, 0);
