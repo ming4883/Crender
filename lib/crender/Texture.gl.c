@@ -84,6 +84,9 @@ size_t crTextureGetMipLevelOffset(CrTexture* self, size_t mipIndex, size_t* mipW
 CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format, const void* data)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
+
+	crTrace("crTextureInit");
+
 	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
 		return CrFalse;
@@ -131,6 +134,8 @@ CR_API CrBool crTextureInit(CrTexture* self, size_t width, size_t height, size_t
 CR_API CrBool crTextureInitRtt(CrTexture* self, size_t width, size_t height, size_t mipCount, size_t surfCount, CrGpuFormat format)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
+
+	crTrace("crTextureInitRtt");
 
 	if(self->flags & CrTexture_Inited) {
 		crDbgStr("texture already inited!\n");
@@ -202,6 +207,8 @@ CR_API CrBool crTextureCommit(CrTexture* self, const void* data)
 	const CrTextureGpuFormatMapping* mapping;
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
+	crTrace("crTextureCommit");
+
 	if(nullptr == self)
 		return CrFalse;
 
@@ -260,6 +267,8 @@ CR_API void crTextureFree(CrTexture* self)
 {
 	CrTextureImpl* impl = (CrTextureImpl*)self;
 
+	crTrace("crTextureFree");
+
 	if(nullptr == self)
 		return;
 
@@ -271,4 +280,6 @@ CR_API void crTextureFree(CrTexture* self)
 	}
 
 	crMem()->free(self, "CrTexture");
+
+	crCheckGLError();
 }

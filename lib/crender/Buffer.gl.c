@@ -30,6 +30,9 @@ CR_API CrBuffer* crBufferAlloc()
 CR_API void crBufferFree(CrBuffer* self)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
+
+	crTrace("crBufferFree");
+
 	if(nullptr == self)
 		return;
 
@@ -46,6 +49,8 @@ CR_API void crBufferFree(CrBuffer* self)
 CR_API CrBool crBufferInit(CrBuffer* self, CrBufferType type, size_t sizeInBytes, void* initialData)
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
+
+	crTrace("crBufferInit");
 
 #if !defined(CR_APPLE_IOS)
 	if(crContextFixedPipelineOnly())
@@ -76,6 +81,8 @@ CR_API void crBufferUpdate(CrBuffer* self, size_t offsetInBytes, size_t sizeInBy
 {
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 
+	//crTrace("crBufferUpdate");
+
 	if(nullptr == self)
 		return;
 
@@ -99,6 +106,8 @@ CR_API void* crBufferMap(CrBuffer* self, CrBufferMapAccess access)
 #endif
 
 	void* ret = nullptr;
+
+	//crTrace("crBufferMap");
 
 	if(nullptr == self)
 		return nullptr;
@@ -127,6 +136,8 @@ CR_API void crBufferUnmap(CrBuffer* self)
 #if !defined(CR_GLES_2)
 	CrBufferImpl* impl = (CrBufferImpl*)self;
 #endif
+
+	//crTrace("crBufferUnmap");
 
 	if(nullptr == self)
 		return;

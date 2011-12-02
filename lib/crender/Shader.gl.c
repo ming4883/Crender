@@ -26,6 +26,8 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 	int compileStatus;
 	CrGpuShaderImpl* impl = (CrGpuShaderImpl*)self;
 
+	crTrace("crGpuShaderInit");
+
 	if(self->flags & CrGpuShader_Inited) {
 		crDbgStr("CrGpuShader already inited!\n");
 		return CrFalse;
@@ -58,6 +60,8 @@ CR_API CrBool crGpuShaderInit(CrGpuShader* self, const char** sources, size_t sr
 		self->flags |= CrGpuShader_Inited;
 	}
 
+	crCheckGLError();
+
 	return CrTrue;
 }
 
@@ -65,11 +69,15 @@ CR_API void crGpuShaderFree(CrGpuShader* self)
 {
 	CrGpuShaderImpl* impl = (CrGpuShaderImpl*)self;
 
+	crTrace("crGpuShaderFree");
+
 	if(nullptr == self)
 		return;
 
 	glDeleteShader(impl->glName);
 	crMem()->free(self, "CrGpuShader");
+
+	crCheckGLError();
 }
 
 CR_API CrGpuProgram* crGpuProgramAlloc()
@@ -87,6 +95,8 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 	GLint attrCnt;
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
 
+	crTrace("crGpuProgramInit");
+
 	if(self->flags & CrGpuProgram_Inited) {
 		crDbgStr("CrGpuProgram already inited!\n");
 		return CrFalse;
@@ -94,17 +104,46 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 	crCheckGLError();	// clear any unhandled gl errors
 
+	crTrace("glCreateProgram");
 	impl->glName = glCreateProgram();
+	crCheckGLError();
 
 	// attach shaders
+	crTrace("glAttachShader");
 	for(i=0; i<shaderCnt; ++i) {
 		if(nullptr != shaders[i]) {
 			glAttachShader(impl->glName, ((CrGpuShaderImpl*)shaders[i])->glName);
 		}
 	}
+	{	GLenum glerr = glGetError();
+		if(GL_INVALID_OPERATION == glerr) {
+			crDbgStr("GL_INVALID_OPERATION\n");
+			if(GL_FALSE == glIsProgram(impl->glName))
+				crDbgStr("0x%08x is not a program\n", impl->glName);
+			crDbgStr("code:\n");
+			for(i=0; i<shaderCnt; ++i) {
+				if(nullptr == shaders[i]) continue;
+				crDbgStr("  -0x%08x\n", ((CrGpuShaderImpl*)shaders[i])->glName);
+			}
+			{	GLsizei cnt;
+				GLuint shaders[16];
+				glGetAttachedShaders(impl->glName, 16, &cnt, shaders);
+
+				crDbgStr("gl:\n");
+				for(i=0; i<(size_t)cnt; ++i) {
+					crDbgStr("  -0x%08x\n", shaders[i]);
+				}
+			}
+		}
+		else if(GL_INVALID_VALUE == glerr) {
+			crDbgStr("GL_INVALID_VALUE\n");
+		}
+	}
 
 	// link program
+	crTrace("glLinkProgram");
 	glLinkProgram(impl->glName);
+	crCheckGLError();
 
 	glGetProgramiv(impl->glName, GL_LINK_STATUS, &linkStatus);
 	if(GL_FALSE == linkStatus) {
@@ -121,9 +160,12 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 
 	self->flags |= CrGpuProgram_Inited;
 
+	crTrace("glUseProgram");
 	glUseProgram(impl->glName);
+	crCheckGLError();
 
 	// query all uniforms
+	crTrace("glGetActiveUniform");
 	{
 		GLint i;
 		GLsizei uniformLength;
@@ -176,8 +218,10 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 			//crDbgStr("%s %d %d 0x%04x %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
 		}
 	}
+	crCheckGLError();
 
 	// query all attributes
+	crTrace("glGetActiveAttrib");
 	{
 		GLint i;
 		GLsizei attrLength;
@@ -210,9 +254,9 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 			//crDbgStr("%s %d %d 0x%04x %d\n", uniformName, i, uniformSize, uniformType, uniform->texunit);
 		}
 	}
+	crCheckGLError();
 
 	crDbgStr("glProgram %d has %d uniforms %d attributes\n", impl->glName, uniformCnt, attrCnt);
-
 
 #if !defined(CR_GLES_2)
 	//glGenVertexArrays(1, &impl->glVertexArray);
@@ -225,6 +269,9 @@ CR_API CrBool crGpuProgramInit(CrGpuProgram* self, CrGpuShader** shaders, size_t
 CR_API void crGpuProgramFree(CrGpuProgram* self)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
+
+	crTrace("crGpuProgramFree");
+
 	if(nullptr == self)
 		return;
 
@@ -241,6 +288,8 @@ CR_API void crGpuProgramFree(CrGpuProgram* self)
 #endif
 
 	crMem()->free(self, "CrGpuProgram");
+
+	crCheckGLError();
 }
 
 CR_API void crGpuProgramPreRender(CrGpuProgram* self)
