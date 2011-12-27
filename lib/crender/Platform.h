@@ -52,11 +52,19 @@ CR_API void crDbgStr(const char* str, ...);
 
 #define crMax(a, b) (a > b ? a : b)
 
-
 #define CrAllocWithImpl(obj, CLASS, CLASSIMPL) \
 	obj = (CLASS*)malloc(sizeof(CLASS)+sizeof(CLASSIMPL));\
 	memset(obj, 0, sizeof(CLASS)+sizeof(CLASSIMPL));\
 	obj->impl = (CLASSIMPL*)((char*)obj + sizeof(CLASS));
+
+//#define CR_TRACE_ENABLED
+
+#ifdef CR_TRACE_ENABLED
+#define crTrace(x) {crDbgStr("%s\n",x);}
+#else
+#define crTrace(x)
+#endif
+
 
 #ifdef __cplusplus
 }
