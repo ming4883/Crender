@@ -1,0 +1,1 @@
+http://industriousone.com/premake-quick-start

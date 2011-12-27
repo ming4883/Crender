@@ -1,0 +1,6 @@
+vs2008/*.*
+*.lib
+*.idb
+*.pdb
+*.PIXExp
+me-*
