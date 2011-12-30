@@ -2,7 +2,7 @@
 project "crender"
 	kind "StaticLib"
 	language "C++"
-	files { "../src/core/**.h", "../src/core/**.c", "../src/core/**.cpp" }
+	files { "../../src/core/**.h", "../../src/core/**.c", "../../src/core/**.cpp" }
 
 	configuration "Debug"
 		defines { "DEBUG" }
