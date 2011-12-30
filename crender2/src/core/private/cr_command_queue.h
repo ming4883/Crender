@@ -10,6 +10,9 @@ namespace cr
 struct command_queue : object
 {
 	static void dstor(object* obj);
+
+	cr_command_id enqueue(cr_command cmd, void* arg);
+	void execute(void);
 };
 
 }	// namespace cr
