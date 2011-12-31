@@ -1,8 +1,11 @@
 -- A project defines one build target
-project "crender"
+project "liblfds"
 	kind "StaticLib"
 	language "C++"
-	files { "../../src/core/**.h", "../../src/core/**.c", "../../src/core/**.cpp" }
+	files { "../../src/liblfds/**.h", "../../src/liblfds/**.c" }
+	excludes { "../../src/liblfds/driver_entry.c" }
+	defines { "_CRT_SECURE_NO_WARNINGS" }
+	includedirs { "../../src/liblfds" }
 
 	configuration "Debug"
 		defines { "DEBUG" }
