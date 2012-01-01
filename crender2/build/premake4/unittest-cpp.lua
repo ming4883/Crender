@@ -1,9 +1,10 @@
 -- A project defines one build target
-project "unittest++"
+project "unittest-cpp"
 	kind "StaticLib"
 	language "C++"
-	files { "../../src/unittest++/**.h", "../../src/unittest++/**.cpp" }
-	excludes { "../../src/unittest++/Posix/**" }
+	files { "../../src/unittest-cpp/**.h", "../../src/unittest-cpp/**.cpp" }
+	-- excludes { "../../src/unittest-cpp/Posix/**" }
+	excludes { "../../src/unittest-cpp/Win32/**" }
 	defines { "_CRT_SECURE_NO_WARNINGS" }
 
 	configuration "Debug"

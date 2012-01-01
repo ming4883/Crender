@@ -21,7 +21,7 @@ CR_API void cr_context_finalize(void);
 	to retain an object (i.e. increase ref-count) invoke cr_retain.
 	to release an object (i.e. decrease ref-count) invoke cr_release.
 */
-typedef int cr_object;
+typedef unsigned long cr_object;
 
 CR_API void cr_retain(cr_object obj);
 

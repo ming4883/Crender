@@ -27,10 +27,10 @@ CR_API cr_object cr_command_queue_new(void)
 {
 	CR_ASSERT(cr::context::singleton);
 
-	cr::command_queue* _self = cr::context::singleton->new_object<cr::command_queue>();
-	_self->dstor_func = &cr::command_queue::dstor;
+	cr::command_queue* self = cr::context::singleton->new_object<cr::command_queue>();
+	self->dstor_func = &cr::command_queue::dstor;
 
-	return (cr_object)_self;
+	return (cr_object)self;
 }
 
 CR_API cr_command_id cr_command_queue_enqueue(cr_object self, cr_command cmd, void* arg)

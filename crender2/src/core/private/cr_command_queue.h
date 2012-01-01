@@ -4,7 +4,7 @@
 #include "../cr_command_queue.h"
 #include "cr_object.h"
 
-#include "tinythread/tinythread.h"
+#include "../tinythread/tinythread.h"
 
 namespace cr
 {

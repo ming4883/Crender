@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-typedef int cr_bool;
+typedef unsigned char cr_bool;
 
 #define CR_TRUE 0
 #define CR_FALSE 1
@@ -18,7 +18,7 @@ typedef int cr_bool;
 #define nullptr 0
 #endif
 
-typedef void*(* cr_alloc_func) (unsigned int size_in_bytes);
+typedef void*(* cr_alloc_func) (unsigned long size_in_bytes);
 typedef void (* cr_free_func) (void* ptr);
 
 #define CR_ASSERT(x) assert(x)
