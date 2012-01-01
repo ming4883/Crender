@@ -1,6 +1,7 @@
 @echo off
-@mkdir vs2008
-@cd vs2008
-@copy ..\premake4\*.lua .\
-..\premake4.exe vs2008
+@set IDE=vs2008
+@if not exist %IDE% mkdir %IDE%
+@cd %IDE%
+@xcopy /q /y ..\premake4\*.lua .\
+..\premake4.exe %IDE%
 @pause

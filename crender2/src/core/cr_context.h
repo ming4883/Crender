@@ -27,6 +27,8 @@ CR_API void cr_retain(cr_object obj);
 
 CR_API void cr_release(cr_object obj);
 
+CR_API unsigned long cr_ref_count_of(cr_object obj);
+
 #ifdef __cplusplus
 }
 #endif

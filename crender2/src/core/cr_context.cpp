@@ -8,6 +8,13 @@ namespace cr
 
 context* context::singleton = nullptr;
 
+void object::cstor()
+{
+	dstor_func = nullptr;
+	next = prev = nullptr;
+	ref_cnt = 1;
+}
+
 void context::add_object(object* obj)
 {
 	DL_APPEND(object_list, obj);
@@ -72,6 +79,13 @@ CR_API void cr_release(cr_object obj)
 		CR_ASSERT(cr::context::singleton);
 		cr::context::singleton->del_object(self);
 	}
+}
+
+CR_API unsigned long cr_ref_count_of(cr_object obj)
+{
+	CR_ASSERT(obj);
+	cr::object* self = (cr::object*)obj;
+	return self->ref_cnt;
 }
 
 #ifdef __cplusplus

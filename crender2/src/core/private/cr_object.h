@@ -1,6 +1,8 @@
 #ifndef CR_OBJECT_PRIVATE_H
 #define CR_OBJECT_PRIVATE_H
 
+#include "../cr_context.h"
+
 namespace cr
 {
 
@@ -14,12 +16,7 @@ struct object
 
 	unsigned long ref_cnt;
 
-	void cstor()
-	{
-		dstor_func = nullptr;
-		next = prev = nullptr;
-		ref_cnt = 1;
-	}
+	void cstor();
 };
 
 }	// namespace cr

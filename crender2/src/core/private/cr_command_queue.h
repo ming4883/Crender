@@ -4,11 +4,15 @@
 #include "../cr_command_queue.h"
 #include "cr_object.h"
 
+#include "tinythread/tinythread.h"
+
 namespace cr
 {
 
 struct command_queue : object
 {
+	tthread::mutex* mutex;
+
 	static void dstor(object* obj);
 
 	cr_command_id enqueue(cr_command cmd, void* arg);

@@ -1,4 +1,4 @@
-solution "crender"
+solution "crender2"
 	configurations { "Debug", "Release" }
 	-- location "vs2008"
 	dofile "crender.lua"

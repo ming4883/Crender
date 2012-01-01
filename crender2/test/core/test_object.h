@@ -1,0 +1,14 @@
+#ifndef TEST_OBJECT_H
+#define TEST_OBJECT_H
+
+#include <private/cr_object.h>
+
+struct test_object : cr::object
+{
+	static int cnt;
+	static void dstor(cr::object* self);
+};
+
+cr_object test_object_new(void);
+
+#endif	// TEST_OBJECT_H

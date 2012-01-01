@@ -15,8 +15,9 @@ project "crender"
 project "crender_core_test"
 	kind "ConsoleApp"
 	language "C++"
-	files { "../../test/core_test.cpp" }
-	includedirs { "../../src/core" }
+	files { "../../test/main.cpp", "../../test/core/**.cpp" }
+	includedirs { "../../src/core", "../../src/unittest++" }
+	links { "unittest++", "crender" }
 	
 	configuration "Debug"
 		defines { "DEBUG" }
