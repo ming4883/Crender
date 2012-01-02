@@ -17,6 +17,7 @@ cr_command_id command_queue::produce(cr_command cmd, void* arg)
 	i->cmd = cmd;
 	i->arg = arg;
 	i->id = ++id_counter;
+	i->next = nullptr;
 
 	LL_APPEND(head, i);
 
@@ -25,8 +26,12 @@ cr_command_id command_queue::produce(cr_command cmd, void* arg)
 
 void command_queue::consume(void)
 {
+	if(nullptr == head)
+		return;
+
 	item* i = head;
-	LL_DELETE_VS2008(head, head);
+
+	LL_DELETE(head, head);
 
 	i->cmd(i->arg);
 
@@ -44,7 +49,7 @@ CR_API cr_command_queue cr_command_queue_new(void)
 	CR_ASSERT(cr::context::singleton);
 
 	cr::command_queue* self = cr::context::singleton->new_object<cr::command_queue>();
-	
+
 	self->dstor_func = &cr::command_queue::dstor;
 	self->mutex = new tthread::mutex;
 	self->id_counter = 0;
