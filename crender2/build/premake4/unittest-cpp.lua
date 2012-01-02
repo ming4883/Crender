@@ -3,8 +3,11 @@ project "unittest-cpp"
 	kind "StaticLib"
 	language "C++"
 	files { "../../src/unittest-cpp/**.h", "../../src/unittest-cpp/**.cpp" }
-	-- excludes { "../../src/unittest-cpp/Posix/**" }
-	excludes { "../../src/unittest-cpp/Win32/**" }
+	if _ACTION == "vs2008" then
+		excludes { "../../src/unittest-cpp/Posix/**" }
+	else
+		excludes { "../../src/unittest-cpp/Win32/**" }
+	end
 	defines { "_CRT_SECURE_NO_WARNINGS" }
 
 	configuration "Debug"

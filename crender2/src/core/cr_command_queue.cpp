@@ -1,20 +1,36 @@
 #include "private/cr_command_queue.h"
 #include "private/cr_context.h"
+#include "uthash/utlist.h"
 
 namespace cr
 {
 
 void command_queue::dstor(cr::object* obj)
 {
+	command_queue& self = (command_queue&)*obj;
+	delete self.mutex;
 }
 
-cr_command_id command_queue::enqueue(cr_command cmd, void* arg)
+cr_command_id command_queue::produce(cr_command cmd, void* arg)
 {
+	item* i = (item*)cr_mem_alloc(sizeof(item));
+	i->cmd = cmd;
+	i->arg = arg;
+	i->id = ++id_counter;
+
+	LL_APPEND(head, i);
+
 	return 0;
 }
 
-void command_queue::execute(void)
+void command_queue::consume(void)
 {
+	item* i = head;
+	LL_DELETE_VS2008(head, head);
+
+	i->cmd(i->arg);
+
+	cr_mem_free(i);
 }
 
 }	// namespace cr
@@ -23,28 +39,31 @@ void command_queue::execute(void)
 extern "C" {
 #endif
 
-CR_API cr_object cr_command_queue_new(void)
+CR_API cr_command_queue cr_command_queue_new(void)
 {
 	CR_ASSERT(cr::context::singleton);
 
 	cr::command_queue* self = cr::context::singleton->new_object<cr::command_queue>();
+	
 	self->dstor_func = &cr::command_queue::dstor;
+	self->mutex = new tthread::mutex;
+	self->id_counter = 0;
 
-	return (cr_object)self;
+	return (cr_command_queue)self;
 }
 
-CR_API cr_command_id cr_command_queue_enqueue(cr_object self, cr_command cmd, void* arg)
+CR_API cr_command_id cr_command_queue_produce(cr_command_queue self, cr_command cmd, void* arg)
 {
 	if(nullptr == self) return 0;
 	if(nullptr == cmd) return 0;
 
-	return ((cr::command_queue*)self)->enqueue(cmd, arg);
+	return ((cr::command_queue*)self)->produce(cmd, arg);
 }
 
-CR_API void cr_command_queue_execute(cr_object self)
+CR_API void cr_command_queue_consume(cr_command_queue self)
 {
 	if(nullptr == self) return;
-	((cr::command_queue*)self)->execute();
+	((cr::command_queue*)self)->consume();
 }
 
 #ifdef __cplusplus

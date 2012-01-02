@@ -2,6 +2,7 @@
 #define CR_PLATFORM_H
 
 #include <assert.h>
+#include <stdlib.h>
 
 #define CR_API
 
@@ -18,7 +19,7 @@ typedef unsigned char cr_bool;
 #define nullptr 0
 #endif
 
-typedef void*(* cr_alloc_func) (unsigned long size_in_bytes);
+typedef void*(* cr_alloc_func) (size_t size_in_bytes);
 typedef void (* cr_free_func) (void* ptr);
 
 #define CR_ASSERT(x) assert(x)

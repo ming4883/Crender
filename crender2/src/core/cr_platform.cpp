@@ -1,7 +1,5 @@
 #include "cr_platform.h"
 
-#include <cstdlib>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
