@@ -12,7 +12,7 @@ extern "C" {
 typedef cr_object cr_command_queue;
 
 /*! a command to be executed */
-typedef void (*cr_command) (void* state);
+typedef void (*cr_command) (cr_command_queue cmd_queue, void* arg);
 
 typedef int cr_command_id;
 

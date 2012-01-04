@@ -19,7 +19,9 @@ cr_command_id command_queue::produce(cr_command cmd, void* arg)
 	i->id = ++id_counter;
 	i->next = nullptr;
 
-	LL_APPEND(head, i);
+	{	lock_guard_t lock(*mutex);
+		LL_APPEND(head, i);
+	}
 
 	return 0;
 }
@@ -31,10 +33,11 @@ void command_queue::consume(void)
 
 	item* i = head;
 
-	LL_DELETE(head, head);
+	{	lock_guard_t lock(*mutex);
+		LL_DELETE(head, head);
+	}
 
-	i->cmd(i->arg);
-
+	i->cmd((cr_command_queue)this, i->arg);
 	cr_mem_free(i);
 }
 
@@ -51,7 +54,7 @@ CR_API cr_command_queue cr_command_queue_new(void)
 	cr::command_queue* self = cr::context::singleton->new_object<cr::command_queue>();
 
 	self->dstor_func = &cr::command_queue::dstor;
-	self->mutex = new tthread::mutex;
+	self->mutex = new cr::command_queue::mutex_t;
 	self->id_counter = 0;
 
 	return (cr_command_queue)self;

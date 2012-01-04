@@ -20,7 +20,10 @@ struct command_queue : object
 		item* next;
 	};
 
-	tthread::mutex* mutex;
+	typedef tthread::mutex mutex_t;
+	typedef tthread::lock_guard<mutex_t> lock_guard_t;
+
+	mutex_t* mutex;
 	cr_command_id id_counter;
 	item* head;
 

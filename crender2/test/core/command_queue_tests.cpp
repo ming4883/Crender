@@ -15,7 +15,7 @@ TEST(cr_command_queue_new_del)
 struct test_cr_command_queue
 {
 	static int counter;
-	static void cmd(void* arg)
+	static void cmd(cr_command_queue cmd_queue, void* arg)
 	{
 		++counter;
 	}
