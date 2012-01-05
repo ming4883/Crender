@@ -7,6 +7,8 @@
 namespace cr
 {
 
+#define cr_context_get(ctx) ((nullptr == ctx) ? cr::context::singleton : (cr::context*)ctx)
+
 struct CR_API context
 {
 	static context* singleton;

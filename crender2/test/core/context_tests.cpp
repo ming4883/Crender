@@ -12,7 +12,7 @@ TEST(cr_context_object_retain_release)
 {
 	cr_context_initialize();
 
-	cr_object t = test_object_new();
+	cr_object t = test_object_new(nullptr);
 
 	CHECK_EQUAL(1, test_object::cnt);	// ref-count of t should be 1
 	CHECK_EQUAL(1, cr_ref_count_of(t));
@@ -33,7 +33,7 @@ TEST(cr_context_auto_delete_objects)
 {
 	cr_context_initialize();
 
-	cr_object t = test_object_new();
+	cr_object t = test_object_new(nullptr);
 	
 	CHECK_EQUAL(1, test_object::cnt);
 

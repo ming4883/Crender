@@ -5,7 +5,7 @@ TEST(cr_command_queue_new_del)
 {
 	cr_context_initialize();
 
-	cr_command_queue q = cr_command_queue_new();
+	cr_command_queue q = cr_command_queue_new(nullptr);
 
 	cr_release(q);
 
@@ -27,7 +27,7 @@ TEST(cr_command_queue_produce_consume)
 {
 	cr_context_initialize();
 
-	cr_command_queue q = cr_command_queue_new();
+	cr_command_queue q = cr_command_queue_new(nullptr);
 
 	test_cr_command_queue::counter = 0;
 	cr_command_queue_produce(q, test_cr_command_queue::cmd, nullptr);

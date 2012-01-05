@@ -24,7 +24,8 @@ struct command_queue : object
 	typedef tthread::lock_guard<mutex_t> lock_guard_t;
 
 	mutex_t* mutex;
-	cr_command_id id_counter;
+	cr_command_id produce_counter;
+	cr_command_id consume_counter;
 	item* head;
 
 	static void dstor(object* obj);

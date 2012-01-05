@@ -9,11 +9,11 @@ void test_object::dstor(cr::object* self)
 	--cnt;
 }
 
-cr_object test_object_new(void)
+cr_object test_object_new(cr_context context)
 {
 	CR_ASSERT(cr::context::singleton);
 
-	test_object* self = cr::context::singleton->new_object<test_object>();
+	test_object* self = cr_context_get(context)->new_object<test_object>();
 	self->dstor_func = &test_object::dstor;
 
 	++test_object::cnt;

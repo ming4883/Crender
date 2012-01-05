@@ -9,6 +9,6 @@ struct test_object : cr::object
 	static void dstor(cr::object* self);
 };
 
-cr_object test_object_new(void);
+cr_object test_object_new(cr_context context);
 
 #endif	// TEST_OBJECT_H

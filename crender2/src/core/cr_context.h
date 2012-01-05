@@ -7,13 +7,16 @@
 extern "C" {
 #endif
 
-/*! Initialize the cr_context singleton.
-	cr_context is the core of crender.
-	It manages the life cycles all create cr_object.
+/*! cr_context is the core of crender.
+	It manages the life cycles all associated cr_object.
+*/
+typedef unsigned int cr_context;
+
+/*! Initialize the global shared cr_context.
 */
 CR_API void cr_context_initialize(void);
 
-/*! Finalize the cr_context singleton and free all created cr_object */
+/*! Finalize the global shared cr_context and free all associated cr_object */
 CR_API void cr_context_finalize(void);
 
 /*! cr_object is the handle to an object in crender.
@@ -21,7 +24,7 @@ CR_API void cr_context_finalize(void);
 	to retain an object (i.e. increase ref-count) invoke cr_retain.
 	to release an object (i.e. decrease ref-count) invoke cr_release.
 */
-typedef unsigned long cr_object;
+typedef unsigned int cr_object;
 
 CR_API void cr_retain(cr_object obj);
 
