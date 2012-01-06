@@ -6,6 +6,11 @@ TEST(cr_context_init_final)
 {
 	cr_context_initialize();
 	cr_context_finalize();
+
+	printf("int=%d\n", sizeof(int));
+	printf("long=%d\n", sizeof(long));
+	printf("void*=%d\n", sizeof(void*));
+	printf("char*=%d\n", sizeof(char*));
 }
 
 TEST(cr_context_object_retain_release)
@@ -34,7 +39,7 @@ TEST(cr_context_auto_delete_objects)
 	cr_context_initialize();
 
 	cr_object t = test_object_new(nullptr);
-	
+
 	CHECK_EQUAL(1, test_object::cnt);
 
 	cr_context_finalize();

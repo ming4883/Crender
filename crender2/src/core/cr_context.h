@@ -10,7 +10,7 @@ extern "C" {
 /*! cr_context is the core of crender.
 	It manages the life cycles all associated cr_object.
 */
-typedef unsigned int cr_context;
+typedef unsigned long cr_context;
 
 /*! Initialize the global shared cr_context.
 */
@@ -24,7 +24,7 @@ CR_API void cr_context_finalize(void);
 	to retain an object (i.e. increase ref-count) invoke cr_retain.
 	to release an object (i.e. decrease ref-count) invoke cr_release.
 */
-typedef unsigned int cr_object;
+typedef unsigned long cr_object;
 
 CR_API void cr_retain(cr_object obj);
 
