@@ -7,8 +7,19 @@ namespace cr
 
 void command_queue::dstor(cr::object* obj)
 {
-	command_queue& self = (command_queue&)*obj;
-	delete self.mutex;
+	command_queue* self = (command_queue*)obj;
+
+	// clean up remaining commands in queue
+	{	lock_guard_t lock(*self->mutex);
+	
+		item* curr = nullptr, * temp = nullptr;
+		LL_FOREACH_SAFE(self->head, curr, temp) {
+			LL_DELETE(self->head, curr);
+			cr_mem_free(curr);
+		}
+	}
+
+	delete self->mutex;
 }
 
 cr_command_id command_queue::produce(cr_command cmd, void* arg)
@@ -23,7 +34,7 @@ cr_command_id command_queue::produce(cr_command cmd, void* arg)
 		LL_APPEND(head, i);
 	}
 
-	return 0;
+	return produce_counter;
 }
 
 void command_queue::consume(void)

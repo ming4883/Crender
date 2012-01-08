@@ -6,6 +6,7 @@
 namespace cr
 {
 
+struct context;
 struct object;
 typedef void (*object_dstor_func) (object* obj);
 
@@ -13,10 +14,11 @@ struct object
 {
 	object_dstor_func dstor_func;
 	object *next, *prev;
+	context* _context;
 
-	unsigned long ref_cnt;
+	cr_uint32 ref_cnt;
 
-	void cstor();
+	void cstor(context* c);
 };
 
 }	// namespace cr

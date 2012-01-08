@@ -10,14 +10,27 @@
 extern "C" {
 #endif
 
+// nullptr
+#ifndef nullptr
+#define nullptr 0
+#endif
+
+// cr_bool
 typedef unsigned char cr_bool;
 
 #define CR_TRUE 0
 #define CR_FALSE 1
 
-#ifndef nullptr
-#define nullptr 0
-#endif
+// integer types
+typedef char cr_int8;
+typedef short cr_int16;
+typedef int cr_int32;
+
+typedef unsigned char cr_uint8;
+typedef unsigned short cr_uint16;
+typedef unsigned int cr_uint32;
+
+typedef unsigned long cr_ptr;
 
 typedef void*(* cr_alloc_func) (size_t size_in_bytes);
 typedef void (* cr_free_func) (void* ptr);
