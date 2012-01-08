@@ -37,10 +37,10 @@ cr_command_id command_queue::produce(cr_command cmd, void* arg)
 	return produce_counter;
 }
 
-void command_queue::consume(void)
+cr_command_id command_queue::consume(void)
 {
 	if(nullptr == head)
-		return;
+		return 0;
 
 	item* i = head;
 
@@ -51,7 +51,10 @@ void command_queue::consume(void)
 		++consume_counter;
 	}
 
+	cr_command_id cid = i->id;
 	cr_mem_free(i);
+
+	return cid;
 }
 
 }	// namespace cr
@@ -83,10 +86,10 @@ CR_API cr_command_id cr_command_queue_produce(cr_command_queue self, cr_command 
 	return ((cr::command_queue*)self)->produce(cmd, arg);
 }
 
-CR_API void cr_command_queue_consume(cr_command_queue self)
+CR_API cr_command_id cr_command_queue_consume(cr_command_queue self)
 {
-	if(nullptr == self) return;
-	((cr::command_queue*)self)->consume();
+	if(nullptr == self) return 0;
+	return ((cr::command_queue*)self)->consume();
 }
 
 CR_API cr_bool cr_command_queue_is_consumed(cr_command_queue self, cr_command_id cmd_id)

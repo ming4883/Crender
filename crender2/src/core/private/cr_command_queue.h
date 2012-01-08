@@ -31,7 +31,7 @@ struct command_queue : object
 	static void dstor(object* obj);
 
 	cr_command_id produce(cr_command cmd, void* arg);
-	void consume(void);
+	cr_command_id consume(void);
 };
 
 }	// namespace cr

@@ -26,7 +26,7 @@ CR_API cr_command_id cr_command_queue_produce(cr_command_queue self, cr_command 
 
 /*! Dequeue and execute the command in the front of the cr_command_queue.
 */
-CR_API void cr_command_queue_consume(cr_command_queue self);
+CR_API cr_command_id cr_command_queue_consume(cr_command_queue self);
 
 /*! Check whether a command is consumed or not.
 */
