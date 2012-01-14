@@ -11,13 +11,29 @@ project "crender"
 	configuration "Release"
 		defines { "NDEBUG" }
 		flags { "Optimize" }
-		
+
 project "crender_core_test"
 	kind "ConsoleApp"
 	language "C++"
 	files { "../../test/main.cpp", "../../test/core/**.cpp" }
 	includedirs { "../../src/core", "../../src/unittest-cpp" }
 	links { "unittest-cpp", "crender" }
+	
+	configuration "Debug"
+		defines { "DEBUG" }
+		flags { "Symbols" }
+
+	configuration "Release"
+		defines { "NDEBUG" }
+		flags { "Optimize" }
+		
+project "crender_framework_test"
+	kind "ConsoleApp"
+	language "C++"
+	files { "../../src/framework/**.h", "../../src/framework/**.c", "../../src/framework/**.cpp" }
+	includedirs { "../../src/core", "../../src" }
+	defines { "_CRT_SECURE_NO_WARNINGS" }
+	links { "crender" }
 	
 	configuration "Debug"
 		defines { "DEBUG" }

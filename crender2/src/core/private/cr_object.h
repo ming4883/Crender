@@ -12,7 +12,7 @@ typedef void (*object_dstor_func) (object* obj);
 
 struct object
 {
-	object_dstor_func dstor_func;
+	object_dstor_func dstor;
 	object *next, *prev;
 	context* _context;
 

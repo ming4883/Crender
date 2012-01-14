@@ -11,7 +11,7 @@ context* context::singleton = nullptr;
 void object::cstor(context* c)
 {
 	_context = c;
-	dstor_func = nullptr;
+	dstor = nullptr;
 	next = prev = nullptr;
 	ref_cnt = 1;
 }
@@ -23,7 +23,7 @@ void context::add_object(object* obj)
 
 void context::del_object(object* obj)
 {
-	if(obj->dstor_func) obj->dstor_func(obj);
+	if(obj->dstor) obj->dstor(obj);
 	DL_DELETE(object_list, obj);
 	cr_mem_free(obj);
 }

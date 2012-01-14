@@ -5,7 +5,7 @@
 namespace cr
 {
 
-void command_queue::dstor(cr::object* obj)
+void command_queue::_dstor(cr::object* obj)
 {
 	command_queue* self = (command_queue*)obj;
 
@@ -69,7 +69,6 @@ CR_API cr_command_queue cr_command_queue_new(cr_context context)
 
 	cr::command_queue* self = cr_context_get(context)->new_object<cr::command_queue>();
 
-	self->dstor_func = &cr::command_queue::dstor;
 	self->mutex = new cr::command_queue::mutex_t;
 	self->produce_counter = 0;
 	self->consume_counter = 0;

@@ -1,6 +1,6 @@
 #include <unittest++.h>
 #include <cr_command_queue.h>
-#include <tinythread/tinythread.h>
+#include <cr_thread.h>
 
 struct test_command_queue
 {
@@ -105,7 +105,7 @@ struct test_command_queue_multi_thread_producer_consumer
 		for(int i=0; i<CMD_COUNT; ++i) {
 			cr_command_id id = cr_command_queue_produce(s.q, test_command_queue::cmd, nullptr);
 			//printf("produced %d\n", id);
-			tthread::this_thread::yield();
+			cr_thread_sleep(1);
 		}
 	}
 
@@ -124,19 +124,15 @@ TEST(cr_command_queue_multi_thread_producer_consumer)
 {
 	typedef test_command_queue_multi_thread_producer_consumer state;
 
-	state s;
-
-	tthread::thread p_thread(state::producer, &s);
-	tthread::thread c_thread(state::consumer, &s);
-
 	cr_context_initialize();
 
+	state s;
 	s.q = cr_command_queue_new(nullptr);
+	cr_thread p_thread = cr_thread_new(nullptr, state::producer, &s);
+	cr_thread c_thread = cr_thread_new(nullptr, state::consumer, &s);
 
-	p_thread.join();
-	c_thread.join();
-
-	cr_release(s.q);
+	cr_thread_join(p_thread);
+	cr_thread_join(c_thread);
 
 	cr_context_finalize();
 }

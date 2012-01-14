@@ -28,7 +28,7 @@ struct command_queue : object
 	cr_command_id consume_counter;
 	item* head;
 
-	static void dstor(object* obj);
+	static void _dstor(object* obj);
 
 	cr_command_id produce(cr_command cmd, void* arg);
 	cr_command_id consume(void);

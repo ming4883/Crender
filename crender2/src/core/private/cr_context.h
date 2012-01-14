@@ -18,6 +18,7 @@ struct CR_API context
 	template<typename T> T* new_object(void) {
 		T* obj = (T*)cr_mem_alloc(sizeof(T));
 		obj->cstor(this);
+		obj->dstor = T::_dstor;
 		add_object(obj);
 		return obj;
 	}
