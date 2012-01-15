@@ -7,11 +7,11 @@
 extern "C" {
 #endif
 
-typedef cr_object cr_app;
-
 //!
 struct cr_app_event
 {
+	struct cr_app_event* next;
+
 	cr_uint32 type;
 	void* value;
 };

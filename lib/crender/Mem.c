@@ -7,8 +7,7 @@ void* crDefaultAlloc(size_t sizeInBytes, const char* id)
 
 void crDefaultFree(void* ptr, const char* id)
 {
-    if(nullptr != ptr)
-        realloc(ptr, 0);
+    free(ptr);
 }
 
 static CrMem _crMemory = 
