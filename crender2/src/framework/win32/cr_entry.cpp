@@ -1,7 +1,7 @@
-#include "../cr_application.h"
+#include "../private/cr_application.h"
 
-#define _WIN32_WINNT 0x0500
-#define WINVER 0x0500
+//#define _WIN32_WINNT 0x0500
+//#define WINVER 0x0500
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h> // GET_X_LPARAM
@@ -11,6 +11,11 @@
 #include <iostream>
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+void cr_app_main_invoker(void* ctx)
+{
+	cr_app_main();
+}
 
 int main(int argc, char** argv)
 {
@@ -42,13 +47,15 @@ int main(int argc, char** argv)
 
 	LPCSTR szName = "CrApp";
 	WNDCLASSEXA wc = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L, GetModuleHandle(0), 0, 0, 0, 0, szName, 0 };
+	wc.hCursor = LoadCursor(0, IDC_ARROW);
+	RegisterClassExA(&wc);
+
 	DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	DWORD dwStyle = WS_VISIBLE | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_OVERLAPPED;
 
 	RECT rect;
 	int windowWidth, windowHeight, windowLeft, windowTop;
 	HWND hWnd;
-	MSG msg = {0};
 	
 	// process parentHWND
 	if(0 != parentHWND) {
@@ -74,11 +81,11 @@ int main(int argc, char** argv)
 		}
 	}
 
-	// cr_app_startup();
+	// invoke startup callback
+	cr_context_initialize();
+	cr_app_startup();
 
-	wc.hCursor = LoadCursor(0, IDC_ARROW);
-	RegisterClassExA(&wc);
-
+	// create windows
 	SetRect(&rect, 0, 0, xres, yres);
 	AdjustWindowRectEx(&rect, dwStyle, FALSE, dwExStyle);
 	if(nullptr == parentHWND) {
@@ -96,7 +103,10 @@ int main(int argc, char** argv)
 	hWnd = CreateWindowExA(0, szName, szName, dwStyle, windowLeft, windowTop, windowWidth, windowHeight, parentHWND, 0, 0, 0);
 	SetWindowTextA(hWnd, "CrApp");
 	
-	// main loop
+	// start the main loop in a seperate thread
+	cr_thread mainthread = cr_thread_new(nullptr, cr_app_main_invoker, nullptr);
+
+	MSG msg = {0};
 	while (msg.message != WM_QUIT) {
 
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
@@ -104,10 +114,16 @@ int main(int argc, char** argv)
 			DispatchMessage(&msg);
 		}
 		else {
-			
-			
+			// do some processing??
+			Sleep(0);
 		}
 	}
+
+	cr::application::inst.push_event(CR_APP_EVT_EXIT, nullptr);
+
+	cr_thread_join(mainthread);
+
+	cr_context_finalize();
 
 	UnregisterClassA(szName, wc.hInstance);
 

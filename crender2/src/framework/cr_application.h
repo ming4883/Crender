@@ -10,17 +10,17 @@ extern "C" {
 //!
 struct cr_app_event
 {
-	struct cr_app_event* next;
-
 	cr_uint32 type;
-	void* value;
+	cr_uint8 value[16];
 };
 
-//! peek the next application-event from queue
-cr_bool cr_app_peek_event(struct cr_app_event* evt);
+#define CR_APP_EVT_EXIT cr_strhash("app_exit")		//!< the application is exiting
+#define CR_APP_EVT_RESIZE cr_strhash("app_resize")	//!< the application is resized, value contains cr_uint32[2]
 
-//! remove the top application-event from queue
-void cr_app_pop_event(void);
+/*! pop the top event from application event queue
+	\param evt, pointer to an cr_app_event struct to recieve the event
+*/
+cr_bool cr_app_pop_event(struct cr_app_event* evt);
 
 //! user implemented init function, called only once at application startup
 void cr_app_startup(void);

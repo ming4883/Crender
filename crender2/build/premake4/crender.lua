@@ -30,8 +30,8 @@ project "crender_core_test"
 project "crender_framework_test"
 	kind "ConsoleApp"
 	language "C++"
-	files { "../../src/framework/**.h", "../../src/framework/**.c", "../../src/framework/**.cpp" }
-	includedirs { "../../src/core", "../../src" }
+	files { "../../src/framework/**.h", "../../src/framework/**.c", "../../src/framework/**.cpp" , "../../test/framework/**.cpp" }
+	includedirs { "../../src/core", "../../src/framework", "../../src" }
 	defines { "_CRT_SECURE_NO_WARNINGS" }
 	links { "crender" }
 	
