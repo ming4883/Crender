@@ -1,6 +1,5 @@
 #include "private/cr_command_queue.h"
 #include "private/cr_context.h"
-#include "uthash/utlist.h"
 
 namespace cr
 {
@@ -10,51 +9,30 @@ void command_queue::_dstor(cr::object* obj)
 	command_queue* self = (command_queue*)obj;
 
 	// clean up remaining commands in queue
-	{	lock_guard_t lock(*self->mutex);
-	
-		item* curr = nullptr, * temp = nullptr;
-		LL_FOREACH_SAFE(self->head, curr, temp) {
-			LL_DELETE(self->head, curr);
-			cr_mem_free(curr);
-		}
-	}
-
-	delete self->mutex;
+	delete self->queue;
 }
 
 cr_command_id command_queue::produce(cr_command cmd, void* arg)
 {
-	item* i = (item*)cr_mem_alloc(sizeof(item));
-	i->cmd = cmd;
-	i->arg = arg;
-	i->next = nullptr;
-
-	{	lock_guard_t lock(*mutex);
-		i->id = ++produce_counter;
-		LL_APPEND(head, i);
-	}
+	command i;
+	i.cmd = cmd;
+	i.arg = arg;
+	i.id = ++produce_counter;
+	queue->push(&i);
 
 	return produce_counter;
 }
 
 cr_command_id command_queue::consume(void)
 {
-	if(nullptr == head)
+	command i;
+	if(!queue->pop(&i))
 		return 0;
 
-	item* i = head;
-
-	i->cmd((cr_command_queue)this, i->arg);
+	++consume_counter;
+	i.cmd((cr_command_queue)this, i.arg);
 	
-	{	lock_guard_t lock(*mutex);
-		LL_DELETE(head, head);
-		++consume_counter;
-	}
-
-	cr_command_id cid = i->id;
-	cr_mem_free(i);
-
-	return cid;
+	return i.id;
 }
 
 }	// namespace cr
@@ -69,11 +47,10 @@ CR_API cr_command_queue cr_command_queue_new(cr_context context)
 
 	cr::command_queue* self = cr_context_get(context)->new_object<cr::command_queue>();
 
-	self->mutex = new cr::command_queue::mutex_t;
+	self->queue = new cr::command_queue::queue_t;
 	self->produce_counter = 0;
 	self->consume_counter = 0;
-	self->head = nullptr;
-
+	
 	return (cr_command_queue)self;
 }
 

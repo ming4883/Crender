@@ -2,29 +2,20 @@
 #define CR_APPLICATION_PRIVATE_H
 
 #include "../cr_application.h"
-#include <tinythread/tinythread.h>
+#include <private/cr_ts_queue.h>
 
 namespace cr
 {
 
 struct application
 {
-	application();
-	~application();
-
 	static application inst;
 
-	struct event
-	{
-		cr_app_event evt;
-		event* next;
-	};
+	typedef ts_queue<cr_app_event> event_queue_t;
+	event_queue_t* event_queue;
 
-	typedef tthread::mutex mutex_t;
-	typedef tthread::lock_guard<mutex_t> lock_guard_t;
-
-	mutex_t* evt_mutex;
-	event* evt_list;
+	application();
+	~application();
 
 	void push_event(cr_uint32 type, const cr_uint8* value);
 	cr_bool pop_event(cr_app_event* evt);

@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define CR_API
 
@@ -18,8 +19,8 @@ extern "C" {
 // cr_bool
 typedef unsigned char cr_bool;
 
-#define CR_TRUE 0
-#define CR_FALSE 1
+#define CR_TRUE 1
+#define CR_FALSE 0
 
 // integer types
 typedef char cr_int8;

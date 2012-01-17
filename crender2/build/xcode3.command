@@ -7,4 +7,4 @@ mkdir -p -v $IDE
 
 cd $IDE
 cp -v ../premake4/*.lua .
-../premake4.osx $IDE
+../premake4/premake4.osx $IDE

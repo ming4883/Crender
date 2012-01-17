@@ -104,7 +104,9 @@ struct test_command_queue_multi_thread_producer_consumer
 
 		for(int i=0; i<CMD_COUNT; ++i) {
 			cr_command_id id = cr_command_queue_produce(s.q, test_command_queue::cmd, nullptr);
-			//printf("produced %d\n", id);
+#ifdef _DEBUG
+			printf("produced %d\n", id);
+#endif
 			cr_thread_sleep(1);
 		}
 	}
@@ -115,7 +117,9 @@ struct test_command_queue_multi_thread_producer_consumer
 
 		while(test_command_queue::counter < CMD_COUNT) {
 			cr_command_id id = cr_command_queue_consume(s.q);
-			//if(id != 0) printf("consumed %d\n", id);
+#ifdef _DEBUG
+			if(id != 0) printf("consumed %d\n", id);
+#endif
 		}
 	}
 };

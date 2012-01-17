@@ -1,8 +1,6 @@
 #include "private/cr_context.h"
 #include "uthash/utlist.h"
 
-#include <cstdlib>
-
 namespace cr
 {
 

@@ -3,31 +3,26 @@
 
 #include "../cr_command_queue.h"
 #include "cr_object.h"
-
-#include "../tinythread/tinythread.h"
+#include "cr_ts_queue.h"
 
 namespace cr
 {
 
 struct command_queue : object
 {
-	struct item
+	struct command
 	{
 		cr_command_id id;
 		cr_command cmd;
 		void* arg;
-
-		item* next;
 	};
 
-	typedef tthread::mutex mutex_t;
-	typedef tthread::lock_guard<mutex_t> lock_guard_t;
+	typedef ts_queue<command> queue_t;
+	queue_t* queue;
 
-	mutex_t* mutex;
 	cr_command_id produce_counter;
 	cr_command_id consume_counter;
-	item* head;
-
+	
 	static void _dstor(object* obj);
 
 	cr_command_id produce(cr_command cmd, void* arg);
