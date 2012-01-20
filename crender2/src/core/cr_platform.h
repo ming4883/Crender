@@ -16,6 +16,13 @@ extern "C" {
 #define nullptr 0
 #endif
 
+// debug flag
+#if defined(DEBUG) || defined(_DEBUG)
+#	define CR_DEBUG 1
+#else
+#	define CR_DEBUG 0
+#endif
+
 // cr_bool
 typedef unsigned char cr_bool;
 
@@ -53,6 +60,11 @@ CR_API void* cr_mem_alloc(unsigned int size_in_bytes);
 
 /*! deallocate memory */
 CR_API void cr_mem_free(void* ptr);
+
+/*! debug printf */
+CR_API void cr_printf(const char* str, ...);
+
+#define cr_dbg_str(str, ...) { if(CR_DEBUG) cr_printf(str, __VA_ARGS__); }
 
 #ifdef __cplusplus
 }

@@ -3,6 +3,9 @@ project "crender"
 	kind "StaticLib"
 	language "C++"
 	files { "../../src/core/**.h", "../../src/core/**.c", "../../src/core/**.cpp" }
+    includedirs { "../../src/glew" }
+    defines { "_CRT_SECURE_NO_WARNINGS", "GLEW_STATIC" }
+    links { "glew" }
 
 	configuration "Debug"
 		defines { "DEBUG" }

@@ -11,6 +11,8 @@ namespace cr
 struct gpu : object
 {
 	static void _dstor(object* obj);
+
+	cr_uint32 xres, yres;
 };
 
 }	// namespace cr

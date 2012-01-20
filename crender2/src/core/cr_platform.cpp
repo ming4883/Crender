@@ -1,5 +1,8 @@
 #include "cr_platform.h"
 
+#include <stdio.h>
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,6 +29,17 @@ CR_API void* cr_mem_alloc(unsigned int size_in_bytes)
 CR_API void cr_mem_free(void* ptr)
 {
 	g_callback.free_fn(ptr);
+}
+
+CR_API void cr_printf(const char* str, ...)
+{
+	char msg[1024] = {0};
+
+	va_list a;
+	va_start(a, str);
+
+	vsprintf (msg, str, a);
+	printf("%s", msg);
 }
 
 #ifdef __cplusplus
