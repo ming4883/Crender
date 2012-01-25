@@ -2,8 +2,11 @@
 #include "cr_context.h"
 #include <GL\wglew.h>
 
+#include "../uthash/utlist.h"
+
 namespace cr
 {
+
 
 void win32_gpu::_dstor(cr::object* obj)
 {
