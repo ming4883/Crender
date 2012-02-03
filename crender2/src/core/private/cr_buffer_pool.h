@@ -10,35 +10,40 @@ namespace cr
 
 struct buffer_pool
 {
+	enum { INITIAL_TTL = 64 };
+
 	struct buf_t
 	{
-		cr_uint32 hotness;
+		cr_uint32 ttl;
 		cr_uint32 size;
 		cr_uint8* ptr;
 		buf_t* next;
 
-		template<typename T> T& as(void) {
-			CR_ASSERT(sizeof(T) <= size);
-			return *((T*)ptr);
+		template<typename T> T& as( void )
+		{
+			CR_ASSERT( sizeof( T ) <= size );
+			return *( ( T* )ptr );
 		}
 	};
 
 	typedef tthread::mutex mutex_t;
-	typedef tthread::lock_guard<mutex_t> lock_guard_t;
+	typedef tthread::lock_guard< mutex_t > lock_guard_t;
 
 	buf_t* used_list;	//!< a list of used buffers
 	buf_t* free_list;	//!< a list of free buffers, to be deleted or reused
 
 	mutex_t* mutex;
 
-	buffer_pool();
-	~buffer_pool();
+	cr_uint32 allocated;
 
-	buf_t* acquire(cr_uint32 size);
-	void release(buf_t* buf);
+	buffer_pool( void );
+	~buffer_pool( void );
+
+	buf_t* acquire( cr_uint32 size );
+	void release( buf_t* buf );
 	
-	void housekeep(void);
-	void clear(void);
+	void housekeep( void );
+	void clear( void );
 };
 
 }	// namespace cr
