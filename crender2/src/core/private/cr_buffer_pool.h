@@ -41,7 +41,7 @@ struct buffer_pool
 
 	buf_t* acquire( cr_uint32 size );
 	void release( buf_t* buf );
-	
+
 	void housekeep( void );
 	void clear( void );
 };

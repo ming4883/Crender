@@ -17,8 +17,8 @@ struct application
 	application();
 	~application();
 
-	void push_event(cr_uint32 type, const cr_uint8* value);
-	cr_bool pop_event(cr_app_event* evt);
+	void push_event( cr_uint32 type, const cr_uint8* value );
+	cr_bool pop_event( cr_app_event* evt );
 
 };	// application
 

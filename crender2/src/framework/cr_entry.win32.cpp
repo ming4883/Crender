@@ -1,4 +1,4 @@
-#include "../private/cr_application.h"
+#include "private/cr_application.h"
 
 //#define _WIN32_WINNT 0x0500
 //#define WINVER 0x0500
@@ -29,22 +29,21 @@ int main( int argc, char** argv )
 	int yres = 480;
 	bool hidden = false;
 
-	for( int i = 0; i < argc; ++i )
+	for ( int i = 0; i < argc; ++i )
 	{
-
-		if( strcmp( "-WaitForDebugger", argv[i] ) == 0 )
+		if ( strcmp( "-WaitForDebugger", argv[i] ) == 0 )
 		{
 			MessageBoxA( 0, "Waiting for debugger", "MCore", MB_OK );
 		}
-		else if( strcmp( "-ParentHWND", argv[i] ) == 0 )
+		else if ( strcmp( "-ParentHWND", argv[i] ) == 0 )
 		{
 			parentHWND = ( HWND )atoi( argv[++i] );
 		}
-		else if( strcmp( "-Hidden", argv[i] ) == 0 )
+		else if ( strcmp( "-Hidden", argv[i] ) == 0 )
 		{
 			hidden = true;
 		}
-		else if( strcmp( "-Res", argv[i] ) == 0 )
+		else if ( strcmp( "-Res", argv[i] ) == 0 )
 		{
 			sscanf( argv[++i], "%dx%d", &xres, &yres );
 		}
@@ -63,13 +62,13 @@ int main( int argc, char** argv )
 	HWND hWnd;
 
 	// process parentHWND
-	if( 0 != parentHWND )
+	if ( 0 != parentHWND )
 	{
 		dwStyle = WS_CHILD | WS_VISIBLE;
 		dwExStyle = 0;
 	}
 
-	if( hidden ) dwStyle &= ~WS_VISIBLE;
+	if ( hidden ) dwStyle &= ~WS_VISIBLE;
 
 	// change current directoy to where the Exe is located
 	{
@@ -82,7 +81,7 @@ int main( int argc, char** argv )
 		_wsplitpath( path, drive, dir, fname, ext );
 		_wmakepath( path, drive, dir, nullptr, nullptr );
 		path[0] = path[0];
-		if( FALSE == SetCurrentDirectoryW( path ) )
+		if ( FALSE == SetCurrentDirectoryW( path ) )
 		{
 			printf( "failed to change current directory to exe path" );
 		}
@@ -95,7 +94,7 @@ int main( int argc, char** argv )
 	// create windows
 	SetRect( &rect, 0, 0, xres, yres );
 	AdjustWindowRectEx( &rect, dwStyle, FALSE, dwExStyle );
-	if( nullptr == parentHWND )
+	if ( nullptr == parentHWND )
 	{
 		windowWidth = rect.right - rect.left;
 		windowHeight = rect.bottom - rect.top;
@@ -118,7 +117,6 @@ int main( int argc, char** argv )
 	MSG msg = {0};
 	while ( msg.message != WM_QUIT )
 	{
-
 		if ( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) )
 		{
 			TranslateMessage( &msg );

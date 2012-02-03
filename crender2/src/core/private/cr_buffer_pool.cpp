@@ -27,8 +27,8 @@ buffer_pool::buf_t* buffer_pool::acquire( cr_uint32 size )
 	{
 		if ( curr->size == size )
 		{
-			if( nullptr == bestfit || curr->size < bestfit->size )
-			bestfit = curr;
+			if ( nullptr == bestfit || curr->size < bestfit->size )
+				bestfit = curr;
 		}
 	}
 
@@ -96,9 +96,9 @@ void buffer_pool::clear( void )
 		cr_mem_free( curr );
 	}
 
-	if( used_list )
+	if ( used_list )
 	{
-		cr_dbg_str( "buffer_pool 0x%08x is cleared while some buffers are still in used\n", (int)this );
+		cr_dbg_str( "buffer_pool 0x%08x is cleared while some buffers are still in used\n", ( int )this );
 
 		LL_FOREACH_SAFE( used_list, curr, tmp )
 		{

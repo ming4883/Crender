@@ -15,16 +15,17 @@ struct CR_API context
 
 	object* object_list;
 
-	template<typename T> T* new_object(void) {
-		T* obj = (T*)cr_mem_alloc(sizeof(T));
-		obj->cstor(this);
+	template<typename T> T* new_object( void )
+	{
+		T* obj = ( T* )cr_mem_alloc( sizeof( T ) );
+		obj->cstor( this );
 		obj->dstor = T::_dstor;
-		add_object(obj);
+		add_object( obj );
 		return obj;
 	}
 
-	void add_object(object* obj);
-	void del_object(object* obj);
+	void add_object( object* obj );
+	void del_object( object* obj );
 };
 
 }	// namespace cr

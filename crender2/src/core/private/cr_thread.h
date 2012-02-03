@@ -15,7 +15,7 @@ struct thread : object
 
 	thread_t* thread_obj;
 
-	static void _dstor(object* obj);
+	static void _dstor( object* obj );
 };
 
 }	// namespace cr

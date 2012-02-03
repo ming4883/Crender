@@ -8,7 +8,7 @@ namespace cr
 
 struct context;
 struct object;
-typedef void (*object_dstor_func) (object* obj);
+typedef void ( *object_dstor_func ) ( object* obj );
 
 struct object
 {
@@ -18,7 +18,7 @@ struct object
 
 	cr_uint32 ref_cnt;
 
-	void cstor(context* c);
+	void cstor( context* c );
 };
 
 }	// namespace cr

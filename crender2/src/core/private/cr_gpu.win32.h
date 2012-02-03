@@ -15,9 +15,9 @@ struct win32_gpu : gpu
 	void* hwnd;
 	GLuint gl_vtx_array_name;
 
-	static void _dstor(object* obj);
+	static void _dstor( object* obj );
 
-	void init(void** window, struct cr_gpu_desc* desc);
+	void init( void** window, struct cr_gpu_desc* desc );
 };
 
 }	// namespace cr

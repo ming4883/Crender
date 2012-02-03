@@ -6,9 +6,9 @@
 struct test_object : cr::object
 {
 	static int cnt;
-	static void _dstor(cr::object* self);
+	static void _dstor( cr::object* self );
 };
 
-cr_object test_object_new(cr_context context);
+cr_object test_object_new( cr_context context );
 
 #endif	// TEST_OBJECT_H

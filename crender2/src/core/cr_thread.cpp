@@ -4,34 +4,34 @@
 namespace cr
 {
 
-void thread::_dstor(cr::object* obj)
+void thread::_dstor( cr::object* obj )
 {
-	thread* self = (thread*)obj;
+	thread* self = ( thread* )obj;
 
 	delete self->thread_obj;
 }
 
 }	// namespace cr
 
-CR_API cr_thread cr_thread_new(cr_context context, void (*func)(void *), void * arg)
+CR_API cr_thread cr_thread_new( cr_context context, void ( *func )( void * ), void * arg )
 {
-	CR_ASSERT(cr::context::singleton);
+	CR_ASSERT( cr::context::singleton );
 
-	cr::thread* self = cr_context_get(context)->new_object<cr::thread>();
+	cr::thread* self = cr_context_get( context )->new_object<cr::thread>();
 
-	self->thread_obj = new cr::thread::thread_t(func, arg);
-	
-	return (cr_thread)self;
+	self->thread_obj = new cr::thread::thread_t( func, arg );
+
+	return ( cr_thread )self;
 }
 
-CR_API void cr_thread_join(cr_thread self)
+CR_API void cr_thread_join( cr_thread self )
 {
-	if(nullptr == self) return;
+	if ( nullptr == self ) return;
 
-	return ((cr::thread*)self)->thread_obj->join();
+	return ( ( cr::thread* )self )->thread_obj->join();
 }
 
-CR_API void cr_thread_sleep(cr_uint32 milliseconds)
+CR_API void cr_thread_sleep( cr_uint32 milliseconds )
 {
-	tthread::this_thread::sleep_for(tthread::chrono::milliseconds(milliseconds));
+	tthread::this_thread::sleep_for( tthread::chrono::milliseconds( milliseconds ) );
 }
