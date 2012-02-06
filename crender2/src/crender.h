@@ -3,6 +3,7 @@
 
 #include "core/cr_context.h"
 #include "core/cr_command_queue.h"
+#include "core/cr_gpu.h"
 #include "core/cr_strhash.h"
 #include "core/cr_thread.h"
 

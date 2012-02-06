@@ -89,6 +89,8 @@ int main( int argc, char** argv )
 
 	// invoke startup callback
 	cr_context_initialize();
+
+	cr::application* app = new cr::application;
 	cr_app_startup();
 
 	// create windows
@@ -111,6 +113,9 @@ int main( int argc, char** argv )
 	hWnd = CreateWindowExA( 0, szName, szName, dwStyle, windowLeft, windowTop, windowWidth, windowHeight, parentHWND, 0, 0, 0 );
 	SetWindowTextA( hWnd, "CrApp" );
 
+	// create gpu object
+	app->gpu = cr_gpu_new( nullptr, ( void** )&hWnd, &app->gpu_desc );
+
 	// start the main loop in a seperate thread
 	cr_thread mainthread = cr_thread_new( nullptr, cr_app_main_invoker, nullptr );
 
@@ -125,14 +130,16 @@ int main( int argc, char** argv )
 		else
 		{
 			// do some processing??
+			cr_gpu_flush( app->gpu );
 			Sleep( 0 );
 		}
 	}
 
-	cr::application::inst.push_event( CR_APP_EVT_EXIT, nullptr );
+	app->push_event( CR_APP_EVT_EXIT, nullptr );
 
 	cr_thread_join( mainthread );
 
+	delete app;
 	cr_context_finalize();
 
 	UnregisterClassA( szName, wc.hInstance );

@@ -18,12 +18,6 @@ struct buffer_pool
 		cr_uint32 size;
 		cr_uint8* ptr;
 		buf_t* next;
-
-		template<typename T> T& as( void )
-		{
-			CR_ASSERT( sizeof( T ) <= size );
-			return *( ( T* )ptr );
-		}
 	};
 
 	typedef tthread::mutex mutex_t;
@@ -39,8 +33,13 @@ struct buffer_pool
 	buffer_pool( void );
 	~buffer_pool( void );
 
-	buf_t* acquire( cr_uint32 size );
-	void release( buf_t* buf );
+	void* acquire( cr_uint32 size );
+	void release( void* buf );
+
+	template< typename T > T* acquire( void )
+	{
+		return ( T* )acquire( sizeof( T ) );
+	}
 
 	void housekeep( void );
 	void clear( void );

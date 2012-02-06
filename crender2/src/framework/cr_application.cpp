@@ -3,17 +3,27 @@
 namespace cr
 {
 
-application application::inst;
+application* application::inst = nullptr;
 
 application::application()
 {
 	memset( this, 0, sizeof( application ) );
 	event_queue = new event_queue_t;
+	gpu = nullptr;
+	gpu_desc.api_major = 2;
+	gpu_desc.api_minor = 1;
+	gpu_desc.msaa_level = 0;
+	gpu_desc.vsync = CR_FALSE;
+
+	inst = this;
 }
 
 application::~application()
 {
+	cr_release( gpu );
 	delete event_queue;
+
+	inst = nullptr;
 }
 
 void application::push_event( cr_uint32 type, const cr_uint8* value )
@@ -34,6 +44,12 @@ cr_bool application::pop_event( cr_app_event* evt )
 
 cr_bool cr_app_pop_event( struct cr_app_event* evt )
 {
-	return cr::application::inst.pop_event( evt );
+	CR_ASSERT( cr::application::inst );
+	return cr::application::inst->pop_event( evt );
 }
 
+cr_gpu cr_app_gpu( void )
+{
+	CR_ASSERT( cr::application::inst );
+	return cr::application::inst->gpu;
+}

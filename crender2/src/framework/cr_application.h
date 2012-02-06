@@ -27,6 +27,10 @@ extern "C" {
 	*/
 	cr_bool cr_app_pop_event( struct cr_app_event* evt );
 
+	/*! get the application-wide gpu object
+	*/
+	cr_gpu cr_app_gpu( void );
+
 //! user implemented init function, called only once at application startup
 	void cr_app_startup( void );
 

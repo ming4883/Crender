@@ -6,7 +6,7 @@ TEST( cr_buffer_pool_new_del )
 {
 	cr::buffer_pool* pool = new cr::buffer_pool;
 
-	cr::buffer_pool::buf_t* buf = pool->acquire( 32 );
+	void* buf = pool->acquire( 32 );
 	pool->release( buf );
 
 	delete pool;
@@ -16,8 +16,8 @@ TEST( cr_buffer_pool_acquire_release )
 {
 	cr::buffer_pool* pool = new cr::buffer_pool;
 
-	cr::buffer_pool::buf_t* a = pool->acquire( 32 );
-	cr::buffer_pool::buf_t* b = pool->acquire( 32 );
+	void* a = pool->acquire( 32 );
+	void* b = pool->acquire( 32 );
 
 	CHECK( a != b );
 	CHECK_EQUAL( 64, pool->allocated );
@@ -29,8 +29,8 @@ TEST( cr_buffer_pool_acquire_release )
 	CHECK_EQUAL( 64, pool->allocated );
 
 	// a2 & b2 should be re-used
-	cr::buffer_pool::buf_t* a2 = pool->acquire( 32 );
-	cr::buffer_pool::buf_t* b2 = pool->acquire( 32 );
+	void* a2 = pool->acquire( 32 );
+	void* b2 = pool->acquire( 32 );
 
 	CHECK_EQUAL( a, a2 );
 	CHECK_EQUAL( b, b2 );
@@ -48,8 +48,8 @@ TEST( cr_buffer_pool_housekeep )
 {
 	cr::buffer_pool* pool = new cr::buffer_pool;
 
-	cr::buffer_pool::buf_t* a = pool->acquire( 32 );
-	cr::buffer_pool::buf_t* b = pool->acquire( 32 );
+	void* a = pool->acquire( 32 );
+	void* b = pool->acquire( 32 );
 
 	CHECK( a != b );
 	CHECK_EQUAL( 64, pool->allocated );
@@ -73,7 +73,7 @@ TEST( cr_buffer_pool_housekeep )
 
 	CHECK_EQUAL( 32, pool->allocated );
 
-	cr::buffer_pool::buf_t* b2 = pool->acquire( 32 );
+	void* b2 = pool->acquire( 32 );
 
 	// b should be reused & pool->allocated stay remain 32 bytes
 	CHECK_EQUAL( b, b2 );

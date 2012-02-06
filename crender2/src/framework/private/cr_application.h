@@ -9,10 +9,13 @@ namespace cr
 
 struct application
 {
-	static application inst;
+	static application* inst;
 
 	typedef ts_queue<cr_app_event> event_queue_t;
 	event_queue_t* event_queue;
+
+	cr_gpu gpu;
+	cr_gpu_desc gpu_desc;
 
 	application();
 	~application();
