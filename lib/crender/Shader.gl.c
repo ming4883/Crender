@@ -507,6 +507,9 @@ CR_API size_t crGenGpuInputId()
 
 char* crGpuFixedIndexPtr = nullptr;
 
+GLuint lastAttrLoc[16] = {0};
+size_t lastAttrCnt = 0;
+
 CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuProgramInput* inputs, size_t count)
 {
 	CrGpuProgramImpl* impl = (CrGpuProgramImpl*)self;
@@ -517,6 +520,13 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 	//glBindVertexArray(impl->glVertexArray);
 #endif
 
+	// disable pervious inputs
+	for(attri=0; attri<lastAttrCnt; ++attri) {
+		glDisableVertexAttribArray(lastAttrLoc[attri]);
+	}
+	lastAttrCnt = 0;
+
+	// enable current inputs
 	for(attri=0; attri<count; ++attri) {
 		CrGpuProgramInput* i = &inputs[attri];
 
@@ -555,6 +565,8 @@ CR_API void crGpuBindProgramInput(CrGpuProgram* self, size_t gpuInputId, CrGpuPr
 					glVertexAttribPointer(a->loc, m->elemCnt, m->elemType, m->normalized, i->stride, (void*)i->offset);
 					glEnableVertexAttribArray(a->loc);
 				}
+
+				lastAttrLoc[lastAttrCnt++] = a->loc;
 			}
 		}
 	}
