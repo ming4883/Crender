@@ -29,6 +29,8 @@ struct buffer_pool
 	mutex_t* mutex;
 
 	cr_uint32 allocated;
+	cr_uint32 acquired;
+	cr_uint32 released;
 
 	buffer_pool( void );
 	~buffer_pool( void );

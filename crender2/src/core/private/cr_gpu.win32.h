@@ -2,7 +2,6 @@
 #define CR_GPU_WIN32_PRIVATE_H
 
 #include "cr_gpu.h"
-#include "cr_buffer_pool.h"
 #include "cr_command_queue.h"
 
 #include <GL/glew.h>
@@ -16,8 +15,24 @@ struct win32_gpu : gpu
 	GLuint hrc;
 	void* hwnd;
 	GLuint gl_vtx_array_name;
-	buffer_pool* buf_pool;
-	cr_command_queue cmd_queue;
+
+	struct queue
+	{
+		enum status_e
+		{
+			EMPTY,
+			FEEDING,
+			FULL,
+		};
+
+		cr_command_queue cmd_queue;
+		status_e status;
+	};
+
+	enum {CMD_QUEUE_COUNT = 2};
+
+	queue queues[CMD_QUEUE_COUNT];
+	queue* feeding_queue;
 
 	static void _dstor( object* obj );
 

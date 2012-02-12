@@ -20,19 +20,31 @@ extern "C" {
 		cr_bool vsync;
 	};
 
-	/*! Create and initialize a cr_gpu object on the.specific window
+	/*! create and initialize a cr_gpu object on the.specific window
 	*/
 	CR_API cr_gpu cr_gpu_new( cr_context context, void** window, struct cr_gpu_desc* desc );
 
-	/*! Flush and execute the stored command in the cr_gpu object
+	/*! retrive the screen resolution
+	*/
+	CR_API void cr_gpu_screen_resolution( cr_gpu self, cr_uint32* xres, cr_uint32* yres );
+
+	/*! flush and execute the stored command in the cr_gpu object
 	*/
 	CR_API void cr_gpu_flush( cr_gpu self );
+
+	/*! inform the gpu to begin executing commands
+	*/
+	CR_API cr_bool cr_gpu_begin( cr_gpu self );
+
+	/*! inform the gpu to end executing commands
+	*/
+	CR_API void cr_gpu_end( cr_gpu self );
 
 	/*! swap the back buffer contents to the front buffer
 	*/
 	CR_API void cr_gpu_swap_buffers( cr_gpu self );
 
-	/*! Apply the viewport to the cr_gpu.
+	/*! apply the viewport to the cr_gpu.
 	*/
 	CR_API void cr_gpu_set_viewport( cr_gpu self, float x, float y, float w, float h, float zmin, float zmax );
 

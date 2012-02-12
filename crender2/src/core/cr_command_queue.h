@@ -28,6 +28,10 @@ extern "C" {
 	*/
 	CR_API cr_command_id cr_command_queue_consume( cr_command_queue self );
 
+	/*! Dequeue and execute all commands in the cr_command_queue.
+	*/
+	CR_API void cr_command_queue_consume_all( cr_command_queue self );
+
 	/*! Check whether a command is consumed or not.
 	*/
 	CR_API cr_bool cr_command_queue_is_consumed( cr_command_queue self, cr_command_id cmd_id );

@@ -131,13 +131,15 @@ int main( int argc, char** argv )
 		{
 			// do some processing??
 			cr_gpu_flush( app->gpu );
-			Sleep( 0 );
+			//Sleep( 0 );
 		}
 	}
 
 	app->push_event( CR_APP_EVT_EXIT, nullptr );
 
 	cr_thread_join( mainthread );
+
+	cr_gpu_flush( app->gpu );
 
 	delete app;
 	cr_context_finalize();

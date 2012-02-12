@@ -68,6 +68,17 @@ extern "C" {
 		return ( ( cr::command_queue* )self )->consume();
 	}
 
+	CR_API void cr_command_queue_consume_all( cr_command_queue self )
+	{
+		if ( nullptr == self ) return;
+
+		cr_command_queue id;
+		do
+		{
+			id = ( ( cr::command_queue* )self )->consume();
+		} while( id != 0 );
+	}
+
 	CR_API cr_bool cr_command_queue_is_consumed( cr_command_queue self, cr_command_id cmd_id )
 	{
 		if ( nullptr == self ) return CR_FALSE;

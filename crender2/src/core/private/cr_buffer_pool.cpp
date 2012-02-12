@@ -9,6 +9,8 @@ buffer_pool::buffer_pool( void )
 	used_list = free_list = nullptr;
 	mutex = new mutex_t;
 	allocated = 0;
+	acquired = 0;
+	released = 0;
 }
 
 buffer_pool::~buffer_pool( void )
@@ -50,6 +52,7 @@ void* buffer_pool::acquire( cr_uint32 size )
 
 	bestfit->ttl = INITIAL_TTL;
 	LL_APPEND( used_list, bestfit );
+	++acquired;
 
 	return bestfit->ptr;
 }
@@ -60,6 +63,7 @@ void buffer_pool::release( void* ptr )
 	lock_guard_t lock( *mutex );
 	LL_DELETE( used_list, buf );
 	LL_APPEND( free_list, buf );
+	++released;
 }
 
 void buffer_pool::housekeep( void )
@@ -105,6 +109,8 @@ void buffer_pool::clear( void )
 	}
 
 	allocated = 0;
+	acquired = 0;
+	released = 0;
 }
 
 
