@@ -42,6 +42,7 @@ extern "C" {
 
 	typedef void*( * cr_alloc_func ) ( size_t size_in_bytes );
 	typedef void ( * cr_free_func ) ( void* ptr );
+	typedef void ( * cr_print_func ) ( const char* msg );
 
 #define CR_ASSERT(x) assert(x)
 
@@ -61,8 +62,14 @@ extern "C" {
 	/*! deallocate memory */
 	CR_API void cr_mem_free( void* ptr );
 
+	/*! set custom print callback */
+	CR_API void cr_print_set_callback( cr_print_func callback );
+
 	/*! debug printf */
 	CR_API void cr_printf( const char* str, ... );
+
+	/*! retrive the platform's time in # of milliseconds */
+	CR_API int cr_platform_time_ms( void );
 
 #define cr_dbg_str(str, ...) { if(CR_DEBUG) cr_printf(str, __VA_ARGS__); }
 
