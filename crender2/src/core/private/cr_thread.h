@@ -9,13 +9,33 @@
 namespace cr
 {
 
+class tt_thread : public tthread::thread
+{
+public:
+	CR_OVERRIDE_NEW_DELETE();
+	tt_thread( void ( *func )( void * ), void * arg ) : tthread::thread( func, arg ) {}
+};
+
+class tt_mutex : public tthread::mutex
+{
+public:
+	CR_OVERRIDE_NEW_DELETE();
+};
+
+class tt_lock_guard : public tthread::lock_guard<tt_mutex>
+{
+public:
+	tt_lock_guard(tt_mutex& mutex) : tthread::lock_guard<tt_mutex>( mutex ) {}
+};
+
 struct thread : object
 {
-	typedef tthread::thread thread_t;
+	CR_OVERRIDE_NEW_DELETE();
 
-	thread_t* thread_obj;
+	tt_thread* thread_obj;
 
-	static void _dstor( object* obj );
+	thread( context* ctx, void ( *func )( void * ), void * arg );
+	~thread( void );
 };
 
 }	// namespace cr

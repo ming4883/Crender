@@ -10,9 +10,12 @@ namespace cr
 
 struct gpu : object
 {
-	static void _dstor( object* obj ) {}
+	CR_OVERRIDE_NEW_DELETE();
 
 	cr_uint32 xres, yres;
+
+	gpu( context* ctx );
+	virtual ~gpu( void );
 };
 
 }	// namespace cr

@@ -5,8 +5,12 @@
 
 struct test_object : cr::object
 {
+	CR_OVERRIDE_NEW_DELETE( test_object );
+
 	static int cnt;
-	static void _dstor( cr::object* self );
+
+	test_object( cr::context* ctx );
+	~test_object( void );
 };
 
 cr_object test_object_new( cr_context context );

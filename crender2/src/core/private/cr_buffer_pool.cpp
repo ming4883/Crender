@@ -7,7 +7,6 @@ namespace cr
 buffer_pool::buffer_pool( void )
 {
 	used_list = free_list = nullptr;
-	mutex = new mutex_t;
 	allocated = 0;
 	acquired = 0;
 	released = 0;
@@ -16,13 +15,10 @@ buffer_pool::buffer_pool( void )
 buffer_pool::~buffer_pool( void )
 {
 	clear();
-	delete mutex;
 }
 
 void* buffer_pool::acquire( cr_uint32 size )
 {
-	lock_guard_t lock( *mutex );
-
 	buf_t* bestfit = nullptr;
 
 	// search for a bestfit buffer in free list
@@ -60,7 +56,6 @@ void* buffer_pool::acquire( cr_uint32 size )
 void buffer_pool::release( void* ptr )
 {
 	buf_t* buf = ( buf_t* )( ( cr_uint8* )ptr - sizeof( buf_t ) );
-	lock_guard_t lock( *mutex );
 	LL_DELETE( used_list, buf );
 	LL_APPEND( free_list, buf );
 	++released;
@@ -70,8 +65,6 @@ void buffer_pool::housekeep( void )
 {
 	buf_t* curr = nullptr;
 	buf_t* tmp = nullptr;
-
-	lock_guard_t lock( *mutex );
 
 	LL_FOREACH_SAFE( free_list, curr, tmp )
 	{
@@ -88,8 +81,6 @@ void buffer_pool::clear( void )
 {
 	buf_t* curr = nullptr;
 	buf_t* tmp = nullptr;
-
-	lock_guard_t lock( *mutex );
 
 	LL_FOREACH_SAFE( free_list, curr, tmp )
 	{

@@ -7,18 +7,28 @@ namespace cr
 {
 
 struct context;
-struct object;
-typedef void ( *object_dstor_func ) ( object* obj );
+
+#define CR_OVERRIDE_NEW_DELETE() \
+void* operator new ( unsigned int count )\
+{\
+	return cr_mem_alloc( count );\
+} \
+void operator delete( void * ptr )\
+{\
+	cr_mem_free( ptr );\
+}
 
 struct object
 {
-	object_dstor_func dstor;
+	CR_OVERRIDE_NEW_DELETE();
+
 	object *next, *prev;
 	context* _context;
 
 	cr_uint32 ref_cnt;
 
-	void cstor( context* c );
+	object( context* ctx );
+	virtual ~object( void );
 };
 
 }	// namespace cr

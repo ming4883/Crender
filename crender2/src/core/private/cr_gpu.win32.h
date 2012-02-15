@@ -11,6 +11,8 @@ namespace cr
 
 struct win32_gpu : gpu
 {
+	CR_OVERRIDE_NEW_DELETE();
+
 	GLuint hdc;
 	GLuint hrc;
 	void* hwnd;
@@ -34,10 +36,12 @@ struct win32_gpu : gpu
 	queue queues[CMD_QUEUE_COUNT];
 	queue* feeding_queue;
 
-	static void _dstor( object* obj );
+	win32_gpu( context* ctx );
+	~win32_gpu( void );
 
 	void init( void** window, struct cr_gpu_desc* desc );
 
+// command related
 	struct cmd_args
 	{
 		win32_gpu* self;

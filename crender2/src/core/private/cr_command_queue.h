@@ -10,6 +10,8 @@ namespace cr
 
 struct command_queue : object
 {
+	CR_OVERRIDE_NEW_DELETE();
+
 	struct command
 	{
 		cr_command_id id;
@@ -23,7 +25,8 @@ struct command_queue : object
 	cr_command_id produce_counter;
 	cr_command_id consume_counter;
 
-	static void _dstor( object* obj );
+	command_queue( context* ctx );
+	~command_queue( void );
 
 	cr_command_id produce( cr_command cmd, void* arg );
 	cr_command_id consume( void );

@@ -20,13 +20,8 @@ struct buffer_pool
 		buf_t* next;
 	};
 
-	typedef tthread::mutex mutex_t;
-	typedef tthread::lock_guard< mutex_t > lock_guard_t;
-
 	buf_t* used_list;	//!< a list of used buffers
 	buf_t* free_list;	//!< a list of free buffers, to be deleted or reused
-
-	mutex_t* mutex;
 
 	cr_uint32 allocated;
 	cr_uint32 acquired;

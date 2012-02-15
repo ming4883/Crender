@@ -6,24 +6,27 @@ namespace cr
 
 context* context::singleton = nullptr;
 
-void object::cstor( context* c )
+object::object( context* ctx )
 {
-	_context = c;
-	dstor = nullptr;
-	next = prev = nullptr;
+	ctx->add_object( this );
 	ref_cnt = 1;
+}
+
+object::~object( void )
+{
+	_context->rmv_object( this );
 }
 
 void context::add_object( object* obj )
 {
+	obj->_context = this;
+	obj->next = obj->prev = nullptr;
 	DL_APPEND( object_list, obj );
 }
 
-void context::del_object( object* obj )
+void context::rmv_object( object* obj )
 {
-	if ( obj->dstor ) obj->dstor( obj );
 	DL_DELETE( object_list, obj );
-	cr_mem_free( obj );
 }
 
 }	// namespace cr
@@ -53,7 +56,8 @@ extern "C" {
 			cr::object* curr = nullptr, * temp = nullptr;
 			DL_FOREACH_SAFE( self->object_list, curr, temp )
 			{
-				self->del_object( curr );
+				//self->del_object( curr );
+				delete curr;
 			}
 		}
 
@@ -77,10 +81,7 @@ extern "C" {
 		--self->ref_cnt;
 
 		if ( 0 == self->ref_cnt )
-		{
-			CR_ASSERT( cr::context::singleton );
-			self->_context->del_object( self );
-		}
+			delete self;
 	}
 
 	CR_API cr_uint32 cr_ref_count_of( cr_object obj )

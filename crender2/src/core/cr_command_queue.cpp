@@ -4,12 +4,18 @@
 namespace cr
 {
 
-void command_queue::_dstor( cr::object* obj )
+command_queue::command_queue( context* c )
+	: object( c )
 {
-	command_queue* self = ( command_queue* )obj;
+	queue = new cr::command_queue::queue_t;
+	produce_counter = 0;
+	consume_counter = 0;
+}
 
+command_queue::~command_queue( void )
+{
 	// clean up remaining commands in queue
-	delete self->queue;
+	delete queue;
 }
 
 cr_command_id command_queue::produce( cr_command cmd, void* arg )
@@ -45,13 +51,7 @@ extern "C" {
 	{
 		CR_ASSERT( cr::context::singleton );
 
-		cr::command_queue* self = cr_context_get( context )->new_object<cr::command_queue>();
-
-		self->queue = new cr::command_queue::queue_t;
-		self->produce_counter = 0;
-		self->consume_counter = 0;
-
-		return ( cr_command_queue )self;
+		return ( cr_command_queue )new cr::command_queue( cr_context_get( context ) );
 	}
 
 	CR_API cr_command_id cr_command_queue_produce( cr_command_queue self, cr_command cmd, void* arg )

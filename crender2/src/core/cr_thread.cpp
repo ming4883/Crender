@@ -4,11 +4,15 @@
 namespace cr
 {
 
-void thread::_dstor( cr::object* obj )
+thread::thread( context* ctx, void ( *func )( void * ), void * arg )
+	: object( ctx )
 {
-	thread* self = ( thread* )obj;
+	thread_obj = new tt_thread( func, arg );
+}
 
-	delete self->thread_obj;
+thread::~thread( void )
+{
+	delete thread_obj;
 }
 
 }	// namespace cr
@@ -17,11 +21,7 @@ CR_API cr_thread cr_thread_new( cr_context context, void ( *func )( void * ), vo
 {
 	CR_ASSERT( cr::context::singleton );
 
-	cr::thread* self = cr_context_get( context )->new_object<cr::thread>();
-
-	self->thread_obj = new cr::thread::thread_t( func, arg );
-
-	return ( cr_thread )self;
+	return ( cr_thread )new cr::thread( cr_context_get( context ), func, arg );
 }
 
 CR_API void cr_thread_join( cr_thread self )
