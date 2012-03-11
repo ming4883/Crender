@@ -18,13 +18,15 @@ command_queue::~command_queue( void )
 	delete queue;
 }
 
-cr_command_id command_queue::produce( cr_command cmd, void* arg )
+cr_command_id command_queue::produce( char** out_args, cr_command cmd )
 {
 	command i;
-	i.cmd = cmd;
-	i.arg = arg;
-	i.id = ++produce_counter;
-	queue->push( &i );
+	i.cmd() = cmd;
+	i.id() = ++produce_counter;
+
+	command* pushed = queue->push( &i );
+	if ( nullptr != out_args )
+		*out_args = ( &pushed->args()[0] );
 
 	return produce_counter;
 }
@@ -36,9 +38,9 @@ cr_command_id command_queue::consume( void )
 		return 0;
 
 	++consume_counter;
-	i.cmd( ( cr_command_queue )this, i.arg );
+	( i.cmd() )( ( cr_command_queue )this, i.args() );
 
-	return i.id;
+	return i.id();
 }
 
 }	// namespace cr
@@ -54,12 +56,12 @@ extern "C" {
 		return ( cr_command_queue )new cr::command_queue( cr_context_get( context ) );
 	}
 
-	CR_API cr_command_id cr_command_queue_produce( cr_command_queue self, cr_command cmd, void* arg )
+	CR_API cr_command_id cr_command_queue_produce( cr_command_queue self, cr_command_args* out_args, cr_command cmd )
 	{
 		if ( nullptr == self ) return 0;
 		if ( nullptr == cmd ) return 0;
 
-		return ( ( cr::command_queue* )self )->produce( cmd, arg );
+		return ( ( cr::command_queue* )self )->produce( ( char** )out_args, cmd );
 	}
 
 	CR_API cr_command_id cr_command_queue_consume( cr_command_queue self )

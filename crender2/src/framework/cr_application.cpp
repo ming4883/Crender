@@ -44,12 +44,12 @@ cr_bool application::pop_event( cr_app_event* evt )
 
 cr_bool cr_app_pop_event( struct cr_app_event* evt )
 {
-	CR_ASSERT( cr::application::inst );
+	cr_assert( cr::application::inst );
 	return cr::application::inst->pop_event( evt );
 }
 
 cr_gpu cr_app_gpu( void )
 {
-	CR_ASSERT( cr::application::inst );
+	cr_assert( cr::application::inst );
 	return cr::application::inst->gpu;
 }

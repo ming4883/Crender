@@ -167,40 +167,34 @@ void gpu_gl::init( void** window, struct cr_gpu_desc* desc )
 	this->hwnd = *hWnd;
 }
 
-void gpu_gl::swap_buffer( cr_command_queue cmd_queue, void* a )
+void gpu_gl::swap_buffer( cr_command_queue cmd_queue, cr_command_args a )
 {
-	float16_args* args = ( float16_args* )a;
+	cmd_args* args = ( cmd_args* )a;
 
 	SwapBuffers( ( HDC )args->self->hdc );
-
-	cr_mem_free( args );
 }
 
-void gpu_gl::set_viewport( cr_command_queue cmd_queue, void* a )
+void gpu_gl::set_viewport( cr_command_queue cmd_queue, cr_command_args a )
 {
-	float16_args* args = ( float16_args* )a;
+	cmd_args* args = ( cmd_args* )a;
 
 	glEnable( GL_SCISSOR_TEST );
 	glViewport( ( GLint )args->value[0], ( GLint )args->value[1], ( GLint )args->value[2], ( GLint )args->value[3] );
 	glScissor( ( GLint )args->value[0], ( GLint )args->value[1], ( GLint )args->value[2], ( GLint )args->value[3] );
 	glDepthRange( args->value[4], args->value[5] );
-
-	cr_mem_free( args );
 }
 
-void gpu_gl::clear_color( cr_command_queue cmd_queue, void* a )
+void gpu_gl::clear_color( cr_command_queue cmd_queue, cr_command_args a )
 {
-	float16_args* args = ( float16_args* )a;
+	cmd_args* args = ( cmd_args* )a;
 
 	glClearColor( args->value[0], args->value[1], args->value[2], args->value[3] );
 	glClear( GL_COLOR_BUFFER_BIT );
-
-	cr_mem_free( args );
 }
 
-void gpu_gl::clear_depth( cr_command_queue cmd_queue, void* a )
+void gpu_gl::clear_depth( cr_command_queue cmd_queue, cr_command_args a )
 {
-	float16_args* args = ( float16_args* )a;
+	cmd_args* args = ( cmd_args* )a;
 
 	//if ( CR_FALSE == impl->appliedGpuState.depthWrite )
 	//	glDepthMask(GL_TRUE);
@@ -210,8 +204,6 @@ void gpu_gl::clear_depth( cr_command_queue cmd_queue, void* a )
 
 	//if ( CR_FALSE == impl->appliedGpuState.depthWrite )
 	//	glDepthMask(GL_FALSE);
-
-	cr_mem_free( args );
 }
 
 }	// namespace cr
@@ -278,16 +270,27 @@ extern "C" {
 
 	CR_API void cr_gpu_swap_buffers( cr_gpu s )
 	{
+		typedef gpu_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+
 		gpu_t* self = ( gpu_t* )s;
-		gpu_t::float16_args* args = ( gpu_t::float16_args* )cr_mem_alloc( sizeof( gpu_t::float16_args ) );
+		args_t* args = nullptr;
+
+		cr_command_queue_produce( self->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_t::swap_buffer );
+
 		args->self = self;
-		cr_command_queue_produce( self->feeding_queue->cmd_queue, gpu_t::swap_buffer, args );
 	}
 
 	CR_API void cr_gpu_set_viewport( cr_gpu s, float x, float y, float w, float h, float zmin, float zmax )
 	{
+		typedef gpu_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+
 		gpu_t* self = ( gpu_t* )s;
-		gpu_t::float16_args* args = ( gpu_t::float16_args* )cr_mem_alloc( sizeof( gpu_t::float16_args ) );
+		args_t* args = nullptr;
+
+		cr_command_queue_produce( self->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_t::set_viewport );
+		
 		args->self = self;
 		args->value[0] = x;
 		args->value[1] = y;
@@ -295,28 +298,37 @@ extern "C" {
 		args->value[3] = h;
 		args->value[4] = zmin;
 		args->value[5] = zmax;
-		cr_command_queue_produce( self->feeding_queue->cmd_queue, gpu_t::set_viewport, args );
 	}
 
 	CR_API void cr_gpu_clear_color( cr_gpu s, float r, float g, float b, float a )
 	{
+		typedef gpu_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+
 		gpu_t* self = ( gpu_t* )s;
-		gpu_t::float16_args* args = ( gpu_t::float16_args* )cr_mem_alloc( sizeof( gpu_t::float16_args ) );
+		args_t* args = nullptr;
+		
+		cr_command_queue_produce( self->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_t::clear_color );
+		
 		args->self = self;
 		args->value[0] = r;
 		args->value[1] = g;
 		args->value[2] = b;
 		args->value[3] = a;
-		cr_command_queue_produce( self->feeding_queue->cmd_queue, gpu_t::clear_color, args );
 	}
 
 	CR_API void cr_gpu_clear_depth( cr_gpu s, float z )
 	{
+		typedef gpu_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+
 		gpu_t* self = ( gpu_t* )s;
-		gpu_t::float16_args* args = ( gpu_t::float16_args* )cr_mem_alloc( sizeof( gpu_t::float16_args ) );
+		args_t* args = nullptr;
+
+		cr_command_queue_produce( self->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_t::clear_depth );
+		
 		args->self = self;
 		args->value[0] = z;
-		cr_command_queue_produce( self->feeding_queue->cmd_queue, gpu_t::clear_depth, args );
 	}
 
 #ifdef __cplusplus

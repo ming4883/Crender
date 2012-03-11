@@ -1,4 +1,4 @@
-#include "cr_vec.h"
+#include "../cr_vec.h"
 #include <math.h>
 
 #ifdef __cplusplus

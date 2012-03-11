@@ -5,7 +5,7 @@
 
 struct test_object : cr::object
 {
-	CR_OVERRIDE_NEW_DELETE( test_object );
+	CR_OVERRIDE_NEW_DELETE();
 
 	static int cnt;
 

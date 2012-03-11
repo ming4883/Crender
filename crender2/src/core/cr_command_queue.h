@@ -11,8 +11,12 @@ extern "C" {
 	*/
 	typedef cr_object cr_command_queue;
 
+	/*! a fixed size command argument buffer */
+	typedef char* cr_command_args;
+	#define CR_COMMAND_ARGS_SIZE 72
+
 	/*! a command to be executed */
-	typedef void ( *cr_command ) ( cr_command_queue cmd_queue, void* arg );
+	typedef void ( *cr_command ) ( cr_command_queue cmd_queue, cr_command_args args );
 
 	typedef int cr_command_id;
 
@@ -22,7 +26,7 @@ extern "C" {
 
 	/*! Enqueue a command to a cr_command_queue.
 	*/
-	CR_API cr_command_id cr_command_queue_produce( cr_command_queue self, cr_command cmd, void* arg );
+	CR_API cr_command_id cr_command_queue_produce( cr_command_queue self, cr_command_args* out_args, cr_command cmd );
 
 	/*! Dequeue and execute the command in the front of the cr_command_queue.
 	*/

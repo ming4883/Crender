@@ -21,17 +21,13 @@ struct gpu_buffer_gl : gpu_buffer
 	struct cmd_args
 	{
 		gpu_buffer_gl* self;
-	};
-
-	struct update_args : cmd_args
-	{
 		cr_uint32 offset;
 		cr_uint32 size;
 		void* data;
 	};
 
-	static void create( cr_command_queue cmd_queue, void* arg );
-	static void update( cr_command_queue cmd_queue, void* arg );
+	static void create( cr_command_queue cmd_queue, cr_command_args args );
+	static void update( cr_command_queue cmd_queue, cr_command_args args );
 };
 
 }	// namespace cr

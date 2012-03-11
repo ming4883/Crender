@@ -52,17 +52,13 @@ struct gpu_gl : gpu
 	struct cmd_args
 	{
 		gpu_gl* self;
-	};
-
-	struct float16_args : cmd_args
-	{
 		float value[16];
 	};
 
-	static void swap_buffer( cr_command_queue cmd_queue, void* arg );
-	static void set_viewport( cr_command_queue cmd_queue, void* arg );
-	static void clear_color( cr_command_queue cmd_queue, void* arg );
-	static void clear_depth( cr_command_queue cmd_queue, void* arg );
+	static void swap_buffer( cr_command_queue cmd_queue, cr_command_args args );
+	static void set_viewport( cr_command_queue cmd_queue, cr_command_args args );
+	static void clear_color( cr_command_queue cmd_queue, cr_command_args args );
+	static void clear_depth( cr_command_queue cmd_queue, cr_command_args args );
 };
 
 }	// namespace cr

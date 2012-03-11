@@ -33,7 +33,7 @@ struct ts_queue
 		delete mutex;
 	}
 
-	void push( T* value )
+	T* push( T* value )
 	{
 		item* i = ( item* )cr_mem_alloc( sizeof( item ) );
 		memset( i, 0, sizeof( item ) );
@@ -43,6 +43,8 @@ struct ts_queue
 			tt_lock_guard lock( *mutex );
 			LL_APPEND( head, i );
 		}
+
+		return &i->value;
 	}
 
 	cr_bool pop( T* value )

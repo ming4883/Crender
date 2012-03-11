@@ -16,7 +16,7 @@ gpu_buffer_gl::~gpu_buffer_gl( void )
 {
 }
 
-void gpu_buffer_gl::create( cr_command_queue cmd_queue, void* a )
+void gpu_buffer_gl::create( cr_command_queue cmd_queue, cr_command_args a )
 {
 	static GLenum gl_targets[] =
 	{
@@ -45,13 +45,11 @@ void gpu_buffer_gl::create( cr_command_queue cmd_queue, void* a )
 
 		cr_check_gl_err();
 	}
-
-	cr_mem_free( args );
 }
 
-void gpu_buffer_gl::update( cr_command_queue cmd_queue, void* a )
+void gpu_buffer_gl::update( cr_command_queue cmd_queue, cr_command_args a )
 {
-	update_args* args = ( update_args* )a;
+	cmd_args* args = ( cmd_args* )a;
 
 	gpu_buffer_gl* self =  args->self;
 
@@ -69,8 +67,6 @@ void gpu_buffer_gl::update( cr_command_queue cmd_queue, void* a )
 			cr_check_gl_err();
 		}
 	}
-
-	cr_mem_free( args );
 }
 
 }
@@ -83,18 +79,39 @@ extern "C" {
 
 	CR_API cr_gpu_buffer cr_gpu_buffer_new( cr_context context, cr_gpu gpu, enum cr_gpu_buffer_type type, cr_uint32 size )
 	{
+		typedef gpu_buffer_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+		
 		cr_assert( cr::context::singleton );
 
 		gpu_buffer_t* self = new gpu_buffer_t( cr_context_get( context ), ( cr::gpu_gl* )gpu );
 		self->size = size;
 		self->type = type;
 
+		args_t* args = nullptr;
+		cr_command_queue_produce( self->gpu->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_buffer_t::create );
+
+		args->self = self;
+
 		return ( cr_gpu_buffer )self;
 	}
 
 	CR_API void cr_gpu_buffer_update( cr_gpu_buffer s, cr_uint32 offset, cr_uint32 size, void* data )
 	{
+		typedef gpu_buffer_t::cmd_args args_t;
+		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
+
 		gpu_buffer_t* self = ( gpu_buffer_t* )s;
+
+		args_t* args = nullptr;
+		cr_command_queue_produce( self->gpu->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_buffer_t::update );
+
+		args->self = self;
+		args->offset = offset;
+		args->size = size;
+		args->data = cr_mem_alloc( size );
+
+		memcpy( args->data, data, size );
 	}
 
 #ifdef __cplusplus

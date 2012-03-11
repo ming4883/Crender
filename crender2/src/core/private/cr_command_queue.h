@@ -14,9 +14,11 @@ struct command_queue : object
 
 	struct command
 	{
-		cr_command_id id;
-		cr_command cmd;
-		void* arg;
+		char data[CR_COMMAND_ARGS_SIZE + 8];
+
+		cr_command_id& id() { return *( ( cr_command_id* )&data[0] ); }
+		cr_command& cmd() { return *( ( cr_command* )&data[4] ); }
+		cr_command_args& args() { return *( ( cr_command_args* )&data[8] ); }
 	};
 
 	typedef ts_queue<command> queue_t;
@@ -28,7 +30,7 @@ struct command_queue : object
 	command_queue( context* ctx );
 	~command_queue( void );
 
-	cr_command_id produce( cr_command cmd, void* arg );
+	cr_command_id produce( char** out_args, cr_command cmd );
 	cr_command_id consume( void );
 };
 

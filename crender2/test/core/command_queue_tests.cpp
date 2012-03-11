@@ -5,7 +5,7 @@
 struct test_command_queue
 {
 	static int counter;
-	static void cmd( cr_command_queue cmd_queue, void* arg )
+	static void cmd( cr_command_queue cmd_queue, cr_command_args arg )
 	{
 		++counter;
 	}
@@ -20,8 +20,8 @@ TEST( cr_command_queue_new_del )
 	cr_command_queue q = cr_command_queue_new( nullptr );
 
 	test_command_queue::counter = 0;
-	cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
-	cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
+	cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
+	cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
 	CHECK_EQUAL( 0, test_command_queue::counter );
 
 	cr_release( q );
@@ -36,7 +36,7 @@ TEST( cr_command_queue_produce_consume )
 	cr_command_queue q = cr_command_queue_new( nullptr );
 
 	test_command_queue::counter = 0;
-	cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
+	cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
 
 	CHECK_EQUAL( 0, test_command_queue::counter );
 
@@ -59,9 +59,9 @@ TEST( cr_command_queue_is_consumed )
 	cr_command_queue q = cr_command_queue_new( nullptr );
 
 	test_command_queue::counter = 0;
-	cr_command_id id0 = cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
-	cr_command_id id1 = cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
-	cr_command_id id2 = cr_command_queue_produce( q, test_command_queue::cmd, nullptr );
+	cr_command_id id0 = cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
+	cr_command_id id1 = cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
+	cr_command_id id2 = cr_command_queue_produce( q, nullptr, test_command_queue::cmd );
 
 	CHECK_EQUAL( 0, test_command_queue::counter );
 
@@ -107,7 +107,7 @@ struct test_command_queue_multi_thread_producer_consumer
 
 		for ( int i = 0; i < CMD_COUNT; ++i )
 		{
-			cr_command_id id = cr_command_queue_produce( s.q, test_command_queue::cmd, nullptr );
+			cr_command_id id = cr_command_queue_produce( s.q, nullptr, test_command_queue::cmd );
 #ifdef _DEBUG
 			printf( "produced %d\n", id );
 #endif

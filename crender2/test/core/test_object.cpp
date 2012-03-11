@@ -17,7 +17,7 @@ test_object::~test_object( void )
 
 cr_object test_object_new( cr_context context )
 {
-	CR_ASSERT( cr::context::singleton );
+	cr_assert( cr::context::singleton );
 
 	return ( cr_object )new test_object( cr_context_get( context ) );
 }
