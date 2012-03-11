@@ -1,5 +1,5 @@
-#include "private/cr_context.h"
-#include "uthash/utlist.h"
+#include "cr_context.h"
+#include "../uthash/utlist.h"
 
 namespace cr
 {
@@ -68,14 +68,14 @@ extern "C" {
 
 	CR_API void cr_retain( cr_object obj )
 	{
-		CR_ASSERT( obj );
+		cr_assert( obj );
 		cr::object* self = ( cr::object* )obj;
 		++self->ref_cnt;
 	}
 
 	CR_API void cr_release( cr_object obj )
 	{
-		CR_ASSERT( obj );
+		cr_assert( obj );
 		cr::object* self = ( cr::object* )obj;
 
 		--self->ref_cnt;
@@ -86,7 +86,7 @@ extern "C" {
 
 	CR_API cr_uint32 cr_ref_count_of( cr_object obj )
 	{
-		CR_ASSERT( obj );
+		cr_assert( obj );
 		cr::object* self = ( cr::object* )obj;
 		return self->ref_cnt;
 	}

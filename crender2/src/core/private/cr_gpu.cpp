@@ -1,5 +1,4 @@
-#include "private/cr_gpu.h"
-#include "private/cr_context.h"
+#include "cr_gpu.h"
 
 namespace cr
 {

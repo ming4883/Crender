@@ -1,5 +1,5 @@
-#include "private/cr_command_queue.h"
-#include "private/cr_context.h"
+#include "cr_command_queue.h"
+#include "cr_context.h"
 
 namespace cr
 {
@@ -49,7 +49,7 @@ extern "C" {
 
 	CR_API cr_command_queue cr_command_queue_new( cr_context context )
 	{
-		CR_ASSERT( cr::context::singleton );
+		cr_assert( cr::context::singleton );
 
 		return ( cr_command_queue )new cr::command_queue( cr_context_get( context ) );
 	}

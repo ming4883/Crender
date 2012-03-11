@@ -3,7 +3,6 @@
 
 #include "../cr_gpu.h"
 #include "cr_object.h"
-#include "cr_ts_queue.h"
 
 namespace cr
 {

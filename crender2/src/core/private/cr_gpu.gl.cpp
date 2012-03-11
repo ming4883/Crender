@@ -1,11 +1,11 @@
-#include "private/cr_gpu.win32.h"
-#include "private/cr_context.h"
+#include "cr_gpu.gl.h"
+#include "cr_context.h"
 #include <GL/wglew.h>
 
 namespace cr
 {
 
-win32_gpu::win32_gpu( context* ctx )
+gpu_gl::gpu_gl( context* ctx )
 	: gpu( ctx )
 {
 	for ( int i = 0; i < CMD_QUEUE_COUNT; ++i )
@@ -16,7 +16,7 @@ win32_gpu::win32_gpu( context* ctx )
 	feeding_queue = nullptr;
 }
 
-win32_gpu::~win32_gpu( void )
+gpu_gl::~gpu_gl( void )
 {
 	for ( int i = 0; i < CMD_QUEUE_COUNT; ++i )
 	{
@@ -24,7 +24,7 @@ win32_gpu::~win32_gpu( void )
 	}
 }
 
-void win32_gpu::init( void** window, struct cr_gpu_desc* desc )
+void gpu_gl::init( void** window, struct cr_gpu_desc* desc )
 {
 	HWND* hWnd = ( HWND* )window;
 	WINDOWINFO info;
@@ -160,12 +160,14 @@ void win32_gpu::init( void** window, struct cr_gpu_desc* desc )
 		glBindVertexArray( this->gl_vtx_array_name );
 	}
 
+	cr_check_gl_err();
+
 	this->hdc = ( GLuint )hDC;
 	this->hrc = ( GLuint )hRC;
 	this->hwnd = *hWnd;
 }
 
-void win32_gpu::swap_buffer( cr_command_queue cmd_queue, void* a )
+void gpu_gl::swap_buffer( cr_command_queue cmd_queue, void* a )
 {
 	float16_args* args = ( float16_args* )a;
 
@@ -174,11 +176,11 @@ void win32_gpu::swap_buffer( cr_command_queue cmd_queue, void* a )
 	cr_mem_free( args );
 }
 
-void win32_gpu::set_viewport( cr_command_queue cmd_queue, void* a )
+void gpu_gl::set_viewport( cr_command_queue cmd_queue, void* a )
 {
 	float16_args* args = ( float16_args* )a;
 
-	glEnable(GL_SCISSOR_TEST);
+	glEnable( GL_SCISSOR_TEST );
 	glViewport( ( GLint )args->value[0], ( GLint )args->value[1], ( GLint )args->value[2], ( GLint )args->value[3] );
 	glScissor( ( GLint )args->value[0], ( GLint )args->value[1], ( GLint )args->value[2], ( GLint )args->value[3] );
 	glDepthRange( args->value[4], args->value[5] );
@@ -186,7 +188,7 @@ void win32_gpu::set_viewport( cr_command_queue cmd_queue, void* a )
 	cr_mem_free( args );
 }
 
-void win32_gpu::clear_color( cr_command_queue cmd_queue, void* a )
+void gpu_gl::clear_color( cr_command_queue cmd_queue, void* a )
 {
 	float16_args* args = ( float16_args* )a;
 
@@ -196,7 +198,7 @@ void win32_gpu::clear_color( cr_command_queue cmd_queue, void* a )
 	cr_mem_free( args );
 }
 
-void win32_gpu::clear_depth( cr_command_queue cmd_queue, void* a )
+void gpu_gl::clear_depth( cr_command_queue cmd_queue, void* a )
 {
 	float16_args* args = ( float16_args* )a;
 
@@ -218,11 +220,11 @@ void win32_gpu::clear_depth( cr_command_queue cmd_queue, void* a )
 extern "C" {
 #endif
 
-	typedef cr::win32_gpu gpu_t;
+	typedef cr::gpu_gl gpu_t;
 
 	CR_API cr_gpu cr_gpu_new( cr_context context, void** window, struct cr_gpu_desc* desc )
 	{
-		CR_ASSERT( cr::context::singleton );
+		cr_assert( cr::context::singleton );
 
 		gpu_t* self = new gpu_t( cr_context_get( context ) );
 		self->init( window, desc );

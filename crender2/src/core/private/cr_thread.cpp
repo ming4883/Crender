@@ -1,5 +1,5 @@
-#include "private/cr_thread.h"
-#include "private/cr_context.h"
+#include "cr_thread.h"
+#include "cr_context.h"
 
 namespace cr
 {
@@ -19,7 +19,7 @@ thread::~thread( void )
 
 CR_API cr_thread cr_thread_new( cr_context context, void ( *func )( void * ), void * arg )
 {
-	CR_ASSERT( cr::context::singleton );
+	cr_assert( cr::context::singleton );
 
 	return ( cr_thread )new cr::thread( cr_context_get( context ), func, arg );
 }

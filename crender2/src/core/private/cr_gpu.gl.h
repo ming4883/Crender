@@ -1,15 +1,22 @@
-#ifndef CR_GPU_WIN32_PRIVATE_H
-#define CR_GPU_WIN32_PRIVATE_H
+#ifndef CR_GPU_GL_PRIVATE_H
+#define CR_GPU_GL_PRIVATE_H
 
 #include "cr_gpu.h"
 #include "cr_command_queue.h"
 
 #include <GL/glew.h>
 
+#if defined( CR_DEBUG )
+#	define cr_check_gl_err() \
+	{ GLenum err = glGetError(); if ( GL_NO_ERROR != err ) cr_printf( "GL error 0x%04x before %s %d\n", err, __FILE__, __LINE__ ); }
+#else
+#	define cr_check_gl_err()
+#endif
+
 namespace cr
 {
 
-struct win32_gpu : gpu
+struct gpu_gl : gpu
 {
 	CR_OVERRIDE_NEW_DELETE();
 
@@ -36,15 +43,15 @@ struct win32_gpu : gpu
 	queue queues[CMD_QUEUE_COUNT];
 	queue* feeding_queue;
 
-	win32_gpu( context* ctx );
-	~win32_gpu( void );
+	gpu_gl( context* ctx );
+	~gpu_gl( void );
 
 	void init( void** window, struct cr_gpu_desc* desc );
 
 // command related
 	struct cmd_args
 	{
-		win32_gpu* self;
+		gpu_gl* self;
 	};
 
 	struct float16_args : cmd_args
@@ -60,4 +67,4 @@ struct win32_gpu : gpu
 
 }	// namespace cr
 
-#endif	// CR_GPU_WIN32_PRIVATE_H
+#endif	// CR_GPU_GL_PRIVATE_H

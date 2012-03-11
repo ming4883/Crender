@@ -1,8 +1,8 @@
-#include "cr_platform.h"
+#include "../cr_platform.h"
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "nedmalloc/nedmalloc.h"
+#include "../nedmalloc/nedmalloc.h"
 
 #ifdef _WIN32
 

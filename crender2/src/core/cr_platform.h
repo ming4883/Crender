@@ -19,8 +19,6 @@ extern "C" {
 // debug flag
 #if defined(DEBUG) || defined(_DEBUG)
 #	define CR_DEBUG 1
-#else
-#	define CR_DEBUG 0
 #endif
 
 // cr_bool
@@ -44,7 +42,7 @@ extern "C" {
 	typedef void ( * cr_free_func ) ( void* ptr );
 	typedef void ( * cr_print_func ) ( const char* msg );
 
-#define CR_ASSERT(x) assert(x)
+#define cr_assert(x) assert(x)
 
 	/*! memory allocation / deallocation callback */
 	struct cr_mem_callback
@@ -71,7 +69,11 @@ extern "C" {
 	/*! retrive the platform's time in # of milliseconds */
 	CR_API int cr_platform_time_ms( void );
 
-#define cr_dbg_str(str, ...) { if(CR_DEBUG) cr_printf(str, __VA_ARGS__); }
+#if defined( CR_DEBUG )
+#	define cr_dbg_str(str, ...) { cr_printf(str, __VA_ARGS__); }
+#else
+#	define cr_dbg_str(str, ...)
+#endif
 
 #ifdef __cplusplus
 }
