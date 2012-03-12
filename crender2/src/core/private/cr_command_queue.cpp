@@ -26,7 +26,7 @@ cr_command_id command_queue::produce( char** out_args, cr_command cmd )
 
 	command* pushed = queue->push( &i );
 	if ( nullptr != out_args )
-		*out_args = ( &pushed->args()[0] );
+		*out_args = pushed->args();
 
 	return produce_counter;
 }
