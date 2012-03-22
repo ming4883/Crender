@@ -12,13 +12,11 @@ struct gpu_shader : object
 	CR_OVERRIDE_NEW_DELETE();
 
 	cr_gpu_shader_type type;
-	cr_uint32 size;
-	void* sys_mem;
+	cr_gpu_shader_state state;
+	char* log;
 
 	gpu_shader( context* ctx );
 	virtual ~gpu_shader( void );
-
-	bool is_sys_mem( void );
 };
 
 }	// namespace cr

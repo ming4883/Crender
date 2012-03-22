@@ -33,7 +33,7 @@ extern "C" {
 		\param size data size in bytes.
 		\param data system memory pointer to the data.
 	*/
-	CR_API void cr_gpu_buffer_update( cr_gpu_buffer self, cr_uint32 offset, cr_uint32 size, void* data );
+	CR_API void cr_gpu_buffer_update( cr_gpu_buffer self, cr_uint32 offset, cr_uint32 size, void* data, struct cr_gpu_callback oncomplete );
 
 #ifdef __cplusplus
 }

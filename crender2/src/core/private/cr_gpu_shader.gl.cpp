@@ -8,65 +8,59 @@ gpu_shader_gl::gpu_shader_gl( context* ctx, gpu_gl* g )
 	: gpu_shader( ctx )
 	, gpu( g )
 	, gl_name( 0 )
-	, gl_target( 0 )
 {
+	cr_retain( ( cr_object )gpu );
 }
 
 gpu_shader_gl::~gpu_shader_gl( void )
 {
+	if ( gl_name )
+		glDeleteShader( gl_name );
+
+	cr_release( ( cr_object )gpu );
 }
 
 void gpu_shader_gl::create( cr_command_queue cmd_queue, cr_command_args a )
 {
-	static GLenum gl_targets[] =
-	{
-		GL_ARRAY_BUFFER,
-		GL_ELEMENT_ARRAY_BUFFER,
-		GL_ELEMENT_ARRAY_BUFFER,
-		0, // not supported
-		0, // not supported
+	static GLenum gl_shader_type[] = {
+		GL_VERTEX_SHADER,
+		GL_FRAGMENT_SHADER,
 	};
 
 	cmd_args* args = ( cmd_args* )a;
 
 	gpu_shader_gl* self =  args->self;
+	self->gl_name = glCreateShader( gl_shader_type[ self->type ] );
 
-	if ( self->is_sys_mem() )
+	cr_check_gl_err();
+
+	glShaderSource( self->gl_name, 1, ( const GLchar** )&args->source, nullptr );
+	glCompileShader( self->gl_name );
+
+	GLint status;
+	glGetShaderiv( self->gl_name, GL_COMPILE_STATUS, &status);
+
+	if ( GL_FALSE == status )
 	{
-		self->sys_mem = cr_mem_alloc( self->size );
+		GLint len;
+		glGetShaderiv( self->gl_name, GL_INFO_LOG_LENGTH, &len);
+		if(len > 0)
+		{
+			self->log = (char*)cr_mem_alloc( len );
+			glGetShaderInfoLog( self->gl_name, len, nullptr, self->log );
+		}
+
+		self->state = CR_GPU_SHADER_COMPILE_FAILED;
 	}
 	else
 	{
-		self->gl_target = gl_targets[ self->type & CR_GPU_BUFFER_MASK ];
-
-		glGenBuffers( 1, &self->gl_name );
-		glBindBuffer( self->gl_target, self->gl_name );
-		glBufferData( self->gl_target, self->size, nullptr, GL_STREAM_DRAW );
-
-		cr_check_gl_err();
+		self->state = CR_GPU_SHADER_COMPILE_SUCCEED;
 	}
-}
 
-void gpu_shader_gl::update( cr_command_queue cmd_queue, cr_command_args a )
-{
-	cmd_args* args = ( cmd_args* )a;
+	cr_check_gl_err();
 
-	gpu_shader_gl* self =  args->self;
-
-	if ( ( args->offset + args->size ) <= self->size )
-	{
-		if ( self->is_sys_mem() )
-		{
-			memcpy( ( ( char* ) self->sys_mem ) + args->offset, args->data, args->size );
-		}
-		else
-		{
-			glBindBuffer( self->gl_target, self->gl_name );
-			glBufferSubData( self->gl_target, args->offset, args->size, args->data );
-
-			cr_check_gl_err();
-		}
-	}
+	cr_mem_free( args->source );
+	
 }
 
 }
@@ -77,7 +71,7 @@ extern "C" {
 
 	typedef cr::gpu_shader_gl gpu_shader_t;
 
-	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, cr_uint32 size )
+	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback oncomplete )
 	{
 		typedef gpu_shader_t::cmd_args args_t;
 		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
@@ -85,33 +79,19 @@ extern "C" {
 		cr_assert( cr::context::singleton );
 
 		gpu_shader_t* self = new gpu_shader_t( cr_context_get( context ), ( cr::gpu_gl* )gpu );
-		self->size = size;
 		self->type = type;
 
 		args_t* args = nullptr;
 		cr_command_queue_produce( self->gpu->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_shader_t::create );
 
 		args->self = self;
+		args->callback = oncomplete;
+
+		int len = strlen( source );
+		args->source = ( char* )cr_mem_alloc( len );
+		memcpy( args->source, source, len );
 
 		return ( cr_gpu_shader )self;
-	}
-
-	CR_API void cr_gpu_shader_update( cr_gpu_shader s, cr_uint32 offset, cr_uint32 size, void* data )
-	{
-		typedef gpu_shader_t::cmd_args args_t;
-		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
-
-		gpu_shader_t* self = ( gpu_shader_t* )s;
-
-		args_t* args = nullptr;
-		cr_command_queue_produce( self->gpu->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_shader_t::update );
-
-		args->self = self;
-		args->offset = offset;
-		args->size = size;
-		args->data = cr_mem_alloc( size );
-
-		memcpy( args->data, data, size );
 	}
 
 #ifdef __cplusplus

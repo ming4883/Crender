@@ -24,6 +24,7 @@ struct gpu_buffer_gl : gpu_buffer
 		cr_uint32 offset;
 		cr_uint32 size;
 		void* data;
+		cr_gpu_callback callback;
 	};
 
 	static void create( cr_command_queue cmd_queue, cr_command_args args );

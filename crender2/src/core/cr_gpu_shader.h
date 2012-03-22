@@ -10,30 +10,32 @@ extern "C" {
 
 	typedef enum cr_gpu_shader_type
 	{
-		CR_GPU_BUFFER_VERTEX,	//!< vertex buffer
-		CR_GPU_BUFFER_INDEX,	//!< 16-bit index buffer
-		CR_GPU_BUFFER_INDEX8,	//!< 8-bit index buffer
-		CR_GPU_BUFFER_INDEX32,	//!< 32-bit index buffer
-		CR_GPU_BUFFER_UNIFORM,	//!< shader uniform buffer
-		CR_GPU_BUFFER_MASK		= 0x0000ffff,
-		CR_GPU_BUFFER_SYSMEM	= 0x80000000,	//!< if set data will be held in sysMem 
+		CR_GPU_SHADER_VERTEX,	//!< vertex shader
+		CR_GPU_SHADER_FRAGMENT,	//!< fragment shader
 	};
 
-	/*! cr_gpu_shader repersents a buffer used by gpu device.
+	typedef enum cr_gpu_shader_state
+	{
+		CR_GPU_SHADER_NOT_COMPILED,		//!< not compiled
+		CR_GPU_SHADER_COMPILE_SUCCEED,	//!< compile succeed
+		CR_GPU_SHADER_COMPILE_FAILED,	//!< compile failed
+	};
+
+	/*! cr_gpu_shader repersents a shader used by gpu device.
 	*/
 	typedef cr_object cr_gpu_shader;
 
 	/*! create and initialize a cr_gpu_shader object.
-		\param size size in bytes
 	*/
-	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, cr_uint32 size );
+	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback oncomplete );
 
-	/*! update a cr_gpu_shader object with data stored in the system memory.
-		\param offset destination offset in bytes in the cr_gpu_shader object.
-		\param size data size in bytes.
-		\param data system memory pointer to the data.
+	/*! retrieve the compile state of a cr_gpu_shader object.
 	*/
-	CR_API void cr_gpu_shader_update( cr_gpu_shader self, cr_uint32 offset, cr_uint32 size, void* data );
+	CR_API enum cr_gpu_shader_state cr_gpu_shader_get_state( cr_gpu_shader self );
+
+	/*! retrieve the compile log of a cr_gpu_shader object.
+	*/
+	CR_API const char* cr_gpu_shader_get_log( cr_gpu_shader self );
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,6 @@ struct gpu_shader_gl : gpu_shader
 
 	gpu_gl* gpu;
 	GLuint gl_name;
-	GLenum gl_target;
 
 	gpu_shader_gl( context* ctx, gpu_gl* gpu );
 	~gpu_shader_gl( void );
@@ -21,13 +20,11 @@ struct gpu_shader_gl : gpu_shader
 	struct cmd_args
 	{
 		gpu_shader_gl* self;
-		cr_uint32 offset;
-		cr_uint32 size;
-		void* data;
+		cr_gpu_callback callback;
+		char* source;
 	};
 
 	static void create( cr_command_queue cmd_queue, cr_command_args args );
-	static void update( cr_command_queue cmd_queue, cr_command_args args );
 };
 
 }	// namespace cr

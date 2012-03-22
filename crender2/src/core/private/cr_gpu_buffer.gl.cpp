@@ -10,10 +10,23 @@ gpu_buffer_gl::gpu_buffer_gl( context* ctx, gpu_gl* g )
 	, gl_name( 0 )
 	, gl_target( 0 )
 {
+	cr_retain( ( cr_object )gpu );
 }
 
 gpu_buffer_gl::~gpu_buffer_gl( void )
 {
+	if ( is_sys_mem() )
+	{
+		cr_mem_free( sys_mem );
+	}
+	else
+	{
+		glDeleteBuffers( 1, &gl_name );
+
+		cr_check_gl_err();
+	}
+
+	cr_release( ( cr_object )gpu );
 }
 
 void gpu_buffer_gl::create( cr_command_queue cmd_queue, cr_command_args a )
@@ -66,6 +79,11 @@ void gpu_buffer_gl::update( cr_command_queue cmd_queue, cr_command_args a )
 
 			cr_check_gl_err();
 		}
+
+		if ( args->callback.func )
+		{
+			args->callback.func( ( cr_object )self, 0, args->callback.args );
+		}
 	}
 }
 
@@ -96,7 +114,7 @@ extern "C" {
 		return ( cr_gpu_buffer )self;
 	}
 
-	CR_API void cr_gpu_buffer_update( cr_gpu_buffer s, cr_uint32 offset, cr_uint32 size, void* data )
+	CR_API void cr_gpu_buffer_update( cr_gpu_buffer s, cr_uint32 offset, cr_uint32 size, void* data, struct cr_gpu_callback oncomplete )
 	{
 		typedef gpu_buffer_t::cmd_args args_t;
 		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
@@ -110,6 +128,7 @@ extern "C" {
 		args->offset = offset;
 		args->size = size;
 		args->data = cr_mem_alloc( size );
+		args->callback = oncomplete;
 
 		memcpy( args->data, data, size );
 	}

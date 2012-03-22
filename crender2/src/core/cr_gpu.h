@@ -20,6 +20,17 @@ extern "C" {
 		cr_bool vsync;
 	};
 
+	/*! a command to be executed */
+	typedef void ( *cr_gpu_callback_func ) ( cr_object object, int result, void* args );
+
+	struct cr_gpu_callback
+	{
+		cr_gpu_callback_func func;
+		void* args;
+	};
+
+	CR_API cr_gpu_callback cr_gpu_callback_null();
+
 	/*! create and initialize a cr_gpu object on the.specific window
 	*/
 	CR_API cr_gpu cr_gpu_new( cr_context context, void** window, struct cr_gpu_desc* desc );
