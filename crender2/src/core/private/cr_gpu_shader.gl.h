@@ -1,5 +1,5 @@
-#ifndef CR_GPU_BUFFER_GL_PRIVATE_H
-#define CR_GPU_BUFFER_GL_PRIVATE_H
+#ifndef CR_GPU_SHADER_GL_PRIVATE_H
+#define CR_GPU_SHADER_GL_PRIVATE_H
 
 #include "cr_gpu_shader.h"
 #include "cr_gpu.gl.h"
@@ -29,4 +29,4 @@ struct gpu_shader_gl : gpu_shader
 
 }	// namespace cr
 
-#endif	// CR_GPU_BUFFER_WIN32_PRIVATE_H
+#endif	// CR_GPU_SHADER_GL_PRIVATE_H

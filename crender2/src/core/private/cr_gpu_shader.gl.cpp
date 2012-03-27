@@ -71,7 +71,7 @@ extern "C" {
 
 	typedef cr::gpu_shader_gl gpu_shader_t;
 
-	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback oncomplete )
+	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback on_complete )
 	{
 		typedef gpu_shader_t::cmd_args args_t;
 		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
@@ -85,7 +85,7 @@ extern "C" {
 		cr_command_queue_produce( self->gpu->feeding_queue->cmd_queue, ( cr_command_args* )&args, gpu_shader_t::create );
 
 		args->self = self;
-		args->callback = oncomplete;
+		args->callback = on_complete;
 
 		int len = strlen( source );
 		args->source = ( char* )cr_mem_alloc( len );

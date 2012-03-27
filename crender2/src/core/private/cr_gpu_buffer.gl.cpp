@@ -114,7 +114,7 @@ extern "C" {
 		return ( cr_gpu_buffer )self;
 	}
 
-	CR_API void cr_gpu_buffer_update( cr_gpu_buffer s, cr_uint32 offset, cr_uint32 size, void* data, struct cr_gpu_callback oncomplete )
+	CR_API void cr_gpu_buffer_update( cr_gpu_buffer s, cr_uint32 offset, cr_uint32 size, void* data, struct cr_gpu_callback on_complete )
 	{
 		typedef gpu_buffer_t::cmd_args args_t;
 		cr_assert( CR_COMMAND_ARGS_SIZE >= sizeof( args_t ) );
@@ -128,7 +128,7 @@ extern "C" {
 		args->offset = offset;
 		args->size = size;
 		args->data = cr_mem_alloc( size );
-		args->callback = oncomplete;
+		args->callback = on_complete;
 
 		memcpy( args->data, data, size );
 	}

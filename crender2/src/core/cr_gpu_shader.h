@@ -1,5 +1,5 @@
-#ifndef CR_GPU_BUFFER_H
-#define CR_GPU_BUFFER_H
+#ifndef CR_GPU_SHADER_H
+#define CR_GPU_SHADER_H
 
 #include "cr_context.h"
 #include "cr_gpu.h"
@@ -27,7 +27,7 @@ extern "C" {
 
 	/*! create and initialize a cr_gpu_shader object.
 	*/
-	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback oncomplete );
+	CR_API cr_gpu_shader cr_gpu_shader_new( cr_context context, cr_gpu gpu, enum cr_gpu_shader_type type, const char* source, struct cr_gpu_callback on_complete );
 
 	/*! retrieve the compile state of a cr_gpu_shader object.
 	*/
@@ -42,4 +42,4 @@ extern "C" {
 #endif
 
 
-#endif	// CR_GPU_H
+#endif	// CR_GPU_SHADER_H
